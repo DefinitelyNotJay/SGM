@@ -8,3 +8,8 @@ class Inventory(View):
     def get(self, request):
         print(Customer.objects.all())
         return HttpResponse("123")
+    
+class ManageUserView(View):
+    def get(self, request):
+        
+        return HttpResponse("123")
