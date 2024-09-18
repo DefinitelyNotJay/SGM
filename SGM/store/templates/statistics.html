@@ -56,9 +56,9 @@
                     <tbody>
                         {% for customer in customers %}
                         <tr class="text-black transform hover:scale-[105%] hover:text-cyan-600 transition-transform duration-100 text-sm bg-stone-200">
-                            <td class="border px-4 py-2 shadow-md ">{{ customer.name }}</td>
-                            <td class="border px-4 py-2 shadow-md"> customer.phone </td>
-                            <td class="border px-4 py-2 shadow-md">{{ customer.total_spent }} บาท</td>
+                            <td class="border pl-7 px-4 py-2  shadow-md ">{{ customer.name }}</td>
+                            <td class="border pl-7 px-4 py-2 shadow-md"> customer.phone </td>
+                            <td class="border pl-7 px-4 py-2 shadow-md">{{ customer.total_spent }} บาท</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -71,15 +71,15 @@
                 <table class="min-w-full bg-white">
                     <thead>
                         <tr class=" bg-stone-200">
-                            <th class="py-2 px-4 shadow-md">สินค้า</th>
-                            <th class="py-2 px-4 shadow-md">จำนวณ</th>
+                            <th class="py-2 px-4 ">สินค้า</th>
+                            <th class="py-2 px-4 ">จำนวณ</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for product in products %}
                         <tr class="text-black transform hover:scale-[105%] hover:text-cyan-600 transition-transform duration-100 text-sm bg-stone-200">
-                            <td class="border px-4 py-2 shadow-md">{{ product.name }} </td>
-                            <td class="border px-4 py-2 shadow-md">{{ product.bestseller }} ชิ้น</td>
+                            <td class="border pl-7 px-4 py-2 shadow-md ">{{ product.name }} </td>
+                            <td class="border pl-7 px-4 py-2 shadow-md ">{{ product.bestseller }} ชิ้น</td>
                         </tr>
                         {% endfor %}
                     </tbody>
