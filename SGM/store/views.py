@@ -8,3 +8,8 @@ class Inventory(View):
     def get(self, request):
         print(Customer.objects.all())
         return HttpResponse("123")
+
+class ViewStock(View):
+    def get(self, request, *args, **kwargs):
+        products = Product.objects.all()  # ดึงสินค้าทั้งหมด
+        return render(request, 'index.html', {'products': products})
