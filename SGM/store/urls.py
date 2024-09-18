@@ -8,4 +8,5 @@ def role_based_urlpatterns(request):
 
 urlpatterns = [
     path('', role_based_urlpatterns, name="inventory"),
+    path('sign-up', SignUp.as_view(), name="sign-up")
 ]
