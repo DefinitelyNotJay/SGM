@@ -50,3 +50,8 @@ class StatisticsView(View):
 
 
         return render(request, 'statistics.html', {'customers': customers , 'products':products, 'allcustomer':allcustomer, 'current_month_name_th': current_month_name_th})
+
+class ViewStock(View):
+    def get(self, request, *args, **kwargs):
+        products = Product.objects.all()  # ดึงสินค้าทั้งหมด
+        return render(request, 'index.html', {'products': products})
