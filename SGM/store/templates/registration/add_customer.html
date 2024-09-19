@@ -6,7 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="flex flex-col" class="flex flex-col flex-1 gap-3 mx-auto max-w-sm mt-20">
+    <form method="post" class="flex flex-col flex-1 gap-3 mx-auto max-w-sm mt-20">
+        {% csrf_token %}
         <div class="flex flex-col">
             <label for='{{ form.username.id_for_label }}'>ชื่อผู้ใช้หรือเบอร์โทรศัพท์</label>
             <input class="p-2 border rounded focus:border-blue-300" type="text" name="username" maxlength="20" required id="id_username">
