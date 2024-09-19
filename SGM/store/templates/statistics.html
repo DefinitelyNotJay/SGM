@@ -1,35 +1,25 @@
 <!-- templates/top_spenders.html -->
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layout.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top Spending Customers</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Noto Sans Thai', sans-serif;
-        }
-    </style>
-</head>
+{% block title %} Top Spending Customers {% endblock %}
 
-<body>
-    {% include 'navbarEMP.html' %}
-    <div class="container mx-auto py-10 px-20 text-black">
-        <div class="flex justify-between ">
-            <h1 class="text-2xl font-bold mb-4"> รายงานและสถิติ </h1>
-            <div
-                class=" ml-4 flex justify-center text-center font-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
-                จำนวนสมาชิกทั้งหมด {{allcustomer}} คน
-            </div>
+{% block nav %}
+{% include 'navbarEMP.html' %}
+{% endblock %}
+
+{% block content %}
+<main class=" ml-7 mr-7 ">
+    <div class="container mx-auto py-10 px-20 text-black"></div>
+    <div class="flex justify-between ">
+        <h1 class="text-2xl font-bold mb-4"> รายงานและสถิติ </h1>
+        <div
+            class=" ml-4 flex justify-center text-center font-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            จำนวนสมาชิกทั้งหมด {{allcustomer}} คน
         </div>
-        <div class="flex" > 
-            
-            <div class="m-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+    </div>
+    <div class="flex">
+
+        <div class="m-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="lucide lucide-calendar ">
                 <path d="M8 2v4" />
@@ -37,56 +27,58 @@
                 <rect width="18" height="18" x="3" y="4" rx="2" />
                 <path d="M3 10h18" />
             </svg> </div>
-            <div class="m-1 font-bold py-2 ">
+        <div class="m-1 font-bold py-2 ">
             {{ current_month_name_th }} <!-- แสดงเดือน --></div>
-            
-        </div>
-        <div class="flex justify-between py-10 space-x-4  rounded-md">
-            <!-- Left Table -->
-            <div class="w-1/2 p-4 shadow-2xl rounded-md">
-                <h1 class="text-xl font-bold mb-4">ลูกค้าที่ใช้จ่ายมากที่สุด</h1>
-                <table class="min-w-full bg-white">
-                    <thead>
-                        <tr class="bg-stone-200">
-                            <th class="py-2 px-4">ชื่อลูกค้า</th>
-                            <th class="py-2 px-4">เบอร์โทร</th>
-                            <th class="py-2 px-4">ยอดที่ใช้จ่าย</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for customer in customers %}
-                        <tr class="text-black transform hover:scale-[105%] hover:text-cyan-600 transition-transform duration-100 text-sm bg-stone-200">
-                            <td class="border pl-7 px-4 py-2  shadow-md ">{{ customer.name }}</td>
-                            <td class="border pl-7 px-4 py-2 shadow-md"> customer.phone </td>
-                            <td class="border pl-7 px-4 py-2 shadow-md">{{ customer.total_spent }} บาท</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
 
-            <!-- Right Table -->
-            <div class="w-1/2 p-4 shadow-2xl rounded-md">
-                <h1 class="text-xl font-bold mb-4">สินค้าที่ขายดีที่สุด</h1>
-                <table class="min-w-full bg-white">
-                    <thead>
-                        <tr class=" bg-stone-200">
-                            <th class="py-2 px-4 ">สินค้า</th>
-                            <th class="py-2 px-4 ">จำนวณ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for product in products %}
-                        <tr class="text-black transform hover:scale-[105%] hover:text-cyan-600 transition-transform duration-100 text-sm bg-stone-200">
-                            <td class="border pl-7 px-4 py-2 shadow-md ">{{ product.name }} </td>
-                            <td class="border pl-7 px-4 py-2 shadow-md ">{{ product.bestseller }} ชิ้น</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    </div>
+    <div class="flex justify-between py-10 space-x-4  rounded-md">
+        <!-- Left Table -->
+        <div class="w-1/2 p-4 shadow-2xl rounded-md">
+            <h1 class="text-xl font-bold mb-4">ลูกค้าที่ใช้จ่ายมากที่สุด</h1>
+            <table class="min-w-full bg-white">
+                <thead>
+                    <tr class="bg-stone-200 ">
+                        <th class="py-2 px-4 ">ชื่อลูกค้า</th>
+                        <th class="py-2 px-4">เบอร์โทร</th>
+                        <th class="py-2 px-4">ยอดที่ใช้จ่าย</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr
+                        class="text-black transform hover:scale-[105%] hover:text-cyan-600 transition-transform duration-100 text-sm bg-stone-200">
+                        <td class="border pl-7 px-4 py-2  shadow-md ">{{ customer.name }}</td>
+                        <td class="border pl-7 px-4 py-2 shadow-md"> customer.phone </td>
+                        <td class="border pl-7 px-4 py-2 shadow-md">{{ customer.total_spent }} บาท</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Right Table -->
+        <div class="w-1/2 p-4 shadow-2xl rounded-md">
+            <h1 class="text-xl font-bold mb-4">สินค้าที่ขายดีที่สุด</h1>
+            <table class="min-w-full bg-white">
+                <thead>
+                    <tr class=" bg-stone-200">
+                        <th class="py-2 px-4 ">สินค้า</th>
+                        <th class="py-2 px-4 ">จำนวณ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr
+                        class="text-black transform hover:scale-[105%] hover:text-cyan-600 transition-transform duration-100 text-sm bg-stone-200">
+                        <td class="border pl-7 px-4 py-2 shadow-md ">{{ product.name }} </td>
+                        <td class="border pl-7 px-4 py-2 shadow-md ">{{ product.bestseller }} ชิ้น</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-</body>
+    </div>
+</main>
 
-</html>
+{% endblock %}
