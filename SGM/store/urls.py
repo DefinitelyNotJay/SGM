@@ -12,5 +12,7 @@ urlpatterns = [
     path('customer/', ListCustomer.as_view(), name="customer"),
     path('customer/<int:customer_id>/', ManageCustomer.as_view(), name="new-customer"),
     path('sign-up', SignUp.as_view(), name="sign-up"),
+    path('statistics', StatisticsView.as_view(), name="statistics"),
     path('Viewproduct', ViewStock.as_view(), name="Viewproduct"),
 ]
+
