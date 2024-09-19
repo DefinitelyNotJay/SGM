@@ -11,5 +11,6 @@ urlpatterns = [
     path('customer/new/', ManageCustomer.as_view()),
     path('customer/', ListCustomer.as_view(), name="customer"),
     path('customer/<int:customer_id>/', ManageCustomer.as_view(), name="new-customer"),
-    path('sign-up', SignUp.as_view(), name="sign-up")
+    path('sign-up', SignUp.as_view(), name="sign-up"),
+    path('Viewproduct', ViewStock.as_view(), name="Viewproduct"),
 ]
