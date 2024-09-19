@@ -1,16 +1,22 @@
 from django.db import models
 from datetime import datetime
+from django.contrib.auth.models import User
+from django.contrib.auth.backends import ModelBackend
 
-# Create your models here.
 class Customer(models.Model):
+    username = models.CharField(max_length=20, unique=True)
+    nickname = models.CharField(max_length=20)
+    join_date = models.DateTimeField(auto_now_add=True)
     class GenderChoices(models.Choices):
         MALE = 'M'
         FEMALE = 'F'
         OTHERS = 'O'
-    name = models.CharField(max_length=150)
     gender = models.CharField(max_length=10, choices=GenderChoices.choices)
-    join_date = models.DateTimeField(default=datetime.now())
-    notes = models.CharField(max_length=200)
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.username + " " + self.nickname
+
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
