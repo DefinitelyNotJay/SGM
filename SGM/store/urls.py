@@ -7,6 +7,6 @@ def role_based_urlpatterns(request):
     return HttpResponse("Hey")
 
 urlpatterns = [
-    path('', role_based_urlpatterns, name="inventory"),
+    path('', Inventory.as_view(), name="inventory"),
     path('sign-up', SignUp.as_view(), name="sign-up")
 ]

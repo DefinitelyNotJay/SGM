@@ -3,12 +3,12 @@ from django.views import View
 from django.http import *
 from store.models import *
 from .forms.authentication import *
+from .forms.customer import *
 # Create your views here.
 
 class Inventory(View):
     def get(self, request):
-        print(Customer.objects.all())
-        return HttpResponse("123")
+        return render(request, "main/home.html", {"form": CustomerCreateForm()})
 
 class SignUp(View):
     def get(self, request):
