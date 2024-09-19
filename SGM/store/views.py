@@ -9,7 +9,7 @@ from django.forms.models import model_to_dict
 
 class Inventory(View):
     def get(self, request):
-        return render(request, "registration/add_customer.html", {"form": CustomerCreateForm()})
+        return render(request, "employee/add_customer.html", {"form": CustomerCreateForm()})
 
 class SignUp(View):
     def get(self, request):
@@ -20,22 +20,16 @@ class ManageCustomer(View):
         if(customer_id):
             # edit customer info
             customer_instance = Customer.objects.get(pk=customer_id)
-            # default_values = {
-            #     "username": customer_instance.username,
-            #     "nickname": customer_instance.nickname,
-            #     "gender": customer_instance.gender,
-            #     "notes": customer_instance.notes,
-            # }
             edit_form = CustomerCreateForm(initial=model_to_dict(customer_instance), instance=customer_instance)
             context = {"form": edit_form, "customer": customer_instance}
-            return render(request, "registration/add_customer.html", context)
+            return render(request, "employee/add_customer.html", context)
 
         # get all customers
         customers = Customer.objects.all()
         form = CustomerCreateForm()
         print(form.fields.get("gender"))
         context = {"form": form}
-        return render(request, "registration/add_customer.html", context)
+        return render(request, "employee/add_customer.html", context)
 
     def post(self, request):
         # create customer
