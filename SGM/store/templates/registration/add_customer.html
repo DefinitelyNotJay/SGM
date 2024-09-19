@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="flex flex-col" class="flex flex-col flex-1 gap-3 mx-auto max-w-sm mt-20">
+        <div class="flex flex-col">
+            <label for='{{ form.username.id_for_label }}'>ชื่อผู้ใช้หรือเบอร์โทรศัพท์</label>
+            <input class="p-2 border rounded focus:border-blue-300" type="text" name="username" maxlength="20" required id="id_username">
+            {{form.username.errors}}
+        </div>
+        <div class="flex flex-col">
+            <label for='{{ form.nickname.id_for_label }}'>ชื่อเล่น</label>
+            <input class="p-2 border rounded focus:border-blue-300 " type="text" name="nickname" maxlength="20" required id="id_nickname">
+            {{form.nickname.errors}}
+        </div>
+        <div class="flex flex-col">
+            <label for='{{ form.gender.id_for_label }}'>เพศ</label>
+            <select name="gender" class="p-2 border rounded focus:border-blue-300 w-fit" required="" id="id_gender">
+                <option value="" selected="">-----</option>
+                <option value="M">ชาย</option>
+                <option value="F">หญิง</option>
+                <option value="O">อื่น ๆ</option>
+              </select>
+            {{form.gender.errors}}
+        </div>
+        <div class="flex flex-col">
+            <label for='{{ form.notes.id_for_label }}'>หมายเหตุ</label>
+            <textarea name="notes" class="p-2 border rounded focus:border-blue-300 resize-none" cols="40" rows="5" id="id_notes"></textarea>
+            {{form.notes.errors}}
+        </div>
+        <button type="submit" class="bg-[#546A7B] hover:bg-[#768895] text-[#FDFDFF] px-4 py-2 w-fit rounded">สร้างบัญชี</button>
+    </form>
+    <script src="https://cdn.tailwindcss.com"></script>
+</body>
+</html>
+
+
+
+{% comment %} indigo: {
+    100: "#dde1e5",
+    200: "#bbc3ca",
+    300: "#98a6b0",
+    400: "#768895",
+    500: "#546a7b",
+    600: "#435562",
+    700: "#32404a",
+    800: "#222a31",
+    900: "#111519"
+}, {% endcomment %}

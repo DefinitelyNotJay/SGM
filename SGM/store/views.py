@@ -8,7 +8,7 @@ from .forms.customer import *
 
 class Inventory(View):
     def get(self, request):
-        return render(request, "main/home.html", {"form": CustomerCreateForm()})
+        return render(request, "registration/add_customer.html", {"form": CustomerCreateForm()})
 
 class SignUp(View):
     def get(self, request):
