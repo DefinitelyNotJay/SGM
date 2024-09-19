@@ -15,6 +15,11 @@ class SignUp(View):
     def get(self, request):
         return render(request, "registration/sign_up.html", {"form": RegisterForm()})
 
+class ListCustomer(View):
+    def get(self, request):
+        customers = Customer.objects.all()
+        return render(request, "employee/all_customer.html", {"customers": customers})
+
 class ManageCustomer(View):
     def get(self, request, customer_id=None):
         if(customer_id):
@@ -23,11 +28,9 @@ class ManageCustomer(View):
             edit_form = CustomerCreateForm(initial=model_to_dict(customer_instance), instance=customer_instance)
             context = {"form": edit_form, "customer": customer_instance}
             return render(request, "employee/customer_form.html", context)
+        return render(request, "employee/customer_form.html", {"form": CustomerCreateForm(), "isCreate": True})
 
         # get all customers
-        customers = Customer.objects.all()
-        return render(request, "employee/all_customer.html", {"customers": customers})
-
     def post(self, request, customer_id=None):
         if customer_id:
             customer_instance = Customer.objects.get(pk=customer_id)
@@ -49,5 +52,9 @@ class ManageCustomer(View):
         return redirect("/customer")
 
     def delete(self, request, customer_id):
-        print(customer_id)
-        return JsonResponse({"success": True})
+        # delete customer
+        try:
+            Customer.objects.get(pk=customer_id).delete()
+            return JsonResponse({"success": True})
+        except:
+            return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")

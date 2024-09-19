@@ -8,6 +8,7 @@
     <title></title>
   </head>
   <body>
+    <a href="/customer/new">สมัคร ALL member</a>
     <table class="max-w-4xl bg-red-300 mx-auto mt-24">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
@@ -35,16 +36,15 @@
   </table>
   <script>
     const deleteButtons = document.querySelectorAll(".deletebutton")
-    console.log(deleteButtons)
     deleteButtons.forEach(button=>button.addEventListener("click", async ()=>{
-      console.log(button)
+      if(!confirm("ยืนยันที่จะลบหรือไม่")) return
       await fetch(`/customer/${button.getAttribute("id")}/`, {
         method: 'DELETE',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}'
         }
     }).then(response=>response.json())
-    .then(data=>alert(data.success))
+    .then(data=>window.location.reload())
     }))
   </script>
   </body>
