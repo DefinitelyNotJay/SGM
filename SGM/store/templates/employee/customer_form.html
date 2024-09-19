@@ -22,7 +22,7 @@
         </div>
         <div class="flex flex-col">
             <label for='{{ form.gender.id_for_label }}'>เพศ</label>
-            {{form.gender|add_class:"px-4 py-2 border w-fit"}}
+            {{form.gender|add_class:"px-4 py-2 border w-fit rounded"}}
             {{form.gender.errors}}
         </div>
         <div class="flex flex-col">
@@ -30,7 +30,7 @@
             {{form.notes|add_class:"p-2 border rounded focus:border-blue-300 resize-none"}}
             {{form.notes.errors}}
         </div>
-        <button type="submit" class="bg-[#546A7B] hover:bg-[#768895] text-[#FDFDFF] px-4 py-2 w-fit rounded">สร้างบัญชี</button>
+        <button type="submit" class="bg-[#546A7B] hover:bg-[#768895] text-[#FDFDFF] px-4 py-2 w-fit rounded">ยืนยัน</button>
     </form>
 </body>
 </html>
