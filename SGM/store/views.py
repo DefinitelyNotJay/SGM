@@ -7,7 +7,7 @@ from .forms.customer import *
 from django.forms.models import model_to_dict
 from django.db.models import Sum
 from datetime import datetime
-from django.utils.timezone import now
+from django.utils.timezone import *
 
 # Create your views here.
 
@@ -91,8 +91,8 @@ class StatisticsView(View):
             orderitem__order__date__month=current_month,
             orderitem__order__date__year=current_year,
             bestseller__isnull=False).order_by('-bestseller')
-       
-        allcustomer = Customer.objects.all().count
+    
+        allcustomer = Customer.objects.all().count()
 
         current_date = now()
         current_month_name_en = current_date.strftime("%B")
