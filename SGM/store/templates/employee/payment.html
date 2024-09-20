@@ -1,0 +1,14 @@
+{% extends './employee_layout.html' %}
+{% block title %} Home {% endblock %}
+<script src="https://cdn.tailwindcss.com"></script>
+{% block nav %}
+    {% include "./navbarEMP.html" %}
+{% endblock%}
+{% block content %}
+    <div class="border rounded px-6 py-2 flex justify-between text-center shadow-md">
+        <button class="w-full">เครื่องดื่ม</button>|
+        <button class="w-full">ขนม</button>|
+        <button class="w-full">ไอศกรีม</button>|
+        <button class="w-full">ของใช้ครัวเรือน</button>
+    </div>
+{% endblock %}
