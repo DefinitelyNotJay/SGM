@@ -19,6 +19,10 @@ class SignUp(View):
     def get(self, request):
         return render(request, "registration/sign_up.html", {"form": RegisterForm()})
 
+class EmployeeHome(View):
+    def get(self, request):
+        return render(request, "employee/home.html")
+
 class ListCustomer(View):
     def get(self, request):
         customers = Customer.objects.all()
@@ -62,7 +66,7 @@ class ManageCustomer(View):
             return JsonResponse({"success": True})
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
-    
+
 class StatisticsView(View):
     MONTHS_EN_TO_TH = {
         "January": "มกราคม",
