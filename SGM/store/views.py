@@ -8,6 +8,7 @@ from django.forms.models import model_to_dict
 from django.db.models import Sum
 from datetime import datetime
 from django.utils.timezone import *
+import json
 
 # Create your views here.
 
@@ -24,9 +25,20 @@ class EmployeeHome(View):
         return render(request, "employee/home.html")
 
 class Payment(View):
-    def get(self, request):
-        products = Product.objects.all()
+    def get(self, request, category=None):
+        # มี query
+        if category is None:
+            products = Product.objects.all()
+        else:
+            # ทั้งหมด
+            products = Product.objects.filter(categories__name=category)
         return render(request, "employee/payment.html", {"products": products})
+    def post(self, request):
+        data = json.loads(request.body)
+        if data:
+            return render(request, "employee/payment_bill.html", {"order_product": data})
+        return redirect("/payment")
+
 class ListCustomer(View):
     def get(self, request):
         customers = Customer.objects.all()

@@ -11,17 +11,18 @@ Home Page
   <div>
     <span id="amount">0</span><span> ชิ้น</span>
   </div>
-  <button id="test-click" class="px-8 py-2 bg-[#000] text-[#fff] rounded-md">
+  <button onclick="processPayment()" id="test-click" class="px-8 py-2 bg-[#000] text-[#fff] rounded-md">
     ยืนยัน
   </button>
 </div>
 <div
   class="border rounded px-6 py-2 flex justify-between text-center shadow-md mt-12"
 >
-  <button class="w-full"><a href="beverage">เครื่องดื่ม</a></button> |
-  <button class="w-full"><a href="snack">ขนม</a></button> |
-  <button class="w-full"><a href="ice-cream">ไอศกรีม</a></button> |
-  <button class="w-full"><a href="household-item">ของใช้ครัวเรือน</a></button>
+  <a class="w-full" href="/payment">ทั้งหมด</a>|
+  <a class="w-full" href="/payment/beverage">เครื่องดื่ม</a>|
+  <a class="w-full" href="/payment/snack">ขนม</a>|
+  <a class="w-full" href="/payment/ice-cream">ไอศกรีม</a>|
+  <a class="w-full" href="/payment/household-item">ของใช้ครัวเรือน</a>
 </div>
 
 <section class="grid grid-cols-3 mt-8 gap-x-6 gap-y-6">
@@ -68,6 +69,18 @@ Home Page
     }
     }  
   };
+
+  async function processPayment(){
+    await fetch(`/payment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body:JSON.stringify({"order_product": selectedProducts})
+    }, 
+    )
+  }
 
 
   //const products = document.querySelectorAll(".product")
