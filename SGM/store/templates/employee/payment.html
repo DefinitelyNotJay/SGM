@@ -42,8 +42,30 @@ Home Page
   let selectedProducts = []
   const amount_element = document.querySelector("#amount");
 
-  function getSelectedProductElement(product_id){
-    const productElement = document.querySelector(`#${product_id}`)
+  const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
+  if (ordered_product){
+    const {storage_products, storage_amount} = ordered_product
+    amount_element.textContent = storage_amount
+    amount = storage_amount
+    selectedProducts = storage_products
+    storage_products.map(productId=>{
+      product = document.querySelector(`#product-${productId}`)
+      if(product){
+        document.querySelector(`#product-${productId}`).classList.add("bg-gray-200")
+      }
+    })
+  }
+
+  async function switchPage(url){
+    await fetch(`/payment/${url}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body:JSON.stringify({"order_product": selectedProducts})
+    }, 
+    )
   }
 
   function selectProduct(product_id){
@@ -52,7 +74,6 @@ Home Page
 
     if (!selectedProducts.includes(product_id)){
       selectedProducts = [...selectedProducts, product_id]
-      // console.log(selectedProducts)
       amount_element.textContent = ++amount;
       currentSeletedProduct.classList.add("bg-gray-200")
     }
@@ -67,7 +88,10 @@ Home Page
       amount--
       amount_element.textContent = amount
     }
-    }  
+    }
+    console.log(selectedProducts)
+    
+    localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
   };
 
   async function processPayment(){
@@ -80,11 +104,9 @@ Home Page
       body:JSON.stringify({"order_product": selectedProducts})
     }, 
     )
+    localStorage.removeItem("ordered_product")
   }
 
-
-  //const products = document.querySelectorAll(".product")
-  //.forEach(product=>product.addEventListener("click", selectProduct))
 
 </script>
 {% endblock script %}
