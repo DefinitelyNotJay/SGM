@@ -11,9 +11,14 @@ Home Page
   <div>
     <span id="amount">0</span><span> ชิ้น</span>
   </div>
-  <button onclick="processPayment()" id="test-click" class="px-8 py-2 bg-[#000] text-[#fff] rounded-md">
+ <div>
+  <button onclick="clearSelectedProduct()" id="test-click" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
+    รีเซ็ต
+  </button>
+  <button onclick="processPayment()" id="test-click" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
     ยืนยัน
   </button>
+ </div>
 </div>
 <div
   class="border rounded px-6 py-2 flex justify-between text-center shadow-md mt-12"
@@ -43,6 +48,7 @@ Home Page
   const amount_element = document.querySelector("#amount");
 
   const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
+  // check if employee selected product before refresh page
   if (ordered_product){
     const {storage_products, storage_amount} = ordered_product
     amount_element.textContent = storage_amount
@@ -54,18 +60,6 @@ Home Page
         document.querySelector(`#product-${productId}`).classList.add("bg-gray-200")
       }
     })
-  }
-
-  async function switchPage(url){
-    await fetch(`/payment/${url}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token }}",
-      },
-      body:JSON.stringify({"order_product": selectedProducts})
-    }, 
-    )
   }
 
   function selectProduct(product_id){
@@ -94,6 +88,11 @@ Home Page
     localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
   };
 
+  function clearSelectedProduct(){
+    localStorage.removeItem("ordered_product")
+    window.location.reload()
+  }
+
   async function processPayment(){
     await fetch(`/payment`, {
       method: "POST",
@@ -110,3 +109,4 @@ Home Page
 
 </script>
 {% endblock script %}
+
