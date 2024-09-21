@@ -25,7 +25,8 @@ class EmployeeHome(View):
 
 class Payment(View):
     def get(self, request):
-        return render(request, "employee/payment.html")
+        products = Product.objects.all()
+        return render(request, "employee/payment.html", {"products": products})
 class ListCustomer(View):
     def get(self, request):
         customers = Customer.objects.all()

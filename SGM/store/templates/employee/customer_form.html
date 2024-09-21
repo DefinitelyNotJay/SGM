@@ -13,18 +13,18 @@
 {% endblock nav %}
 {% block content %}
 <form method="post" class="flex flex-col flex-1 gap-3 mx-auto max-w-sm mt-20">
-    <h1 class="text-3xl text-center font-semibold mb-4">
+    <h1 class="text-3xl  text-center font-semibold mb-4">
     {% if isCreate %}
         สมัครสมาชิกใหม่
     {% else%}
         แก้ไขข้อมูลสมาชิก
     {% endif %}
-        </h1>
     {% csrf_token %}
     <div class="flex flex-col">
         <label for='{{ form.username.id_for_label }}'>ชื่อผู้ใช้หรือเบอร์โทรศัพท์</label>
         {{form.username|add_class:"p-2 border rounded focus:border-blue-300"}}
         {{form.username.errors}}
+        
     </div>
     <div class="flex flex-col">
         <label for='{{ form.nickname.id_for_label }}'>ชื่อเล่น</label>

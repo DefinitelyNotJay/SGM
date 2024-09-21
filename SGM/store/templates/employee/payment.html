@@ -1,14 +1,77 @@
-{% extends './employee_layout.html' %}
-{% block title %} Home {% endblock %}
-<script src="https://cdn.tailwindcss.com"></script>
-{% block nav %}
-    {% include "./navbarEMP.html" %}
-{% endblock%}
+{% extends "./employee_layout.html" %} 
+{% block title %} 
+Home Page 
+{% endblock %} 
+{% block nav %} 
+  {% include "./navbarEMP.html" %} 
+{% endblock nav%}
 {% block content %}
-    <div class="border rounded px-6 py-2 flex justify-between text-center shadow-md">
-        <button class="w-full">เครื่องดื่ม</button>|
-        <button class="w-full">ขนม</button>|
-        <button class="w-full">ไอศกรีม</button>|
-        <button class="w-full">ของใช้ครัวเรือน</button>
-    </div>
-{% endblock %}
+<div class="w-full flex justify-between items-center px-4 mt-8">
+  <p class="text-2xl font-bold">คิดเงิน</p>
+  <div>
+    <span id="amount">0</span><span> ชิ้น</span>
+  </div>
+  <button id="test-click" class="px-8 py-2 bg-[#000] text-[#fff] rounded-md">
+    ยืนยัน
+  </button>
+</div>
+<div
+  class="border rounded px-6 py-2 flex justify-between text-center shadow-md mt-12"
+>
+  <button class="w-full"><a href="beverage">เครื่องดื่ม</a></button> |
+  <button class="w-full"><a href="snack">ขนม</a></button> |
+  <button class="w-full"><a href="ice-cream">ไอศกรีม</a></button> |
+  <button class="w-full"><a href="household-item">ของใช้ครัวเรือน</a></button>
+</div>
+
+<section class="grid grid-cols-3 mt-8 gap-x-6 gap-y-6">
+  {% for product in products %}
+  <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
+    <p class="text-lg">{{ product.name }}</p>
+    {% comment %} <img src="" alt=""> {% endcomment %}
+    <div class="bg-gray-300 h-44"></div>
+    <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
+  </div>
+  {% endfor %}
+</section>
+{% endblock content %} 
+{% block script %}
+<script>
+  let amount = 0;
+  let selectedProducts = []
+  const amount_element = document.querySelector("#amount");
+
+  function getSelectedProductElement(product_id){
+    const productElement = document.querySelector(`#${product_id}`)
+  }
+
+  function selectProduct(product_id){
+
+    const currentSeletedProduct = document.querySelector(`#product-${product_id}`)
+
+    if (!selectedProducts.includes(product_id)){
+      selectedProducts = [...selectedProducts, product_id]
+      // console.log(selectedProducts)
+      amount_element.textContent = ++amount;
+      currentSeletedProduct.classList.add("bg-gray-200")
+    }
+    else {
+      selectedProducts = selectedProducts.filter(productId=>productId!=product_id)
+    console.log(selectedProducts)
+    currentSeletedProduct.classList.remove("bg-gray-200")
+    if (amount <= 0){
+      amount = 0
+      amount_element.textContent = 0
+    } else {
+      amount--
+      amount_element.textContent = amount
+    }
+    }  
+  };
+
+
+  //const products = document.querySelectorAll(".product")
+  //.forEach(product=>product.addEventListener("click", selectProduct))
+
+</script>
+{% endblock script %}
