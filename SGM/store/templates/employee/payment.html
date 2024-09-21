@@ -6,16 +6,25 @@ Home Page
   {% include "./navbarEMP.html" %} 
 {% endblock nav%}
 {% block content %}
+<style>
+  @layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+</style>
 <div class="w-full flex justify-between items-center px-4 mt-8">
   <p class="text-2xl font-bold">คิดเงิน</p>
   <div>
     <span id="amount">0</span><span> ชิ้น</span>
   </div>
  <div>
-  <button onclick="clearSelectedProduct()" id="test-click" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
+  <button onclick="clearSelectedProduct()" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
     รีเซ็ต
   </button>
-  <button onclick="processPayment()" id="test-click" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
+  <button onclick="processPayment()" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
     ยืนยัน
   </button>
  </div>
@@ -36,7 +45,14 @@ Home Page
     <p class="text-lg">{{ product.name }}</p>
     {% comment %} <img src="" alt=""> {% endcomment %}
     <div class="bg-gray-300 h-44"></div>
-    <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
+    <div class="flex items-center justify-center gap-6">
+      <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
+      <div id='input-{{ product.id }}' class="hidden">
+        <span>จำนวน </span>
+        <input onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-12 resize-none border rounded-md py-1  text-center'>
+        <span>ชิ้น</span>
+      </div>
+    </div>
   </div>
   {% endfor %}
 </section>
@@ -70,11 +86,13 @@ Home Page
       selectedProducts = [...selectedProducts, product_id]
       amount_element.textContent = ++amount;
       currentSeletedProduct.classList.add("bg-gray-200")
+      inputAmountFieldHandler(product_id, true)
     }
     else {
       selectedProducts = selectedProducts.filter(productId=>productId!=product_id)
     console.log(selectedProducts)
     currentSeletedProduct.classList.remove("bg-gray-200")
+    inputAmountFieldHandler(product_id, false)
     if (amount <= 0){
       amount = 0
       amount_element.textContent = 0
@@ -88,20 +106,25 @@ Home Page
     localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
   };
 
+  function inputAmountFieldHandler(product_id, isActive){
+    product_input = document.querySelector(`#input-${product_id}`)
+    isActive ? product_input.classList.remove('hidden') : product_input.classList.add('hidden')
+  }
+
   function clearSelectedProduct(){
     localStorage.removeItem("ordered_product")
     window.location.reload()
   }
 
-  async function processPayment(){
-    await fetch(`/payment`, {
+  function processPayment(){
+    fetch(`/payment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": "{{ csrf_token }}",
       },
       body:JSON.stringify({"order_product": selectedProducts})
-    }, 
+    },
     )
     localStorage.removeItem("ordered_product")
   }

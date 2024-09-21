@@ -35,7 +35,11 @@ class Payment(View):
         return render(request, "employee/payment.html", {"products": products})
     def post(self, request):
         data = json.loads(request.body)
+        print(data)
         if data:
+            # for product_id in data.order_product:
+            #     product = Product.objects.get(pk=product_id)
+            #     Order.objects.create()
             return render(request, "employee/payment_bill.html", {"order_product": data})
         return redirect("/payment")
 
