@@ -47,9 +47,9 @@ Home Page
     <div class="bg-gray-300 h-44"></div>
     <div class="flex items-center justify-center gap-6">
       <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
-      <div id='input-{{ product.id }}' class="hidden">
+      <div id='inputGroup-{{ product.id }}' class="hidden">
         <span>จำนวน </span>
-        <input onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-12 resize-none border rounded-md py-1  text-center'>
+        <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})" onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-12 resize-none border rounded-md py-1  text-center'>
         <span>ชิ้น</span>
       </div>
     </div>
@@ -64,35 +64,44 @@ Home Page
   const amount_element = document.querySelector("#amount");
 
   const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
+  console.log(ordered_product)
   // check if employee selected product before refresh page
   if (ordered_product){
     const {storage_products, storage_amount} = ordered_product
     amount_element.textContent = storage_amount
     amount = storage_amount
     selectedProducts = storage_products
-    storage_products.map(productId=>{
-      product = document.querySelector(`#product-${productId}`)
-      if(product){
-        document.querySelector(`#product-${productId}`).classList.add("bg-gray-200")
+
+
+    storage_products.map(product=>{
+      find_product = document.querySelector(`#product-${product.id}`)
+      if(find_product){
+        document.getElementById(`product-${product.id}`).classList.add("bg-gray-200")
+        inputAmountFieldHandler(product.id, true)
+        document.getElementById(`input-${product.id}`).value = product.amount
       }
     })
   }
+
 
   function selectProduct(product_id){
 
     const currentSeletedProduct = document.querySelector(`#product-${product_id}`)
 
-    if (!selectedProducts.includes(product_id)){
-      selectedProducts = [...selectedProducts, product_id]
+    if (!selectedProducts.some(product=>product.id==product_id)){
+      inputAmountFieldHandler(product_id, false)
+      product_amount = parseInt(document.getElementById(`input-${product_id}`).value)
+      selectedProducts = [...selectedProducts, {id: product_id, amount: product_amount}]
       amount_element.textContent = ++amount;
       currentSeletedProduct.classList.add("bg-gray-200")
       inputAmountFieldHandler(product_id, true)
     }
     else {
-      selectedProducts = selectedProducts.filter(productId=>productId!=product_id)
-    console.log(selectedProducts)
+      selectedProducts = selectedProducts.filter(product=>product.id!=product_id)
+
     currentSeletedProduct.classList.remove("bg-gray-200")
-    inputAmountFieldHandler(product_id, false)
+    
+  
     if (amount <= 0){
       amount = 0
       amount_element.textContent = 0
@@ -101,19 +110,27 @@ Home Page
       amount_element.textContent = amount
     }
     }
-    console.log(selectedProducts)
     
     localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
   };
 
   function inputAmountFieldHandler(product_id, isActive){
-    product_input = document.querySelector(`#input-${product_id}`)
+    product_input = document.querySelector(`#inputGroup-${product_id}`)
     isActive ? product_input.classList.remove('hidden') : product_input.classList.add('hidden')
   }
 
   function clearSelectedProduct(){
     localStorage.removeItem("ordered_product")
     window.location.reload()
+  }
+
+  function updateAmountChange(product_id){
+    // update each product amount to localStorage
+    const index = selectedProducts.findIndex(product=>product.id==product_id)
+    const product_amount = document.querySelector(`#input-${product_id}`).value
+    selectedProducts[index].amount = parseInt(product_amount)
+    console.log(selectedProducts)
+    localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
   }
 
   function processPayment(){
