@@ -34,14 +34,31 @@ class Payment(View):
             products = Product.objects.filter(categories__name=category)
         return render(request, "employee/payment.html", {"products": products})
     def post(self, request):
-        data = json.loads(request.body)
-        print(data)
-        if data:
-            # for product_id in data.order_product:
-            #     product = Product.objects.get(pk=product_id)
-            #     Order.objects.create()
-            return render(request, "employee/payment_bill.html", {"order_product": data})
-        return redirect("/payment")
+        order_data = json.loads(request.body)
+        if order_data:
+            print(order_data)
+            total_price = 0
+            new_order = Order.objects.create(quantity=order_data.get("storage_amount"))
+            for order in order_data.get("storage_products"):
+                product_id = order.get("id")
+                amount = order.get("amount")
+                product = Product.objects.get(pk=product_id)
+                # add cost to total_price
+                total_price += product.price * amount
+                # create orderItem
+                new_orderItem = OrderItem.objects.create(order=new_order, product=product, amount=amount)
+            new_order.total_price = total_price
+            new_order.save()
+                
+                
+                
+
+            return JsonResponse({"status": "success"})
+        return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
+
+class PaymentBill(View):
+    def get(self, request):
+        return render(request, "employee/payment_bill.html")
 
 class ListCustomer(View):
     def get(self, request):

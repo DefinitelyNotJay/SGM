@@ -100,7 +100,7 @@ Home Page
       selectedProducts = selectedProducts.filter(product=>product.id!=product_id)
 
     currentSeletedProduct.classList.remove("bg-gray-200")
-    
+    inputAmountFieldHandler(product_id, false)
   
     if (amount <= 0){
       amount = 0
@@ -129,21 +129,20 @@ Home Page
     const index = selectedProducts.findIndex(product=>product.id==product_id)
     const product_amount = document.querySelector(`#input-${product_id}`).value
     selectedProducts[index].amount = parseInt(product_amount)
-    console.log(selectedProducts)
     localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
   }
 
   function processPayment(){
+    if(selectedProducts.length === 0) return alert("ไม่มีสินค้าที่เลือก")
     fetch(`/payment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": "{{ csrf_token }}",
       },
-      body:JSON.stringify({"order_product": selectedProducts})
+      body:JSON.stringify(ordered_product)
     },
-    )
-    localStorage.removeItem("ordered_product")
+    ).then(()=>{window.location.href = "/payment/bill";})
   }
 
 

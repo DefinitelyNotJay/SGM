@@ -10,6 +10,7 @@ urlpatterns = [
     path('', Inventory.as_view(), name="inventory"),
     path('emp-home', EmployeeHome.as_view()),
     path('payment', Payment.as_view()),
+    path('payment/bill', PaymentBill.as_view()),
     path('payment/<str:category>', Payment.as_view()),
     path('customer/new/', ManageCustomer.as_view()),
     path('customer/', ListCustomer.as_view(), name="customer"),
