@@ -64,7 +64,6 @@ Home Page
   const amount_element = document.querySelector("#amount");
 
   const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
-  console.log(ordered_product)
   // check if employee selected product before refresh page
   if (ordered_product){
     const {storage_products, storage_amount} = ordered_product
@@ -73,50 +72,62 @@ Home Page
     selectedProducts = storage_products
 
 
-    storage_products.map(product=>{
+    storage_products.map((product)=>{
       find_product = document.querySelector(`#product-${product.id}`)
       if(find_product){
-        document.getElementById(`product-${product.id}`).classList.add("bg-gray-200")
         inputAmountFieldHandler(product.id, true)
         document.getElementById(`input-${product.id}`).value = product.amount
       }
     })
   }
 
+  function getProductAmount(product_id){
+    return parseInt(document.getElementById(`input-${product_id}`).value)
+  }
+
+  function setProductAmount(product_id, value){
+    document.getElementById(`input-${product_id}`).value = value
+  }
+
 
   function selectProduct(product_id){
 
-    const currentSeletedProduct = document.querySelector(`#product-${product_id}`)
-
-    if (!selectedProducts.some(product=>product.id==product_id)){
-      inputAmountFieldHandler(product_id, false)
-      product_amount = parseInt(document.getElementById(`input-${product_id}`).value)
-      selectedProducts = [...selectedProducts, {id: product_id, amount: product_amount}]
-      amount_element.textContent = ++amount;
-      currentSeletedProduct.classList.add("bg-gray-200")
+    // เช็คว่ามี product ใน array หรือยัง
+    const isProductInCart = selectedProducts.some(product=>product.id==product_id)
+  
+    if (!isProductInCart){
+      // แสดง input
       inputAmountFieldHandler(product_id, true)
+      // เอาจำนวน product มา
+      const product_amount = getProductAmount(product_id)
+      // เพิ่มเข้า selectedProducts
+      selectedProducts = [...selectedProducts, {id: product_id, amount: product_amount}]
     }
     else {
-      selectedProducts = selectedProducts.filter(product=>product.id!=product_id)
+      console.log(product_id)
+      inputAmountFieldHandler(product_id, false)
+      deleteElement(product_id)
+    }
+    updateAllAmount()
 
-    currentSeletedProduct.classList.remove("bg-gray-200")
-    inputAmountFieldHandler(product_id, false)
-  
-    if (amount <= 0){
-      amount = 0
-      amount_element.textContent = 0
-    } else {
-      amount--
-      amount_element.textContent = amount
-    }
-    }
-    
     localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
   };
 
+  function updateAllAmount(){
+    amount = selectedProducts.reduce((acc, item)=> acc+item.amount, 0)
+    amount_element.textContent = amount
+  }
+
   function inputAmountFieldHandler(product_id, isActive){
-    product_input = document.querySelector(`#inputGroup-${product_id}`)
-    isActive ? product_input.classList.remove('hidden') : product_input.classList.add('hidden')
+    const product_input = document.querySelector(`#inputGroup-${product_id}`)
+    if(isActive){
+      product_input.classList.remove('hidden')
+      document.getElementById(`product-${product_id}`).classList.add("bg-gray-200")
+      setProductAmount(product_id, 1)
+    }else {
+      document.getElementById(`product-${product_id}`).classList.remove("bg-gray-200")
+      product_input.classList.add('hidden')
+    }
   }
 
   function clearSelectedProduct(){
@@ -124,15 +135,32 @@ Home Page
     window.location.reload()
   }
 
+  function deleteElement(product_id){
+    console.log("before delete", selectedProducts)
+    const index = selectedProducts.findIndex(product => product.id === product_id);
+    console.log("index", index)
+    selectedProducts.splice(index, 1)
+  }
+
   function updateAmountChange(product_id){
-    // update each product amount to localStorage
-    const index = selectedProducts.findIndex(product=>product.id==product_id)
-    const product_amount = document.querySelector(`#input-${product_id}`).value
-    selectedProducts[index].amount = parseInt(product_amount)
+    const product_amount = getProductAmount(product_id)
+    
+    if(product_amount <= 0){
+      // employee enters 0 means that item is no longer in the cart
+      inputAmountFieldHandler(product_id, false)
+      deleteElement(product_id)
+    } else {
+      // update amount number
+      const product = selectedProducts.find(product=>product.id==product_id)
+      product.amount = product_amount
+    }
+    console.log("updated", selectedProducts)
+    updateAllAmount()
     localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
   }
 
   function processPayment(){
+    const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
     if(selectedProducts.length === 0) return alert("ไม่มีสินค้าที่เลือก")
     fetch(`/payment`, {
       method: "POST",
@@ -142,7 +170,11 @@ Home Page
       },
       body:JSON.stringify(ordered_product)
     },
-    ).then(()=>{window.location.href = "/payment/bill";})
+    ).then(()=>{
+      window.location.href = "/payment/bill";
+      //console.log(selectedProducts, amount)
+      }
+    )
   }
 
 

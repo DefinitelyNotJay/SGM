@@ -4,8 +4,9 @@ from django.http import *
 from store.models import *
 from .forms.authentication import *
 from .forms.customer import *
+from .forms.order import *
 from django.forms.models import model_to_dict
-from django.db.models import Sum
+from django.db.models import Sum, Count, F, Value
 from datetime import datetime
 from django.utils.timezone import *
 import json
@@ -35,8 +36,8 @@ class Payment(View):
         return render(request, "employee/payment.html", {"products": products})
     def post(self, request):
         order_data = json.loads(request.body)
+        print(order_data)
         if order_data:
-            print(order_data)
             total_price = 0
             new_order = Order.objects.create(quantity=order_data.get("storage_amount"))
             for order in order_data.get("storage_products"):
@@ -49,16 +50,16 @@ class Payment(View):
                 new_orderItem = OrderItem.objects.create(order=new_order, product=product, amount=amount)
             new_order.total_price = total_price
             new_order.save()
-                
-                
-                
-
             return JsonResponse({"status": "success"})
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
 class PaymentBill(View):
     def get(self, request):
-        return render(request, "employee/payment_bill.html")
+        order = Order.objects.order_by("-id").first()
+        print(order)
+        orderItems = OrderItem.objects.filter(order=order).annotate(price=(F("amount") * F("product__price")))
+
+        return render(request, "employee/payment_bill.html", {"form": OrderForm(), "order": order, "orderItems": orderItems})
 
 class ListCustomer(View):
     def get(self, request):
