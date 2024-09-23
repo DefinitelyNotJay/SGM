@@ -24,7 +24,7 @@ Home Page
   <button onclick="clearSelectedProduct()" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
     รีเซ็ต
   </button>
-  <button onclick="processPayment()" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
+  <button onclick="processPayment('{{isPaid}}')" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
     ยืนยัน
   </button>
  </div>
@@ -170,9 +170,11 @@ Home Page
       },
       body:JSON.stringify(ordered_product)
     },
-    ).then(()=>{
-      window.location.href = "/payment/bill";
-      //console.log(selectedProducts, amount)
+    ).then((res)=>{
+      res.json().then(data=>{
+        localStorage.setItem("order_id", data.order_id)
+        window.location.href = "/payment/bill";
+      })
       }
     )
   }
@@ -180,4 +182,3 @@ Home Page
 
 </script>
 {% endblock script %}
-

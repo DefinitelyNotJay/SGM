@@ -50,7 +50,7 @@ class Payment(View):
                 new_orderItem = OrderItem.objects.create(order=new_order, product=product, amount=amount)
             new_order.total_price = total_price
             new_order.save()
-            return JsonResponse({"status": "success"})
+            return JsonResponse({"status": "success", "order_id": new_order.id})
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
 class PaymentBill(View):
@@ -58,8 +58,31 @@ class PaymentBill(View):
         order = Order.objects.order_by("-id").first()
         print(order)
         orderItems = OrderItem.objects.filter(order=order).annotate(price=(F("amount") * F("product__price")))
-
         return render(request, "employee/payment_bill.html", {"form": OrderForm(), "order": order, "orderItems": orderItems})
+    def post(self, request):
+        order_data = json.loads(request.body)
+        order_id = order_data.get("order_id")
+        # ทำให้จำนวน product แต่ละตัวลด
+        products_in_cart = order_data.get("storage_products")
+        try:
+            for data in products_in_cart:
+                product = Product.objects.get(pk=data.get('id'))
+                amount_in_stock = product.quantity_in_stock
+                product.quantity_in_stock = amount_in_stock - data.get("amount")
+                product.save()
+        except Exception:
+            return HttpResponseServerError("Products in cart went wrong !", Exception)
+            
+        # อัพเดท order นั้นให้มีสถานะเป็น 'PAID'
+        try:
+            order = Order.objects.get(pk=order_id)
+            order.status = 'PAID'
+            order.save()
+        except Exception:
+            return HttpResponseServerError("Order object error!", Exception)
+        return JsonResponse({"success": True})
+
+        
 
 class ListCustomer(View):
     def get(self, request):
@@ -144,6 +167,8 @@ class StatisticsView(View):
         return render(request, 'statistics.html', {'customers': customers , 'products':products, 'allcustomer':allcustomer, 'current_month_name_th': current_month_name_th})
 
 class ViewStock(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
+
+
         return render(request, 'index.html', {'products': products})

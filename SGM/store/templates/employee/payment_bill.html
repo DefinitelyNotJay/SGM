@@ -5,27 +5,59 @@
     {% include "./navbarEMP.html" %} 
 {% endblock nav %} 
 {% block content %}
-    this is payment_bill page
-    {{form}}
-    <table>
-        <thead>
+
+<div class= "w-[850px] rounded-lg shadow-lg max-h-[900px] overflow-y-auto mx-auto">
+    <table class="min-w-full">
+        <thead class="text-gray-700 bg-gray-200">
             <tr>
-                <th>name</th>
-                <th>amount</th>
-                <th>price</th>
+                <th scope="col" class="px-6 py-3">ชื่อสินค้า</th>
+                <th scope="col" class="px-6 py-3">จำนวน</th>
+                <th scope="col" class="px-6 py-3">ราคา</th>
+                <th scope="col" class="px-6 py-3">รวม</th>
             </tr>
         </thead>
         <tbody>
             {% for o_item in  orderItems%}
             <tr>
-                <td>{{ o_item.product.name }}</td>
-                <td>{{ o_item.amount }}</td>
-                <td>{{ o_item.price }}</td>
+                <td class="px-6 py-4">{{ forloop.counter }}. {{ o_item.product.name }}</td>
+                <td class="px-6 py-4 text-center">{{ o_item.amount }}</td>
+                <td class="px-6 py-4 text-center">{{ o_item.product.price }} บาท</td>
+                <td class="px-6 py-4 text-center">{{ o_item.price }} บาท</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <button onclick='paymentHandler()'>ชำระเงิน</button>
+    </div>
 {% endblock content %} 
 {% block script %}
+<script>
+    // ดึงข้อมูล order มา
+    const ordered_product = JSON.parse(localStorage.getItem("ordered_product"))
+    const order_id = JSON.parse(localStorage.getItem("order_id"))
+
+    if(!ordered_product){
+        alert("ไม่พบข้อมูลสินค้า")
+        localStorage.removeItem("ordered_product")
+        window.location.href("/payment")
+    }
+
+    function paymentHandler(){
+        fetch(`/payment/bill`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body:JSON.stringify({...ordered_product, order_id})
+          },
+          ).then(()=>{
+            
+            }
+          )
+    }
+
+
+</script>
 {% endblock script %}
     
