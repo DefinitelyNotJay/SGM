@@ -20,14 +20,16 @@ Home Page
   <div>
     <span id="amount">0</span><span> ชิ้น</span>
   </div>
- <div>
-  <button onclick="clearSelectedProduct()" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
+ <form method="POST" action='/payment'>
+  {% csrf_token %}
+  <input type="text" class='hidden' name='ordered_products' id='ordered_products'>
+  <button type="button" onclick="clearSelectedProduct()" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
     รีเซ็ต
   </button>
-  <button onclick="processPayment('{{isPaid}}')" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
+  <button type="submit" onclick="processPayment()" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
     ยืนยัน
   </button>
- </div>
+ </form>
 </div>
 <div
   class="border rounded px-6 py-2 flex justify-between text-center shadow-md mt-12"
@@ -160,23 +162,27 @@ Home Page
   }
 
   function processPayment(){
-    const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
-    if(selectedProducts.length === 0) return alert("ไม่มีสินค้าที่เลือก")
-    fetch(`/payment`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token }}",
-      },
-      body:JSON.stringify(ordered_product)
-    },
-    ).then((res)=>{
-      res.json().then(data=>{
-        localStorage.setItem("order_id", data.order_id)
-        window.location.href = "/payment/bill";
-      })
-      }
-    )
+    const ordered_product = localStorage.getItem("ordered_product")
+    console.log(ordered_product)
+    const input_field = document.getElementById('ordered_products')
+    input_field.value = ordered_product
+    
+    // if(selectedProducts.length === 0) return alert("ไม่มีสินค้าที่เลือก")
+    // fetch(`/payment`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "X-CSRFToken": "{{ csrf_token }}",
+    //   },
+    //   body:JSON.stringify(ordered_product)
+    // },
+    // ).then((res)=>{
+    //   res.json().then(data=>{
+    //     localStorage.setItem("order_id", data.order_id)
+    //     window.location.href = "/payment/bill";
+    //   })
+    //   }
+    // )
   }
 
 

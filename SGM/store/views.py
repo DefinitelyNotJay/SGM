@@ -35,12 +35,11 @@ class Payment(View):
             products = Product.objects.filter(categories__name=category)
         return render(request, "employee/payment.html", {"products": products})
     def post(self, request):
-        order_data = json.loads(request.body)
-        print(order_data)
-        if order_data:
+        ordered_products = json.loads(request.POST.get('ordered_products'))
+        if ordered_products:
             total_price = 0
-            new_order = Order.objects.create(quantity=order_data.get("storage_amount"))
-            for order in order_data.get("storage_products"):
+            new_order = Order.objects.create(quantity=ordered_products.get("storage_amount"))
+            for order in ordered_products.get("storage_products"):
                 product_id = order.get("id")
                 amount = order.get("amount")
                 product = Product.objects.get(pk=product_id)
@@ -50,16 +49,23 @@ class Payment(View):
                 new_orderItem = OrderItem.objects.create(order=new_order, product=product, amount=amount)
             new_order.total_price = total_price
             new_order.save()
-            return JsonResponse({"status": "success", "order_id": new_order.id})
+            return redirect(f'/payment/bill/{new_order.id}')
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
 class PaymentBill(View):
-    def get(self, request):
-        order = Order.objects.order_by("-id").first()
-        print(order)
+    def get(self, request, order_id):
+        order = Order.objects.get(pk=order_id)
         orderItems = OrderItem.objects.filter(order=order).annotate(price=(F("amount") * F("product__price")))
-        return render(request, "employee/payment_bill.html", {"form": OrderForm(), "order": order, "orderItems": orderItems})
-    def post(self, request):
+
+        total = 0
+        for o in orderItems:
+            total += o.price
+
+        context = {"form": OrderForm(), "order": order, "orderItems": orderItems, "order_amount": order.quantity, "total_price": total}
+        return render(request, "employee/payment_bill.html", context)
+
+    def post(self, request, order_id=None):
+        print('sdfsfddsf')
         order_data = json.loads(request.body)
         order_id = order_data.get("order_id")
         # ทำให้จำนวน product แต่ละตัวลด

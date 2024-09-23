@@ -6,28 +6,41 @@
 {% endblock nav %} 
 {% block content %}
 
-<div class= "w-[850px] rounded-lg shadow-lg max-h-[900px] overflow-y-auto mx-auto">
-    <table class="min-w-full">
-        <thead class="text-gray-700 bg-gray-200">
-            <tr>
-                <th scope="col" class="px-6 py-3">ชื่อสินค้า</th>
-                <th scope="col" class="px-6 py-3">จำนวน</th>
-                <th scope="col" class="px-6 py-3">ราคา</th>
-                <th scope="col" class="px-6 py-3">รวม</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for o_item in  orderItems%}
-            <tr>
-                <td class="px-6 py-4">{{ forloop.counter }}. {{ o_item.product.name }}</td>
-                <td class="px-6 py-4 text-center">{{ o_item.amount }}</td>
-                <td class="px-6 py-4 text-center">{{ o_item.product.price }} บาท</td>
-                <td class="px-6 py-4 text-center">{{ o_item.price }} บาท</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <button onclick='paymentHandler()'>ชำระเงิน</button>
+<div class= "w-[850px] rounded-lg shadow-lg mx-auto">
+    <div class="h-[440px] overflow-y-scroll rounded-lg">
+        <table class="min-w-full min-h-[400px]">
+            <thead class="text-gray-700 bg-gray-200">
+                <tr>
+                    <th scope="col" class="px-6 py-3">ชื่อสินค้า</th>
+                    <th scope="col" class="px-6 py-3">จำนวน</th>
+                    <th scope="col" class="px-6 py-3">ราคา</th>
+                    <th scope="col" class="px-6 py-3">รวม</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o_item in  orderItems%}
+                <tr>
+                    <td class="px-6 py-4">{{ forloop.counter }}. {{ o_item.product.name }}</td>
+                    <td class="px-6 py-4 text-center">{{ o_item.amount }}</td>
+                    <td class="px-6 py-4 text-center">{{ o_item.product.price }} บาท</td>
+                    <td class="px-6 py-4 text-center">{{ o_item.price }} บาท</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class='p-4'>
+        <hr>
+        <div class='text-center font-semibold text-lg mt-4'>
+            <span>จำนวนทั้งหมด <span>{{ order_amount }}</span> ชิ้น</span>
+            <span>ราคารวม <span>{{ total_price }}</span> บาท
+        </div>
+        <div class="flex gap-4 w-fit mx-auto py-4">
+            <button onclick='window.history.back()' class='text-lg px-4 py-2 border rounded-md text-[#333] bg-[#c6c5b9] hover:bg-[#d1d1c7]'>กลับ</button>
+            <button class='text-lg px-4 py-2 border rounded-md text-[#FDFDFF] bg-[#546a7b] hover:bg-[#768895]' onclick='paymentHandler()'>ชำระเงิน</button>
+        </div>
+    </div>
+    
     </div>
 {% endblock content %} 
 {% block script %}
@@ -39,7 +52,11 @@
     if(!ordered_product){
         alert("ไม่พบข้อมูลสินค้า")
         localStorage.removeItem("ordered_product")
-        window.location.href("/payment")
+        window.location.href = "/payment"
+    }
+
+    function goBack(){
+        window.location.href ="/payment"
     }
 
     function paymentHandler(){
@@ -51,8 +68,11 @@
             },
             body:JSON.stringify({...ordered_product, order_id})
           },
-          ).then(()=>{
-            
+          ).then((res)=>{
+            res.json().then(data=>{
+                localStorage.removeItem("ordered_product")
+                window.location.href = '/payment'
+            })
             }
           )
     }
@@ -61,3 +81,28 @@
 </script>
 {% endblock script %}
     
+
+{% comment %} yellow: {
+    100: "#f4f3f1",
+    200: "#e8e8e3",
+    300: "#dddcd5",
+    400: "#d1d1c7",
+    500: "#c6c5b9",
+    600: "#9e9e94",
+    700: "#77766f",
+    800: "#4f4f4a",
+    900: "#282725"
+}, {% endcomment %}
+
+{% comment %} 
+indigo: {
+    100: "#dde1e5",
+    200: "#bbc3ca",
+    300: "#98a6b0",
+    400: "#768895",
+    500: "#546a7b",
+    600: "#435562",
+    700: "#32404a",
+    800: "#222a31",
+    900: "#111519"
+}, {% endcomment %}
