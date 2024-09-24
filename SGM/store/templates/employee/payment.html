@@ -45,7 +45,6 @@ Home Page
   {% for product in products %}
   <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
     <p class="text-lg">{{ product.name }}</p>
-    {% comment %} <img src="" alt=""> {% endcomment %}
     <div class="bg-gray-300 h-44"></div>
     <div class="flex items-center justify-center gap-6">
       <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
@@ -138,9 +137,7 @@ Home Page
   }
 
   function deleteElement(product_id){
-    console.log("before delete", selectedProducts)
     const index = selectedProducts.findIndex(product => product.id === product_id);
-    console.log("index", index)
     selectedProducts.splice(index, 1)
   }
 

@@ -6,15 +6,16 @@
 {% endblock nav %} 
 {% block content %}
 
-<div class= "w-[850px] rounded-lg shadow-lg mx-auto">
-    <div class="h-[440px] overflow-y-scroll rounded-lg">
-        <table class="min-w-full min-h-[400px]">
-            <thead class="text-gray-700 bg-gray-200">
+<div class= "w-[850px] mx-auto">
+    <p class='text-2xl text-center font-semibold p-2'>รายการออเดอร์ที่<span id='order_id'>  {{ order.id }}</span></p>
+    <div class="h-[380px] overflow-y-scroll rounded-lg">
+        <table class="min-w-full min-h-[300px] table-fixed">
+            <thead class="text-gray-700 bg-gray-200 sticky top-0 w-full">
                 <tr>
-                    <th scope="col" class="px-6 py-3">ชื่อสินค้า</th>
-                    <th scope="col" class="px-6 py-3">จำนวน</th>
-                    <th scope="col" class="px-6 py-3">ราคา</th>
-                    <th scope="col" class="px-6 py-3">รวม</th>
+                    <th scope="col" class="px-6 py-3 w-1/4">ชื่อสินค้า</th>
+                    <th scope="col" class="px-6 py-3 w-1/4">จำนวน</th>
+                    <th scope="col" class="px-6 py-3 w-1/4">ราคา</th>
+                    <th scope="col" class="px-6 py-3 w-1/4">รวม</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,7 +37,7 @@
             <span>ราคารวม <span>{{ total_price }}</span> บาท
         </div>
         <div class="flex gap-4 w-fit mx-auto py-4">
-            <button onclick='window.history.back()' class='text-lg px-4 py-2 border rounded-md text-[#333] bg-[#c6c5b9] hover:bg-[#d1d1c7]'>กลับ</button>
+            <button onclick='window.history.back()'d class='text-lg px-4 py-2 border rounded-md text-[#333] bg-[#c6c5b9] hover:bg-[#d1d1c7]'>กลับ</button>
             <button class='text-lg px-4 py-2 border rounded-md text-[#FDFDFF] bg-[#546a7b] hover:bg-[#768895]' onclick='paymentHandler()'>ชำระเงิน</button>
         </div>
     </div>
@@ -47,7 +48,7 @@
 <script>
     // ดึงข้อมูล order มา
     const ordered_product = JSON.parse(localStorage.getItem("ordered_product"))
-    const order_id = JSON.parse(localStorage.getItem("order_id"))
+    localStorage.setItem("order_id", )
 
     if(!ordered_product){
         alert("ไม่พบข้อมูลสินค้า")
