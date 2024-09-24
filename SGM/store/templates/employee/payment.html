@@ -43,6 +43,8 @@ Home Page
 
 <section class="grid grid-cols-3 mt-8 gap-x-6 gap-y-6">
   {% for product in products %}
+  
+  {% if product.quantity_in_stock > 0 %}
   <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
     <p class="text-lg">{{ product.name }}</p>
     <div class="bg-gray-300 h-44"></div>
@@ -55,6 +57,16 @@ Home Page
       </div>
     </div>
   </div>
+  {% else %}
+  <div id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
+    <p class="text-lg">{{ product.name }}</p>
+    <div class="bg-gray-300 h-44"></div>
+    <div class="flex items-center justify-center gap-6">
+      <p>สินค้าหมด</p>
+    </div>
+  </div>
+  {% endif %}
+    
   {% endfor %}
 </section>
 {% endblock content %} 
