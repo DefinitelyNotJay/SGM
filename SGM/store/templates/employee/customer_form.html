@@ -1,71 +1,52 @@
+{% extends "./employee_layout.html" %}
 {% load widget_tweaks %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-    <form method="post" class="flex flex-col flex-1 gap-3 mx-auto max-w-sm mt-20">
-        <h1 class="text-3xl text-center font-semibold mb-4">
-        {% if isCreate %}
-            สมัครสมาชิกใหม่
-        {% else%}
-            แก้ไขข้อมูลสมาชิก
-        {% endif %}
-            </h1>
-        {% csrf_token %}
-        <div class="flex flex-col">
-            <label for='{{ form.username.id_for_label }}'>ชื่อผู้ใช้หรือเบอร์โทรศัพท์</label>
-            {{form.username|add_class:"p-2 border rounded focus:border-blue-300"}}
-            {{form.username.errors}}
-        </div>
-        <div class="flex flex-col">
-            <label for='{{ form.nickname.id_for_label }}'>ชื่อเล่น</label>
-            {{form.nickname|add_class:"p-2 border rounded focus:border-blue-300"}}
-            {{form.nickname.errors}}
-        </div>
-        <div class="flex flex-col">
-            <label for='{{ form.gender.id_for_label }}'>เพศ</label>
-            {{form.gender|add_class:"px-4 py-2 border w-fit rounded"}}
-            {{form.gender.errors}}
-        </div>
-        <div class="flex flex-col">
-            <label for='{{ form.notes.id_for_label }}'>หมายเหตุ</label>
-            {{form.notes|add_class:"p-2 border rounded focus:border-blue-300 resize-none"}}
-            {{form.notes.errors}}
-        </div>
-   <div class="mx-auto">
-       <button type="button" class="bg-[#FF4044] hover:bg-[#ff6669] text-[#FDFDFF] px-4 py-2 w-fit rounded"><a href="/customer">ยกเลิก</a></button>
-       <button type="submit" class="bg-[#546A7B] hover:bg-[#768895] text-[#FDFDFF] px-4 py-2 w-fit rounded">ยืนยัน</button>
-   </div>
-    </form>
-</body>
-</html>
+{% block title %}
+
+{% if isCreate %}
+    Customer Register
+{% else %}
+    Customer Edit
+{% endif %}
+{% endblock title %}
+{% block nav %}
+    {% include "./navbarEMP.html" %}
+{% endblock nav %}
+{% block content %}
+<form method="post" class="flex flex-col flex-1 gap-3 mx-auto max-w-sm mt-20">
+    <h1 class="text-3xl  text-center font-semibold mb-4">
+    {% if isCreate %}
+        สมัครสมาชิกใหม่
+    {% else%}
+        แก้ไขข้อมูลสมาชิก
+    {% endif %}
+    {% csrf_token %}
+    <div class="flex flex-col">
+        <label for='{{ form.username.id_for_label }}'>ชื่อผู้ใช้หรือเบอร์โทรศัพท์</label>
+        {{form.username|add_class:"p-2 border rounded focus:border-blue-300"}}
+        {{form.username.errors}}
+        
+    </div>
+    <div class="flex flex-col">
+        <label for='{{ form.nickname.id_for_label }}'>ชื่อเล่น</label>
+        {{form.nickname|add_class:"p-2 border rounded focus:border-blue-300"}}
+        {{form.nickname.errors}}
+    </div>
+    <div class="flex flex-col">
+        <label for='{{ form.gender.id_for_label }}'>เพศ</label>
+        {{form.gender|add_class:"px-4 py-2 border w-fit rounded"}}
+        {{form.gender.errors}}
+    </div>
+    <div class="flex flex-col">
+        <label for='{{ form.notes.id_for_label }}'>หมายเหตุ</label>
+        {{form.notes|add_class:"p-2 border rounded focus:border-blue-300 resize-none"}}
+        {{form.notes.errors}}
+    </div>
+<div class="mx-auto">
+   <button type="button" class="bg-[#FF4044] hover:bg-[#ff6669] text-[#FDFDFF] px-4 py-2 w-fit rounded"><a href="/customer">ยกเลิก</a></button>
+   <button type="submit" class="bg-[#546A7B] hover:bg-[#768895] text-[#FDFDFF] px-4 py-2 w-fit rounded">ยืนยัน</button>
+</div>
+</form>
+{% endblock content %}
 
 
-
-{% comment %} indigo: {
-    100: "#dde1e5",
-    200: "#bbc3ca",
-    300: "#98a6b0",
-    400: "#768895",
-    500: "#546a7b",
-    600: "#435562",
-    700: "#32404a",
-    800: "#222a31",
-    900: "#111519"
-}, {% endcomment %}
-{% comment %} red: {
-    100: "#ffd9da",
-    200: "#ffb3b4",
-    300: "#ff8c8f",
-    400: "#ff6669",
-    500: "#ff4044",
-    600: "#cc3336",
-    700: "#992629",
-    800: "#661a1b",
-    900: "#330d0e"
-}, {% endcomment %}
+   
