@@ -19,12 +19,12 @@
                 </tr>
             </thead>
             <tbody>
-                {% for o_item in  orderItems%}
+                {% for product in storage_products%}
                 <tr>
-                    <td class="px-6 py-4">{{ forloop.counter }}. {{ o_item.product.name }}</td>
-                    <td class="px-6 py-4 text-center">{{ o_item.amount }}</td>
-                    <td class="px-6 py-4 text-center">{{ o_item.product.price }} บาท</td>
-                    <td class="px-6 py-4 text-center">{{ o_item.price }} บาท</td>
+                    <td class="px-6 py-4">{{ forloop.counter }}. {{ product.name }}</td>
+                    <td class="px-6 py-4 text-center">{{ product.amount }}</td>
+                    <td class="px-6 py-4 text-center">{{ product.price }} บาท</td>
+                    <td class="px-6 py-4 text-center">{{ product.price_amount }} บาท</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -33,11 +33,11 @@
     <div class='p-4'>
         <hr>
         <div class='text-center font-semibold text-lg mt-4'>
-            <span>จำนวนทั้งหมด <span>{{ order_amount }}</span> ชิ้น</span>
-            <span>ราคารวม <span>{{ total_price }}</span> บาท
+            <span>จำนวนทั้งหมด <span>{{ storage_amount }}</span> ชิ้น</span>
+            <span>ราคารวม <span>{{ total }}</span> บาท
         </div>
         <div class="flex gap-4 w-fit mx-auto py-4">
-            <button onclick="goBack('{{ order.id }}')" class='text-lg px-4 py-2 border rounded-md text-[#333] bg-[#c6c5b9] hover:bg-[#d1d1c7]'>กลับ</button>
+            <button onclick="window.history.back()" class='text-lg px-4 py-2 border rounded-md text-[#333] bg-[#c6c5b9] hover:bg-[#d1d1c7]'>กลับ</button>
             <button class='text-lg px-4 py-2 border rounded-md text-[#FDFDFF] bg-[#546a7b] hover:bg-[#768895]' onclick='paymentHandler()'>ชำระเงิน</button>
         </div>
     </div>
@@ -51,21 +51,8 @@
 
     if(!ordered_product){
         alert("ไม่พบข้อมูลสินค้า")
-        localStorage.removeItem("ordered_product")
+        localStorage.removeItem('ordered_product')
         window.location.href = "/payment"
-    }
-
-    function goBack(order_id){
-        fetch(`/payment/bill/${order_id}`, {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": "{{ csrf_token }}",
-            },
-          }).then(
-            res=>res.json().then(data=>window.location.href ="/payment")
-          )
-        
     }
 
     function paymentHandler(){
@@ -75,7 +62,7 @@
               "Content-Type": "application/json",
               "X-CSRFToken": "{{ csrf_token }}",
             },
-            body:JSON.stringify({...ordered_product, 'order_id': '{{ order.id }}'})
+            body:JSON.stringify({...ordered_product, 'total': '{{ total }}'})
           },
           ).then((res)=>{
             res.json().then(data=>{
