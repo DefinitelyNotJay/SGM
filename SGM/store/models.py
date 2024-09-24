@@ -20,6 +20,8 @@ class Customer(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    def __str__(self):
+        return self.name
 
 class Product(models.Model):
     name = models.CharField(max_length=120)
@@ -27,6 +29,8 @@ class Product(models.Model):
     quantity_in_stock = models.IntegerField()
     add_date = models.DateTimeField(default=datetime.now())
     categories = models.ManyToManyField(Category)
+    def __str__(self):
+        return self.name
 
 class Order(models.Model):
     class StatusChoices(models.Choices):

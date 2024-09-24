@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}  <!-- แสดงฟอร์มในรูปแบบพารากราฟ -->
+    
+    <button type="submit">บันทึก</button>
+</form>
+
+<form method="post" action="{% url 'delete_product' product.id %}">
+    {% csrf_token %}
+    <button type="submit">ลบสินค้า</button>
+</form>
+
+{% endblock %}

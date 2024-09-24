@@ -14,5 +14,9 @@ urlpatterns = [
     path('sign-up', SignUp.as_view(), name="sign-up"),
     path('statistics', StatisticsView.as_view(), name="statistics"),
     path('Viewproduct', ViewStock.as_view(), name="Viewproduct"),
+    path('manageInventory', ManageInventory.as_view(), name="manageInventory"),
+    path('manageInventory/<str:category_name>/', ManageInventory.as_view(), name='manageInvenCat'),
+    path('editProduct/<int:product_id>/', Editproduct.as_view(), name="editProduct"),
+    path('deleteProduct/<int:product_id>/', DeleteProduct.as_view(), name='delete_product'),
 ]
 

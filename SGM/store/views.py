@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.http import *
 from store.models import *
@@ -8,6 +8,7 @@ from django.forms.models import model_to_dict
 from django.db.models import Sum
 from datetime import datetime
 from django.utils.timezone import *
+from store.forms.product import ProductForm
 
 # Create your views here.
 
@@ -105,3 +106,53 @@ class ViewStock(View):
     def get(self, request, *args, **kwargs):
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
         return render(request, 'index.html', {'products': products})
+
+class ManageInventory(View):
+    CATEGORY_EN_TO_TH = {
+        "Beverages": "เครื่องดื่ม",
+        "Snacks": "ขนม",
+        "Ice-cream": "ไอศกรีม",
+        "Household-item": "ของใช้ครัวเรือน",
+    }
+    def get(self, request, category_name=None):
+        # ถ้ามีการระบุหมวดหมู่ใน URL ให้ทำการกรองสินค้าตามหมวดหมู่
+        if category_name:
+            category = get_object_or_404(Category, name=category_name)
+            products = Product.objects.filter(categories=category)
+            translated_category_name = self.CATEGORY_EN_TO_TH.get(category_name, category_name)
+            
+        else:
+            products = Product.objects.all()
+            translated_category_name = "ทั้งหมด"
+
+        return render(request, 'manageInventory.html', {
+            'products': products,
+            'category_name': category_name,
+            'translated_category_name': translated_category_name  # ส่งหมวดหมู่ที่ถูกเลือกไปยังเทมเพลต
+        })
+
+    def post(self, request):
+        product_id = request.POST.get('product_id')  # รับ product_id จากฟอร์ม
+        return redirect('editProduct', product_id=product_id)  # เปลี่ยนเส้นทางไปที่ view แก้ไขผลิตภัณฑ์
+
+class Editproduct(View):
+    def get(self, request, product_id):
+        product = get_object_or_404(Product, id=product_id)
+        form = ProductForm(instance=product)  # สร้างฟอร์มจากอินสแตนซ์ของผลิตภัณฑ์
+        return render(request, 'editProduct.html', {'form': form, 'product': product})
+
+    def post(self, request, product_id):
+        product = get_object_or_404(Product, id=product_id)
+        form = ProductForm(request.POST, instance=product)  # สร้างฟอร์มจากข้อมูลที่ส่งมา
+
+        if form.is_valid():
+            form.save()  # บันทึกข้อมูลที่แก้ไข
+            return redirect('manageInventory')  # เปลี่ยนเส้นทางกลับไปที่หน้า Manage Inventory
+
+        return render(request, 'editProduct.html', {'form': form, 'product': product})  # หากฟอร์มไม่ถูกต้อง ให้แสดงฟอร์มอีกครั้ง
+
+class DeleteProduct(View):
+    def post(self, request, product_id):
+        product = get_object_or_404(Product, id=product_id)
+        product.delete()  # ลบสินค้า
+        return redirect('manageInventory')  # กลับไปที่หน้า manageInventory
