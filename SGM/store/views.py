@@ -4,10 +4,12 @@ from django.http import *
 from store.models import *
 from .forms.authentication import *
 from .forms.customer import *
+from .forms.order import *
 from django.forms.models import model_to_dict
-from django.db.models import Sum
+from django.db.models import Sum, Count, F, Value
 from datetime import datetime
 from django.utils.timezone import *
+import json
 from store.forms.product import ProductForm
 
 # Create your views here.
@@ -19,6 +21,84 @@ class Inventory(View):
 class SignUp(View):
     def get(self, request):
         return render(request, "registration/sign_up.html", {"form": RegisterForm()})
+
+class EmployeeHome(View):
+    def get(self, request):
+        return render(request, "employee/home.html")
+
+class Payment(View):
+    def get(self, request, category=None):
+        # มี query
+        if category is None:
+            products = Product.objects.all()
+        else:
+            # ทั้งหมด
+            products = Product.objects.filter(categories__name=category)
+        return render(request, "employee/payment.html", {"products": products})
+    def post(self, request):
+        ordered_products = json.loads(request.POST.get('ordered_products'))
+        if ordered_products:
+            total_price = 0
+            new_order = Order.objects.create(quantity=ordered_products.get("storage_amount"))
+            for order in ordered_products.get("storage_products"):
+                product_id = order.get("id")
+                amount = order.get("amount")
+                product = Product.objects.get(pk=product_id)
+                # add cost to total_price
+                total_price += product.price * amount
+                # create orderItem
+                new_orderItem = OrderItem.objects.create(order=new_order, product=product, amount=amount)
+            new_order.total_price = total_price
+            new_order.save()
+            return redirect(f'/payment/bill/{new_order.id}')
+        return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
+
+class PaymentBill(View):
+    def get(self, request, order_id):
+        order = Order.objects.get(pk=order_id)
+        orderItems = OrderItem.objects.filter(order=order).annotate(price=(F("amount") * F("product__price")))
+
+        total = 0
+        for o in orderItems:
+            total += o.price
+
+        context = {"form": OrderForm(), "order": order, "orderItems": orderItems, "order_amount": order.quantity, "total_price": total}
+        return render(request, "employee/payment_bill.html", context)
+
+    def delete(self, request, order_id):
+        order = Order.objects.get(pk=order_id)
+        try:
+            order.delete()
+            return JsonResponse({'status': 'sucess'})
+        except:
+            return HttpResponseServerError('ไม่สามารถลบได้')
+
+    def post(self, request, order_id=None):
+        # print('sdfsfddsf')
+        order_data = json.loads(request.body)
+        print(order_data)
+        order_id = order_data.get("order_id")
+        # ทำให้จำนวน product แต่ละตัวลด
+        products_in_cart = order_data.get("storage_products")
+        try:
+            for data in products_in_cart:
+                product = Product.objects.get(pk=data.get('id'))
+                amount_in_stock = product.quantity_in_stock
+                product.quantity_in_stock = amount_in_stock - data.get("amount")
+                product.save()
+        except Exception:
+            return HttpResponseServerError("Products in cart went wrong !", Exception)
+            
+        # อัพเดท order นั้นให้มีสถานะเป็น 'PAID'
+        try:
+            order = Order.objects.get(pk=order_id)
+            order.status = 'PAID'
+            order.save()
+        except Exception:
+            return HttpResponseServerError("Order object error!", Exception)
+        return JsonResponse({"success": True})
+
+        
 
 class ListCustomer(View):
     def get(self, request):
@@ -63,7 +143,7 @@ class ManageCustomer(View):
             return JsonResponse({"success": True})
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
-    
+
 class StatisticsView(View):
     MONTHS_EN_TO_TH = {
         "January": "มกราคม",
@@ -103,8 +183,10 @@ class StatisticsView(View):
         return render(request, 'statistics.html', {'customers': customers , 'products':products, 'allcustomer':allcustomer, 'current_month_name_th': current_month_name_th})
 
 class ViewStock(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
+
+
         return render(request, 'index.html', {'products': products})
 
 class ManageInventory(View):
@@ -156,3 +238,16 @@ class DeleteProduct(View):
         product = get_object_or_404(Product, id=product_id)
         product.delete()  # ลบสินค้า
         return redirect('manageInventory')  # กลับไปที่หน้า manageInventory
+
+
+class AddProduct(View):
+    def get(self, request):
+        form = ProductForm()
+        return render(request, 'addProduct.html', {'form': form})
+
+    def post(self, request):
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()  # บันทึกสินค้าใหม่
+            return redirect('manageInventory') 
+        return render(request, 'addProduct.html', {'form': form})

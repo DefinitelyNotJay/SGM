@@ -1,0 +1,199 @@
+{% extends "./employee_layout.html" %} 
+{% block title %} 
+Home Page 
+{% endblock %} 
+{% block nav %} 
+  {% include "./navbarEMP.html" %} 
+{% endblock nav%}
+{% block content %}
+<style>
+  @layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+</style>
+<div class="w-full flex justify-between items-center px-4 mt-8">
+  <p class="text-2xl font-bold">คิดเงิน</p>
+  <div>
+    <span id="amount">0</span><span> ชิ้น</span>
+  </div>
+ <form method="POST" action='/payment'>
+  {% csrf_token %}
+  <input type="text" class='hidden' name='ordered_products' id='ordered_products'>
+  <button type="button" onclick="clearSelectedProduct()" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
+    รีเซ็ต
+  </button>
+  <button type="submit" onclick="processPayment()" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
+    ยืนยัน
+  </button>
+ </form>
+</div>
+<div
+  class="border rounded px-6 py-2 flex justify-between text-center shadow-md mt-12"
+>
+  <a class="w-full" href="/payment">ทั้งหมด</a>|
+  <a class="w-full" href="/payment/beverage">เครื่องดื่ม</a>|
+  <a class="w-full" href="/payment/snack">ขนม</a>|
+  <a class="w-full" href="/payment/ice-cream">ไอศกรีม</a>|
+  <a class="w-full" href="/payment/household-item">ของใช้ครัวเรือน</a>
+</div>
+
+<section class="grid grid-cols-3 mt-8 gap-x-6 gap-y-6">
+  {% for product in products %}
+  
+  {% if product.quantity_in_stock > 0 %}
+  <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
+    <p class="text-lg">{{ product.name }}</p>
+    <div class="bg-gray-300 h-44"></div>
+    <div class="flex items-center justify-center gap-6">
+      <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
+      <div id='inputGroup-{{ product.id }}' class="hidden">
+        <span>จำนวน </span>
+        <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})" onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-12 resize-none border rounded-md py-1  text-center'>
+        <span>ชิ้น</span>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
+    <p class="text-lg">{{ product.name }}</p>
+    <div class="bg-gray-300 h-44"></div>
+    <div class="flex items-center justify-center gap-6">
+      <p>สินค้าหมด</p>
+    </div>
+  </div>
+  {% endif %}
+    
+  {% endfor %}
+</section>
+{% endblock content %} 
+{% block script %}
+<script>
+  let amount = 0;
+  let selectedProducts = []
+  const amount_element = document.querySelector("#amount");
+
+  const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
+  // check if employee selected product before refresh page
+  if (ordered_product){
+    const {storage_products, storage_amount} = ordered_product
+    amount_element.textContent = storage_amount
+    amount = storage_amount
+    selectedProducts = storage_products
+
+
+    storage_products.map((product)=>{
+      find_product = document.querySelector(`#product-${product.id}`)
+      if(find_product){
+        inputAmountFieldHandler(product.id, true)
+        document.getElementById(`input-${product.id}`).value = product.amount
+      }
+    })
+  }
+
+  function getProductAmount(product_id){
+    return parseInt(document.getElementById(`input-${product_id}`).value)
+  }
+
+  function setProductAmount(product_id, value){
+    document.getElementById(`input-${product_id}`).value = value
+  }
+
+
+  function selectProduct(product_id){
+
+    // เช็คว่ามี product ใน array หรือยัง
+    const isProductInCart = selectedProducts.some(product=>product.id==product_id)
+  
+    if (!isProductInCart){
+      // แสดง input
+      inputAmountFieldHandler(product_id, true)
+      // เอาจำนวน product มา
+      const product_amount = getProductAmount(product_id)
+      // เพิ่มเข้า selectedProducts
+      selectedProducts = [...selectedProducts, {id: product_id, amount: product_amount}]
+    }
+    else {
+      console.log(product_id)
+      inputAmountFieldHandler(product_id, false)
+      deleteElement(product_id)
+    }
+    updateAllAmount()
+
+    localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
+  };
+
+  function updateAllAmount(){
+    amount = selectedProducts.reduce((acc, item)=> acc+item.amount, 0)
+    amount_element.textContent = amount
+  }
+
+  function inputAmountFieldHandler(product_id, isActive){
+    const product_input = document.querySelector(`#inputGroup-${product_id}`)
+    if(isActive){
+      product_input.classList.remove('hidden')
+      document.getElementById(`product-${product_id}`).classList.add("bg-gray-200")
+      setProductAmount(product_id, 1)
+    }else {
+      document.getElementById(`product-${product_id}`).classList.remove("bg-gray-200")
+      product_input.classList.add('hidden')
+    }
+  }
+
+  function clearSelectedProduct(){
+    localStorage.removeItem("ordered_product")
+    window.location.reload()
+  }
+
+  function deleteElement(product_id){
+    const index = selectedProducts.findIndex(product => product.id === product_id);
+    selectedProducts.splice(index, 1)
+  }
+
+  function updateAmountChange(product_id){
+    const product_amount = getProductAmount(product_id)
+    
+    if(product_amount <= 0){
+      // employee enters 0 means that item is no longer in the cart
+      inputAmountFieldHandler(product_id, false)
+      deleteElement(product_id)
+    } else {
+      // update amount number
+      const product = selectedProducts.find(product=>product.id==product_id)
+      product.amount = product_amount
+    }
+    console.log("updated", selectedProducts)
+    updateAllAmount()
+    localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
+  }
+
+  function processPayment(){
+    const ordered_product = localStorage.getItem("ordered_product")
+    console.log(ordered_product)
+    const input_field = document.getElementById('ordered_products')
+    input_field.value = ordered_product
+    
+    // if(selectedProducts.length === 0) return alert("ไม่มีสินค้าที่เลือก")
+    // fetch(`/payment`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "X-CSRFToken": "{{ csrf_token }}",
+    //   },
+    //   body:JSON.stringify(ordered_product)
+    // },
+    // ).then((res)=>{
+    //   res.json().then(data=>{
+    //     localStorage.setItem("order_id", data.order_id)
+    //     window.location.href = "/payment/bill";
+    //   })
+    //   }
+    // )
+  }
+
+
+</script>
+{% endblock script %}
