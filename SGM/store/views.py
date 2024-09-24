@@ -36,36 +36,21 @@ class Payment(View):
             products = Product.objects.filter(categories__name=category)
         return render(request, "employee/payment.html", {"products": products})
     def post(self, request):
-        ordered_products = json.loads(request.POST.get('ordered_products'))
-        if ordered_products:
-            total_price = 0
-            new_order = Order.objects.create(quantity=ordered_products.get("storage_amount"))
-            for order in ordered_products.get("storage_products"):
-                product_id = order.get("id")
-                amount = order.get("amount")
-                product = Product.objects.get(pk=product_id)
-                # add cost to total_price
-                total_price += product.price * amount
-                # create orderItem
-                new_orderItem = OrderItem.objects.create(order=new_order, product=product, amount=amount)
-            new_order.total_price = total_price
-            new_order.save()
-            return redirect(f'/payment/bill/{new_order.id}')
+        post_data = request.POST.get('ordered_products')
+        print(post_data)
+        data = json.loads(post_data)
+        if data:
+            total = 0
+            for product in data.get('storage_products'):
+                product_time_amount = product['price'] * product['amount']
+                product['price_amount'] = product_time_amount
+                total += product_time_amount
+            data['total'] = total
+            return render(request, 'employee/payment_bill.html', data)
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
 class PaymentBill(View):
-    def get(self, request, order_id):
-        order = Order.objects.get(pk=order_id)
-        orderItems = OrderItem.objects.filter(order=order).annotate(price=(F("amount") * F("product__price")))
-
-        total = 0
-        for o in orderItems:
-            total += o.price
-
-        context = {"form": OrderForm(), "order": order, "orderItems": orderItems, "order_amount": order.quantity, "total_price": total}
-        return render(request, "employee/payment_bill.html", context)
-
-    def delete(self, request, order_id):
+    def delete(self, request):
         order = Order.objects.get(pk=order_id)
         try:
             order.delete()
@@ -73,30 +58,21 @@ class PaymentBill(View):
         except:
             return HttpResponseServerError('ไม่สามารถลบได้')
 
-    def post(self, request, order_id=None):
-        # print('sdfsfddsf')
-        order_data = json.loads(request.body)
-        print(order_data)
-        order_id = order_data.get("order_id")
-        # ทำให้จำนวน product แต่ละตัวลด
-        products_in_cart = order_data.get("storage_products")
+    def post(self, request):
+        ordered_products = json.loads(request.body)
+        products = ordered_products.get('storage_products')
+        amount = int(ordered_products.get('storage_amount'))
+        total = float(ordered_products.get('total'))
+        # create order
         try:
-            for data in products_in_cart:
-                product = Product.objects.get(pk=data.get('id'))
-                amount_in_stock = product.quantity_in_stock
-                product.quantity_in_stock = amount_in_stock - data.get("amount")
-                product.save()
-        except Exception:
-            return HttpResponseServerError("Products in cart went wrong !", Exception)
-            
-        # อัพเดท order นั้นให้มีสถานะเป็น 'PAID'
-        try:
-            order = Order.objects.get(pk=order_id)
-            order.status = 'PAID'
-            order.save()
-        except Exception:
-            return HttpResponseServerError("Order object error!", Exception)
-        return JsonResponse({"success": True})
+            order = Order.objects.create(total_price=total, quantity=amount, status='PAID')
+            # create orderItem
+            for product in products:
+                OrderItem.objects.create(order=order, product=Product.objects.get(id=product['id']), amount=product['amount'])
+            return JsonResponse({'status': 'complete'})
+        except Exception as e:
+            print(e)
+            return HttpResponse(e)
 
         
 

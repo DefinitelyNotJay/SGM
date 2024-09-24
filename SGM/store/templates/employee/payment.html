@@ -45,16 +45,20 @@ Home Page
   {% for product in products %}
   
   {% if product.quantity_in_stock > 0 %}
-  <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
+  <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-12 shadow-md border flex flex-col gap-3 text-center">
+    <input type="text" id='{{product.id}}' class='hidden' value='{{product.id}},{{product.name}},{{product.price}},{{product.quantity_in_stock}}'>
     <p class="text-lg">{{ product.name }}</p>
     <div class="bg-gray-300 h-44"></div>
-    <div class="flex items-center justify-center gap-6">
-      <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
+    <div class="flex items-center justify-center gap-2">
+      <div class="flex gap-2">
+        <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
+        <span>{{product.price}}</span> บาท
+      </div>
       <div id='inputGroup-{{ product.id }}' class="hidden">
-        <span>จำนวน </span>
         <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})" onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-12 resize-none border rounded-md py-1  text-center'>
         <span>ชิ้น</span>
       </div>
+
     </div>
   </div>
   {% else %}
@@ -102,19 +106,28 @@ Home Page
     document.getElementById(`input-${product_id}`).value = value
   }
 
+  function getProductInfo(product_id){
+    const data = document.getElementById(product_id).value
+    return data.split(',')
+  }
 
   function selectProduct(product_id){
 
     // เช็คว่ามี product ใน array หรือยัง
     const isProductInCart = selectedProducts.some(product=>product.id==product_id)
-  
+
     if (!isProductInCart){
       // แสดง input
       inputAmountFieldHandler(product_id, true)
       // เอาจำนวน product มา
       const product_amount = getProductAmount(product_id)
+      const data_array = getProductInfo(product_id)
+      const id = parseInt(data_array[0])
+      const name = data_array[1]
+      const price = parseFloat(data_array[2])
+      const quantity = parseInt(data_array[3])
       // เพิ่มเข้า selectedProducts
-      selectedProducts = [...selectedProducts, {id: product_id, amount: product_amount}]
+      selectedProducts = [...selectedProducts, {id: id, amount: product_amount, name:name, price:price, quantity:quantity}]
     }
     else {
       console.log(product_id)
