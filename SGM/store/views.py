@@ -64,9 +64,18 @@ class PaymentBill(View):
         context = {"form": OrderForm(), "order": order, "orderItems": orderItems, "order_amount": order.quantity, "total_price": total}
         return render(request, "employee/payment_bill.html", context)
 
+    def delete(self, request, order_id):
+        order = Order.objects.get(pk=order_id)
+        try:
+            order.delete()
+            return JsonResponse({'status': 'sucess'})
+        except:
+            return HttpResponseServerError('ไม่สามารถลบได้')
+
     def post(self, request, order_id=None):
-        print('sdfsfddsf')
+        # print('sdfsfddsf')
         order_data = json.loads(request.body)
+        print(order_data)
         order_id = order_data.get("order_id")
         # ทำให้จำนวน product แต่ละตัวลด
         products_in_cart = order_data.get("storage_products")
