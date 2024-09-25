@@ -50,13 +50,6 @@ class Payment(View):
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
 class PaymentBill(View):
-    def delete(self, request):
-        order = Order.objects.get(pk=order_id)
-        try:
-            order.delete()
-            return JsonResponse({'status': 'sucess'})
-        except:
-            return HttpResponseServerError('ไม่สามารถลบได้')
 
     def post(self, request):
         ordered_products = json.loads(request.body)
