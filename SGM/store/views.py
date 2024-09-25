@@ -26,6 +26,11 @@ class EmployeeHome(View):
     def get(self, request):
         return render(request, "employee/home.html")
 
+class Stock(View):
+    def get(self, request):
+        products = Product.objects.all().order_by('quantity_in_stock')
+        return render(request, "employee/stock.html")
+
 class Payment(View):
     def get(self, request, category=None):
         # มี query
@@ -56,9 +61,12 @@ class PaymentBill(View):
         products = ordered_products.get('storage_products')
         amount = int(ordered_products.get('storage_amount'))
         total = float(ordered_products.get('total'))
+        customer_id = ordered_products.get('customer_id') # คือเบอร์โทร
+        
         # create order
         try:
-            order = Order.objects.create(total_price=total, quantity=amount, status='PAID')
+            customer = Customer.objects.filter(username=customer_id).first() #กรณีไม่มีมันจะเป็น null
+            order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID')
             # create orderItem
             for product in products:
                 OrderItem.objects.create(order=order, product=Product.objects.get(id=product['id']), amount=product['amount'])
@@ -154,8 +162,6 @@ class StatisticsView(View):
 class ViewStock(View):
     def get(self, request):
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
-
-
         return render(request, 'index.html', {'products': products})
 
 class ManageInventory(View):

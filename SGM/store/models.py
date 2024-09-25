@@ -41,7 +41,6 @@ class Order(models.Model):
     date = models.DateTimeField(default=datetime.now())
     status = models.CharField(max_length=16, choices=StatusChoices.choices, default="UNPAID")
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
-    total_item_purchased = models.IntegerField(default=1)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
