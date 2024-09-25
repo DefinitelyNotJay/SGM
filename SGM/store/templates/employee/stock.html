@@ -1,51 +1,116 @@
-{% extends "./employee_layout.html" %}
-{% block head %}
-{% endblock %}
-
+{% extends "./employee_layout.html" %} 
+{% block title %} 
+Home Page 
+{% endblock %} 
+{% block nav %} 
+  {% include "./navbarEMP.html" %} 
+{% endblock nav%}
 {% block content %}
+<style>
+  @layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+</style>
 
-<div class="max-w-5xl mx-auto py-10">
-
-    <a class="flex text-center w-full transform hover:scale-[110%] transition-transform duration-100 "
-        href="{% url 'manageInventory' %}">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="lucide lucide-circle-arrow-left pr-2">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M16 12H8" />
-            <path d="m12 8-4 4 4 4" />
-        </svg>
-        <p class="pt-1"> ย้อนกลับ </p>
-    </a>
-    <div class="grid grid-cols-2  bg-white shadow-md rounded p-20 m-10 py-4">
-        <div class="pl-2 pt-2">
-            <h1 class="text-2xl font-bold mb-8">แก้ไขสินค้า</h1>
-            <img src="https://pagedone.io/asset/uploads/1700726158.png" alt="face cream image"
-                class="w-1/2 aspect-square rounded-2xl object-cover mr-10">
+<div class='w-full p-8 pt-0  flex flex-col gap-6'>
+    <h1 class='text-4xl font-bold'>คลังสินค้า</h1>
+    <div class='w-full flex justify-between'>
+       <div class='flex gap-3 w-full items-center'>
+            <div>
+                <select name="filter" id="category_filter" class='border px-3 py-2 rounded-md' onchange='selectCategory()'>
+                    <option value="" default>------</option>
+                    {% for c in categories  %}
+                        <option value='{{ c.name }}'>{{c.name}}</option>
+                    {% endfor %}
+                </select>
+                <select onchange='fetchTag()' name="filter" id="sort_filter" class='border px-3 py-2 rounded-md'>
+                    <option value="" default></option>
+                    <option value="sell-low-to-high">ยอดขาย น้อย-มาก</option>
+                    <option value="sell-high-to-low">ยอดขาย มาก-น้อย</option>
+                    <option value="quantity">ปริมาณ น้อย-มาก</option>
+                    <option value="quantity">ปริมาณ มาก-น้อย</option>
+                </select>
+                
+            </div>
+            <div class='flex gap-3' id='category-area'>
+            </div>
+       </div>
+       <button>บันทึก</button>
+    </div>
+    <div class='w-full h-full grid grid-cols-6 shadow-md overflow-y-scroll border p-8 rounded-xl gap-y-4'>
+        {% for p in  products %}
+        <div class='w-[165px] h-[160px]'>
+            <div class='w-[165px] h-[60px] bg-slate-200 border border-b-0 border-t rounded-t-md'>
+                <p class='font-bold text-xl text-center'>{{p.name}}</p>
+            </div>
+            <div class='flex flex-col justify-between border border-t-0 rounded-lg rounded-t-none  px-4 py-2'>
+                    <p class='text-center'>คงเหลือ <span>{{ p.quantity_in_stock }}</span> ชิ้น</p>
+                <div class='flex gap-3 justify-center items-center'>
+                    <input type="number" class='w-12 p-2 pb-0 border-b text-center focus:outline-none border-gray-700'>
+                    <span>ชิ้น</span>
+                </div>
+            </div>
         </div>
-        <div class="grid gap-y-12  bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ">
-            <form method="post">
-                {% csrf_token %}
-                {% comment %} {{ form.as_p }} {% endcomment %}
-                <div class="flex justify-between">
-                    <div class="mt-4"><button type="submit"
-                            class="bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded leading-tight">
-                            บันทึกการแก้ไข
-                        </button></div>
-
-            </form>
-
-            <form method="post" action="{% url 'delete_product' product.id %}" class="mt-4">
-                {% csrf_token %}
-                <button type="submit"
-                    class="bg-black hover:bg-red-800 text-white font-bold py-2 px-4 rounded leading-tight">
-                    ลบสินค้า
-                </button>
-            </form>
-        </div>
+        {% endfor %}
     </div>
 </div>
-</div>
-</div>
 
-{% endblock %}
+{% endblock content %} 
+{% block script %}
+<script>
+    let categories = []
+    const category_area = document.getElementById('category-area')
+
+    function getCategoryFilter(){
+        return document.getElementById('category_filter').value
+    }
+
+    function deleteCategoryTag(category_target){
+        console.log(category_target)
+        console.log(categories)
+        const pTags = category_area.getElementsByTagName('p')
+        categories = categories.filter(cate => cate !== category_target)
+        cate_area_elements = document.querySelector('#category-area')
+        console.log(categories)
+        for (let p of pTags){
+            if(p.textContent === category_target){
+                p.remove()
+                break
+            }
+        }
+    }
+
+    function selectCategory(){
+        category_target = getCategoryFilter()
+        if(!categories.includes(category_target)){
+            categories = [...categories, category_target]
+            // create element
+            const pTag = document.createElement('p')
+            pTag.textContent = category_target
+            pTag.id = category_target
+            pTag.className = `cursor-pointer hover:underline`
+            pTag.onclick = (e) => {
+                deleteCategoryTag(e.target.textContent)
+            }
+            category_area.appendChild(pTag)
+            fetchTag()
+        }
+    }
+
+    function fetchTag(){
+        let categories_str = categories.map(cate=>`category=${cate}`)
+        let categories_get = categories_str.join('&')
+        let sort_filter = document.getElementById('sort_filter').value
+        let sort_filter_get = sort_filter && `${categories.length <= 0 ? '' : '&'}sort_filter=${sort_filter}`
+        
+        console.log(`/stock/?${categories_get}${sort_filter_get}`)
+        fetch(`/stock/?${categories_get}${sort_filter_get}`)
+    }
+
+
+</script>
+{% endblock  %}

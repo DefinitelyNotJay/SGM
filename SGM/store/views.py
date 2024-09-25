@@ -29,7 +29,16 @@ class EmployeeHome(View):
 class Stock(View):
     def get(self, request):
         products = Product.objects.all().order_by('quantity_in_stock')
-        return render(request, "employee/stock.html")
+        categories = Category.objects.all()
+        context = {'products': products, 'categories': categories}
+        return render(request, "employee/stock.html", context)
+
+class StockManagement(View):
+    def get(self, request):
+        categories = request.GET.getlist('category')  # รับ category จาก query parameters ที่อาจมีมากกว่า 1
+        sort_filter = request.GET.get('sort_filter')  # รับตัวกรองการเรียงลำดับ เช่น 'ยอดขายมากที่สุด'
+        print(categories, "|", sort_filter)
+        return HttpResponse('success')
 
 class Payment(View):
     def get(self, request, category=None):
@@ -70,6 +79,12 @@ class PaymentBill(View):
             # create orderItem
             for product in products:
                 OrderItem.objects.create(order=order, product=Product.objects.get(id=product['id']), amount=product['amount'])
+                # ลดจำนวน product ทีทูกซื้อไป
+                use_product = Product.objects.get(pk=product['id'])
+                quantity = use_product.quantity_in_stock
+                use_product.quantity_in_stock = quantity - product['amount']
+                use_product.save()
+                
             return JsonResponse({'status': 'complete'})
         except Exception as e:
             print(e)
