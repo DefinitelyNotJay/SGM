@@ -20,6 +20,12 @@ from django.urls import reverse
 
 class Inventory(View):
     def get(self, request):
+        print(Customer.objects.all())
+        return HttpResponse("123")
+    
+class ManageUserView(View):
+    def get(self, request):
+        
         return render(request, "employee/customer_form.html", {"form": CustomerCreateForm()})
 
 class SignUp(View):
@@ -122,8 +128,6 @@ class PaymentBill(View):
         except Exception as e:
             print(e)
             return HttpResponse(e)
-
-        
 
 class ListCustomer(View):
     def get(self, request):
