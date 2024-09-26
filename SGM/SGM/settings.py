@@ -37,8 +37,31 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'store'
+    'store',
+    "crispy_forms",
+    "crispy_tailwind",
+    'widget_tweaks',
+    'storages',
 ]
+# AWS S3 Configuration
+AWS_ACCESS_KEY_ID = 'AKIAT5GQZXMGBOBQOIGB'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'sgmimage'
+AWS_S3_REGION_NAME = 'ap-southeast-1'  # เช่น 'us-east-1'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Media files
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+CRISPY_TEMPLATE_PACK = "tailwind"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

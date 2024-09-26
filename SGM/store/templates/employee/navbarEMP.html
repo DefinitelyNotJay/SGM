@@ -1,0 +1,63 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sulphur+Point:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+    .logo {
+        font-family: "Sulphur Point", sans-serif;
+        font-weight: 700;
+        font-style: normal;
+    }
+</style>
+
+<div class="flex justify-between h-[6rem] px-10 shadow items-center bg-slate-400">
+    <div class="flex items-center animate-pulse h-fit">
+      <div class="flex flex-col text-center cursor-pointer" onclick="location.href='/'">
+        <p class="logo tracking-widest text-3xl">VENA</p>
+        <p class="tracking-[5px] text-xs">GROCERY STORE</p>
+      </div>
+    </div>
+    <div class="flex space-x-4 items-center text-bold">
+        <!-- กำหนด path-->
+        <a href="manageInventory"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-blacktransform hover:scale-[120%] hover:text-sky-500  transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-archive">
+                <rect width="20" height="5" x="2" y="3" rx="1" />
+                <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+                <path d="M10 12h4" />
+            </svg>
+        </a>
+        <!-- กำหนด path -->
+        <a href="manageAccount"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-user-round-cog">
+                <path d="M2 21a8 8 0 0 1 10.434-7.62" />
+                <circle cx="10" cy="8" r="5" />
+                <circle cx="18" cy="18" r="3" />
+                <path d="m19.5 14.3-.4.9" />
+                <path d="m16.9 20.8-.4.9" />
+                <path d="m21.7 19.5-.9-.4" />
+                <path d="m15.2 16.9-.9-.4" />
+                <path d="m21.7 16.5-.9.4" />
+                <path d="m15.2 19.1-.9.4" />
+                <path d="m19.5 21.7-.4-.9" />
+                <path d="m16.9 15.2-.4-.9" />
+            </svg>
+        </a>
+        <!-- กำหนด path -->
+        <a href="Logout"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-log-out">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+        </a>
+    </div>
+</div>
