@@ -11,6 +11,9 @@ from datetime import datetime
 from django.utils.timezone import *
 import json
 from store.forms.product import ProductForm
+from django.utils import timezone
+from django.db.models import *
+
 
 # Create your views here.
 
@@ -28,18 +31,40 @@ class EmployeeHome(View):
 
 class Stock(View):
     def get(self, request):
-        products = Product.objects.all().order_by('quantity_in_stock')
-        categories = Category.objects.all()
-        context = {'products': products, 'categories': categories}
-        return render(request, "employee/stock.html", context)
-
-class StockManagement(View):
-    def get(self, request):
         categories = request.GET.getlist('category')  # รับ category จาก query parameters ที่อาจมีมากกว่า 1
-        sort_filter = request.GET.get('sort_filter')  # รับตัวกรองการเรียงลำดับ เช่น 'ยอดขายมากที่สุด'
-        print(categories, "|", sort_filter)
-        return HttpResponse('success')
+        sort_filter = request.GET.get('sort_filter')  # รับตัวเลือกการกรองข้อมูล
 
+        # กรณีไม่มีการเลือก category หรือ sort_filter ใด ๆ
+        if not categories and not sort_filter:
+            products = Product.objects.all().order_by('quantity_in_stock')
+            categories = Category.objects.all()
+            context = {'products': products, 'categories': categories}
+            return render(request, "employee/stock.html", context)
+
+        # หากมีการเลือก filter
+        else:
+            new_products = Product.objects.all()
+
+            # มี sort_filter
+            if sort_filter:
+                if sort_filter == 'sales-asc':
+                    new_products = Product.objects.annotate(total_sold=Sum('orderitem__amount')).order_by('total_sold')
+                elif sort_filter == 'sales-desc':
+                    new_products = Product.objects.annotate(total_sold=Sum('orderitem__amount')).order_by('-total_sold')
+                elif sort_filter == 'quantity-asc':
+                    new_products = Product.objects.order_by('quantity_in_stock')
+                elif sort_filter == 'quantity-desc':
+                    new_products = Product.objects.order_by('-quantity_in_stock')
+
+            # มี categories
+            if categories:
+                new_products = new_products.filter(categories__name__in=categories).distinct()
+
+            all_categories = Category.objects.all()
+            context = {'products': new_products, 'categories': all_categories}
+            print(context)
+            return render(request, "employee/stock.html", context)
+    
 class Payment(View):
     def get(self, request, category=None):
         # มี query

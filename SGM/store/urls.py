@@ -9,8 +9,8 @@ def role_based_urlpatterns(request):
 urlpatterns = [
     path('', Inventory.as_view(), name="inventory"),
     path('emp-home', EmployeeHome.as_view()),
-    path('stock', Stock.as_view()),
-    path('stock/', StockManagement.as_view()),
+    path('stock/', Stock.as_view()),
+    # path('stock/', StockManagement.as_view()),
     path('payment', Payment.as_view()),
     path('payment/bill', PaymentBill.as_view()),
     path('payment/<str:category>', Payment.as_view()),

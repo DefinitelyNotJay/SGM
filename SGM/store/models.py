@@ -29,6 +29,7 @@ class Product(models.Model):
     quantity_in_stock = models.IntegerField()
     add_date = models.DateTimeField(default=datetime.now())
     categories = models.ManyToManyField(Category)
+    daily_restock_quantity = models.IntegerField(default=50)
     def __str__(self):
         return self.name
 
