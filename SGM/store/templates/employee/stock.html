@@ -28,7 +28,6 @@ Home Page
                     {% endfor %}
                 </select>
                 <select onchange='selectSortFilter()' name="filter" id="sort_filter" class='border px-3 py-2 rounded-md'>
-                    {% comment %} <option value=""></option> {% endcomment %}
                     <option value="sales-asc">ยอดขาย น้อย-มาก</option>
                     <option value="sales-desc">ยอดขาย มาก-น้อย</option>
                     <option value="quantity-asc">ปริมาณ น้อย-มาก</option>
@@ -44,7 +43,7 @@ Home Page
     <div class='w-full h-full grid grid-cols-6 shadow-md overflow-y-scroll border p-8 rounded-xl gap-y-4'>
         {% for p in  products %}
         <div class='w-[165px] h-[160px]'>
-            <div class='w-[165px] h-[60px] bg-slate-200 border border-b-0 border-t rounded-t-md'>
+            <div onclick='location.href = "/editProduct/{{ p.id }}/"' class='w-[165px] h-[60px] bg-slate-200 hover:bg-gray-100 border border-b-0 border-t rounded-t-md cursor-pointer'>
                 <p class='font-bold text-xl text-center'>{{p.name}}</p>
             </div>
             <div class='flex flex-col justify-between border border-t-0 rounded-lg rounded-t-none  px-4 py-2'>
@@ -159,7 +158,6 @@ Home Page
     }
 
     function submitAmountChange(){
-        console.log("123")
         fetch('/stock/', {
             method: 'POST',
             body: JSON.stringify(add_stock_amount),
