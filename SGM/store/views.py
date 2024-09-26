@@ -11,6 +11,9 @@ from datetime import datetime
 from django.utils.timezone import *
 import json
 from store.forms.product import ProductForm
+from django.utils import timezone
+from django.db.models import *
+
 
 # Create your views here.
 
@@ -25,6 +28,49 @@ class SignUp(View):
 class EmployeeHome(View):
     def get(self, request):
         return render(request, "employee/home.html")
+
+class Stock(View):
+    def get(self, request):
+        categories = request.GET.getlist('category')  # รับ category จาก query parameters ที่อาจมีมากกว่า 1
+        sort_filter = request.GET.get('sort_filter')  # รับตัวเลือกการกรองข้อมูล
+
+        # กรณีไม่มีการเลือก category หรือ sort_filter ใด ๆ
+        if not categories and not sort_filter:
+            products = Product.objects.all().order_by('quantity_in_stock')
+            categories = Category.objects.all()
+            context = {'products': products, 'categories': categories}
+            return render(request, "employee/stock.html", context)
+
+        # หากมีการเลือก filter
+        else:
+            new_products = Product.objects.all()
+
+            # มี sort_filter
+            if sort_filter:
+                if sort_filter == 'sales-asc':
+                    new_products = Product.objects.annotate(total_sold=Sum('orderitem__amount')).order_by('total_sold')
+                elif sort_filter == 'sales-desc':
+                    new_products = Product.objects.annotate(total_sold=Sum('orderitem__amount')).order_by('-total_sold')
+                elif sort_filter == 'quantity-asc':
+                    new_products = Product.objects.order_by('quantity_in_stock')
+                elif sort_filter == 'quantity-desc':
+                    new_products = Product.objects.order_by('-quantity_in_stock')
+
+            # มี categories
+            if categories:
+                new_products = new_products.filter(categories__name__in=categories).distinct()
+
+            all_categories = Category.objects.all()
+            context = {'products': new_products, 'categories': all_categories}
+            return render(request, "employee/stock.html", context)
+    def post(self, request):
+        print(request.body)
+        stock_amount = json.loads(request.body)
+        for p in stock_amount:
+            product = Product.objects.get(pk=p['id'])
+            product.daily_restock_quantity = p['amount']
+            product.save()
+        return JsonResponse({'status': 'success'})
 
 class Payment(View):
     def get(self, request, category=None):
@@ -56,12 +102,21 @@ class PaymentBill(View):
         products = ordered_products.get('storage_products')
         amount = int(ordered_products.get('storage_amount'))
         total = float(ordered_products.get('total'))
+        customer_id = ordered_products.get('customer_id') # คือเบอร์โทร
+        
         # create order
         try:
-            order = Order.objects.create(total_price=total, quantity=amount, status='PAID')
+            customer = Customer.objects.filter(username=customer_id).first() #กรณีไม่มีมันจะเป็น null
+            order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID')
             # create orderItem
             for product in products:
                 OrderItem.objects.create(order=order, product=Product.objects.get(id=product['id']), amount=product['amount'])
+                # ลดจำนวน product ทีทูกซื้อไป
+                use_product = Product.objects.get(pk=product['id'])
+                quantity = use_product.quantity_in_stock
+                use_product.quantity_in_stock = quantity - product['amount']
+                use_product.save()
+                
             return JsonResponse({'status': 'complete'})
         except Exception as e:
             print(e)
@@ -154,8 +209,6 @@ class StatisticsView(View):
 class ViewStock(View):
     def get(self, request):
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
-
-
         return render(request, 'index.html', {'products': products})
 
 class ManageInventory(View):

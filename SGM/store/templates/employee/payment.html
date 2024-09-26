@@ -185,26 +185,8 @@ Home Page
 
   function processPayment(){
     const ordered_product = localStorage.getItem("ordered_product")
-    console.log(ordered_product)
     const input_field = document.getElementById('ordered_products')
     input_field.value = ordered_product
-    
-    // if(selectedProducts.length === 0) return alert("ไม่มีสินค้าที่เลือก")
-    // fetch(`/payment`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "X-CSRFToken": "{{ csrf_token }}",
-    //   },
-    //   body:JSON.stringify(ordered_product)
-    // },
-    // ).then((res)=>{
-    //   res.json().then(data=>{
-    //     localStorage.setItem("order_id", data.order_id)
-    //     window.location.href = "/payment/bill";
-    //   })
-    //   }
-    // )
   }
 
 

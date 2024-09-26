@@ -33,6 +33,7 @@ class Product(models.Model):
     add_date = models.DateTimeField(default=datetime.now())
     categories = models.ManyToManyField(Category)
     image = models.ImageField(upload_to=product_image_path,default='default_image.png')  # ใช้ฟังก์ชันเพื่อกำหนดเส้นทาง
+    daily_restock_quantity = models.IntegerField(default=50)
     def __str__(self):
         return self.name
 
@@ -45,7 +46,6 @@ class Order(models.Model):
     date = models.DateTimeField(default=datetime.now())
     status = models.CharField(max_length=16, choices=StatusChoices.choices, default="UNPAID")
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
-    total_item_purchased = models.IntegerField(default=1)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
