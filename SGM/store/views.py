@@ -159,7 +159,7 @@ class ManageCustomer(View):
         form = CustomerCreateForm(request.POST)
         if form.is_valid:
             try:
-                customer = form.save()
+                form.save()
                 return redirect("/customer")
             except:
                 return redirect("/customer/new/")

@@ -1,41 +1,53 @@
 {% extends "./employee_layout.html" %}
-{% block title %} Customer List {%endblock title %}
+{% block title %} Customer List {% endblock title %}
 {% block nav %} {% include "./navbarEMP.html" %} {% endblock %}
 
 {% block content %}
-<button class="px-4 py-2 rounded bg-blue-200">
-  <a href="/customer/new">สมัคร ALL member</a>
-</button>
-<table class="max-w-4xl bg-red-300 mx-auto mt-24">
-  <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-    <tr>
-      <th scope="col" class="px-6 py-3">ชื่อผู้ใช้/เบอร์โทรศัพท์</th>
-      <th scope="col" class="px-6 py-3">ชื่อเล่น</th>
-      <th scope="col" class="px-6 py-3">เพศ</th>
-      <th scope="col" class="px-6 py-3">หมายเหตุ</th>
-      <th scope="col" class="px-6 py-3">ดำเนินการ</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for customer in customers %}
-    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 text-[#e7e7e7]">
-      <td class="px-6 py-4">{{customer.username}}</td>
-      <td class="px-6 py-4">{{customer.nickname}}</td>
-      <td class="px-6 py-4">{{customer.gender}}</td>
-      <td class="px-6 py-4">{{customer.notes}}</td>
-      <td class="px-6 py-4 flex gap-2">
-        <button class="px-2 hover:underline hover:text-[#FFBF69]">
-          <a href="/customer/{{ customer.id }}/">แก้ไข</a>
-        </button>
-        <button id="{{ customer.id }}" class="deletebutton hover:underline hover:text-[#FF4044]">
-          ลบ
-        </button>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% endblock content %} {% block script %}
+<div class="container mx-auto px-4">
+  <h1 class="text-2xl font-bold mt-6 mb-4 text-center">รายการลูกค้า</h1>
+  
+  <div class="flex  mb-6">
+    <button class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition duration-300">
+      <a href="/customer/new">สมัครสมาชิก</a>
+    </button>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg">
+      <thead class="bg-gray-100">
+        <tr class="text-left">
+          <th class="px-6 py-3 border-b-2 border-gray-300">ชื่อผู้ใช้/เบอร์โทรศัพท์</th>
+          <th class="px-6 py-3 border-b-2 border-gray-300">ชื่อเล่น</th>
+          <th class="px-6 py-3 border-b-2 border-gray-300">เพศ</th>
+          <th class="px-6 py-3 border-b-2 border-gray-300">หมายเหตุ</th>
+          <th class="px-6 py-3 border-b-2 border-gray-300">ดำเนินการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for customer in customers %}
+        <tr class="border-b hover:bg-gray-50 transition duration-200">
+          <td class="px-6 py-4">{{ customer.username }}</td>
+          <td class="px-6 py-4">{{ customer.nickname }}</td>
+          <td class="px-6 py-4">{{ customer.gender }}</td>
+          <td class="px-6 py-4">{{ customer.notes }}</td>
+          <td class="px-6 py-4 flex gap-2">
+            <button class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition duration-300">
+              <a href="/customer/{{ customer.id }}/">แก้ไข</a>
+            </button>
+            <button id="{{ customer.id }}" class="deletebutton px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
+              ลบ
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock content %} 
+
+{% block script %}
 <script>
   const deleteButtons = document.querySelectorAll(".deletebutton");
   deleteButtons.forEach((button) =>
@@ -47,8 +59,14 @@
           "X-CSRFToken": "{{ csrf_token }}",
         },
       })
-        .then((response) => response.json())
-        .then((data) => window.location.reload());
+      .then((response) => {
+        if (response.ok) {
+          alert("ลบลูกค้าเรียบร้อย");
+          window.location.reload();
+        } else {
+          alert("ไม่สามารถลบลูกค้าได้");
+        }
+      });
     })
   );
 </script>
