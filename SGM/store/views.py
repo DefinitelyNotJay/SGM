@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, redirect
 from django.views import View
 from django.http import *
 from store.models import *
@@ -13,7 +13,7 @@ import json
 from store.forms.product import ProductForm
 from django.utils import timezone
 from django.db.models import *
-
+from django.urls import reverse
 
 # Create your views here.
 
@@ -217,20 +217,26 @@ class ManageInventory(View):
         if category_name:
             category = get_object_or_404(Category, name=category_name)
             products = Product.objects.filter(categories=category)
+            category_name = category
             
         else:
             products = Product.objects.all()
-            translated_category_name = "ทั้งหมด"
+            category_name = "ทั้งหมด"
 
         return render(request, 'manageInventory.html', {
             'products': products,
             'category_name': category_name,
         })
 
-    def post(self, request):
+    def post(self, request, category_name=None, *args, **kwargs):
         product_id = request.POST.get('product_id')  # รับ product_id จากฟอร์ม
-        return redirect('editProduct', product_id=product_id)  # เปลี่ยนเส้นทางไปที่ view แก้ไขผลิตภัณฑ์
-
+        if product_id:
+          # สร้าง URL สำหรับไปยัง view ที่ใช้แก้ไขผลิตภัณฑ์ โดยส่ง category_name ด้วย
+            return redirect(reverse('editProduct', kwargs={'product_id': product_id}))
+        else:
+            # หากไม่มี product_id ให้ redirect กลับไปยังหน้าเดิม
+            return redirect('manage_inventory', category_name=category_name)
+        
 class Editproduct(View):
     def get(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
