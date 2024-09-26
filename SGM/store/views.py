@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404, redirect
 from django.views import View
 from django.http import *
 from store.models import *
-from .forms.authentication import *
-from .forms.customer import *
-from .forms.order import *
+from store.forms.authentication import *
+from store.forms.customer import *
+from store.forms.order import *
+from store.forms.product import *
 from django.forms.models import model_to_dict
 from django.db.models import Sum, Count, F, Value
 from datetime import datetime
