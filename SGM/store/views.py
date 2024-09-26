@@ -62,9 +62,16 @@ class Stock(View):
 
             all_categories = Category.objects.all()
             context = {'products': new_products, 'categories': all_categories}
-            print(context)
             return render(request, "employee/stock.html", context)
-    
+    def post(self, request):
+        print(request.body)
+        stock_amount = json.loads(request.body)
+        for p in stock_amount:
+            product = Product.objects.get(pk=p['id'])
+            product.daily_restock_quantity = p['amount']
+            product.save()
+        return JsonResponse({'status': 'success'})
+
 class Payment(View):
     def get(self, request, category=None):
         # มี query

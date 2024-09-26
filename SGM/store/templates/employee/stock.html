@@ -39,7 +39,7 @@ Home Page
             <div class='flex gap-3' id='category-area'>
             </div>
        </div>
-       <button>บันทึก</button>
+       <button onclick='submitAmountChange()' class='px-4 py-2 bg-[#393d3f] text-[#fdfdff] rounded-md'>บันทึก</button>
     </div>
     <div class='w-full h-full grid grid-cols-6 shadow-md overflow-y-scroll border p-8 rounded-xl gap-y-4'>
         {% for p in  products %}
@@ -156,6 +156,19 @@ Home Page
     function changeStockAmount(product_id, amount){
         add_stock_amount = [...add_stock_amount, {'id': parseInt(product_id), 'amount': parseInt(amount)}]
         console.log(add_stock_amount)
+    }
+
+    function submitAmountChange(){
+        console.log("123")
+        fetch('/stock/', {
+            method: 'POST',
+            body: JSON.stringify(add_stock_amount),
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                'Content-Type': "application/json",
+            }
+        }).then(res=>res.json())
+        .then(data=> window.location.reload())
     }
 
 
