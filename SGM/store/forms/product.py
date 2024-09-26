@@ -34,6 +34,14 @@ class ProductForm(forms.ModelForm):
             'class': 'shadow border rounded w-full mb-4 py-2 px-3 text-gray-700 leading-tight focus:shadow-outline'
         })
     )
+    
+    image = forms.ImageField(
+        label='อัปโหลดภาพสินค้า',  # เปลี่ยนชื่อ label
+        widget=forms.ClearableFileInput(attrs={
+            'class': 'shadow border rounded w-full mb-4 py-2 px-3 text-gray-700 leading-tight focus:shadow-outline'
+        }),
+        required=False  # กำหนดให้ไม่บังคับต้องอัปโหลด
+    )
 
     class Meta:
         model = Product

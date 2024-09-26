@@ -212,18 +212,11 @@ class ViewStock(View):
         return render(request, 'index.html', {'products': products})
 
 class ManageInventory(View):
-    CATEGORY_EN_TO_TH = {
-        "Beverages": "เครื่องดื่ม",
-        "Snacks": "ขนม",
-        "Ice-cream": "ไอศกรีม",
-        "Household-item": "ของใช้ครัวเรือน",
-    }
     def get(self, request, category_name=None):
         # ถ้ามีการระบุหมวดหมู่ใน URL ให้ทำการกรองสินค้าตามหมวดหมู่
         if category_name:
             category = get_object_or_404(Category, name=category_name)
             products = Product.objects.filter(categories=category)
-            translated_category_name = self.CATEGORY_EN_TO_TH.get(category_name, category_name)
             
         else:
             products = Product.objects.all()
@@ -232,7 +225,6 @@ class ManageInventory(View):
         return render(request, 'manageInventory.html', {
             'products': products,
             'category_name': category_name,
-            'translated_category_name': translated_category_name  # ส่งหมวดหมู่ที่ถูกเลือกไปยังเทมเพลต
         })
 
     def post(self, request):
