@@ -129,8 +129,6 @@ class PaymentBill(View):
             print(e)
             return HttpResponse(e)
 
-        
-
 class ListCustomer(View):
     def get(self, request):
         customers = Customer.objects.all()
