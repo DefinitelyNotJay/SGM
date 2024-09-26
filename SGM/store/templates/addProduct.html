@@ -9,7 +9,18 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container mx-auto px-4 py-8">
+    <div class="container px-4 py-8">
+        <a class="flex text-center w-full transform hover:scale-[110%] transition-transform duration-100 "
+        href="{% url 'manageInventory' %}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="lucide lucide-circle-arrow-left pr-2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M16 12H8" />
+            <path d="m12 8-4 4 4 4" />
+        </svg>
+        <p class="pt-1"> กลับไปหน้ารายการสินค้า </p>
+    </a>
         <h1 class="text-3xl font-bold mb-6">เพิ่มสินค้าใหม่</h1>
         <form method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             {% csrf_token %}
@@ -58,8 +69,5 @@
                 เพิ่มสินค้า
             </button>
         </form>
-        <a href="{% url 'manageInventory' %}" class="text-blue-500 hover:text-blue-700">
-            &larr; กลับไปหน้ารายการสินค้า
-        </a>
     </div>
 {% endblock %}
