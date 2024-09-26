@@ -32,10 +32,17 @@
     </div>
     <div class='p-4'>
         <hr>
-        <div class='text-center font-semibold text-lg mt-4'>
+        <div class='text-center font-semibold text-lg mt-6 flex justify-evenly items-center'>
             <span>จำนวนทั้งหมด <span>{{ storage_amount }}</span> ชิ้น</span>
+            <div>
+                <label for="customer_number">เบอร์ลูกค้า</label>
+                <input type="text" id='customer_number' class="px-3 py-2 border self-center font-medium rounded-md w-[130px]">
+            </div>
             <span>ราคารวม <span>{{ total }}</span> บาท
+            
         </div>
+        
+        
         <div class="flex gap-4 w-fit mx-auto py-4">
             <button onclick="window.history.back()" class='text-lg px-4 py-2 border rounded-md text-[#333] bg-[#c6c5b9] hover:bg-[#d1d1c7]'>กลับ</button>
             <button class='text-lg px-4 py-2 border rounded-md text-[#FDFDFF] bg-[#546a7b] hover:bg-[#768895]' onclick='paymentHandler()'>ชำระเงิน</button>
@@ -56,13 +63,16 @@
     }
 
     function paymentHandler(){
+
+        const customer_id = document.getElementById('customer_number').value
+        alert(customer_id)
         fetch(`/payment/bill`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               "X-CSRFToken": "{{ csrf_token }}",
             },
-            body:JSON.stringify({...ordered_product, 'total': '{{ total }}'})
+            body:JSON.stringify({...ordered_product, 'total': '{{ total }}', 'customer_id': customer_id || 0})
           },
           ).then((res)=>{
             res.json().then(data=>{
