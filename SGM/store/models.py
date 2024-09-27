@@ -41,11 +41,17 @@ class Order(models.Model):
     class StatusChoices(models.Choices):
         PAID = "P"
         UNPAID = "U"
+        
+    class PaymentMethodChoices(models.TextChoices):
+        POMPAL = "QR Code(pompal)", "QR Code (Pompal)"
+        CASH = "Cash", "เงินสด"
+        
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     quantity = models.IntegerField()
     date = models.DateTimeField(default=datetime.now())
-    status = models.CharField(max_length=16, choices=StatusChoices.choices, default="UNPAID")
+    status = models.CharField(max_length=16, choices=StatusChoices.choices, default=StatusChoices.UNPAID)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
+    payment_method = models.CharField(max_length=20, choices=PaymentMethodChoices.choices, default=PaymentMethodChoices.CASH) 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

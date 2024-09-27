@@ -16,27 +16,8 @@ from django.utils import timezone
 from django.db.models import *
 from django.urls import reverse
 from promptpay import qrcode
+from io import BytesIO
 # Create your views here.
-def generate_qrcode(request):
-    id_or_phone_number = "0802695576"  # หมายเลขที่ต้องการ
-    amount = 100  # จำนวนเงิน
-
-    # สร้าง payload สำหรับหมายเลขโทรศัพท์และจำนวนเงิน
-    payload = qrcode.generate_payload(id_or_phone_number)
-    payload_with_amount = qrcode.generate_payload(id_or_phone_number, amount)
-
-    # ส่งออกเป็นภาพ PIL
-    img = qrcode.to_image(payload)
-    img_with_amount = qrcode.to_image(payload_with_amount)
-
-    # บันทึกเป็นไฟล์
-    img.save("qrcode-0802695576.png")
-    img_with_amount.save("qrcode-0802695576-with-amount.png")
-
-    # ส่งกลับเป็นไฟล์ภาพใน HttpResponse
-    response = HttpResponse(content_type="image/png")
-    img_with_amount.save(response, "PNG")  # เปลี่ยนให้ส่งภาพที่มีจำนวนเงิน
-    return response
 
 class Inventory(View):
     def get(self, request):
@@ -121,24 +102,21 @@ class Payment(View):
             data['total'] = total
             return render(request, 'employee/payment_bill.html', data)
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
-
 class PaymentBill(View):
-
     def post(self, request):
         ordered_products = json.loads(request.body)
         products = ordered_products.get('storage_products')
         amount = int(ordered_products.get('storage_amount'))
         total = float(ordered_products.get('total'))
-        customer_id = ordered_products.get('customer_id') # คือเบอร์โทร
+        customer_id = ordered_products.get('customer_id')
+        payment_method = ordered_products.get('payment_method')
         
-        # create order
         try:
-            customer = Customer.objects.filter(username=customer_id).first() #กรณีไม่มีมันจะเป็น null
-            order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID')
-            # create orderItem
+            customer = Customer.objects.filter(username=customer_id).first()
+            order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID', payment_method=payment_method)
+            
             for product in products:
                 OrderItem.objects.create(order=order, product=Product.objects.get(id=product['id']), amount=product['amount'])
-                # ลดจำนวน product ทีทูกซื้อไป
                 use_product = Product.objects.get(pk=product['id'])
                 quantity = use_product.quantity_in_stock
                 use_product.quantity_in_stock = quantity - product['amount']
@@ -148,6 +126,21 @@ class PaymentBill(View):
         except Exception as e:
             print(e)
             return HttpResponse(e)
+
+class GenerateQRCode(View):
+    def get(self, request):
+        amount = request.GET.get('amount')
+        customer_id = '0802695576'
+
+        payload_with_amount = qrcode.generate_payload(customer_id, float(amount))
+
+        img = qrcode.to_image(payload_with_amount)
+
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        return HttpResponse(buffer.getvalue(), content_type="image/png")
 
 class ListCustomer(View):
     def get(self, request):

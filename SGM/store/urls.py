@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import *
 from .views import *
+from . import views
+
 
 def role_based_urlpatterns(request):
     return HttpResponse("Hey")
@@ -10,9 +12,9 @@ urlpatterns = [
     path('', Inventory.as_view(), name="inventory"),
     path('emp-home', EmployeeHome.as_view()),
     path('stock/', Stock.as_view()),
-    # path('stock/', StockManagement.as_view()),
     path('payment', Payment.as_view()),
     path('payment/bill', PaymentBill.as_view()),
+    path('payment/generate-qrcode', GenerateQRCode.as_view(), name='generate_qrcode'),
     path('payment/<str:category>', Payment.as_view()),
     path('customer/new/', ManageCustomer.as_view()),
     path('customer/', ListCustomer.as_view(), name="customer"),
@@ -26,5 +28,4 @@ urlpatterns = [
     path('deleteProduct/<int:product_id>/', DeleteProduct.as_view(), name='delete_product'),
     path('addProduct/', AddProduct.as_view(), name='addProduct'),
     path('ManageUser', ManageUserView.as_view(), name="ManageUser"),
-    path('generate_qrcode/', generate_qrcode, name='generate_qrcode'),
 ]
