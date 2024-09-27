@@ -32,7 +32,7 @@ class Product(models.Model):
     quantity_in_stock = models.IntegerField()
     add_date = models.DateTimeField(default=datetime.now())
     categories = models.ManyToManyField(Category)
-    image = models.ImageField(upload_to=product_image_path,default='')  # ใช้ฟังก์ชันเพื่อกำหนดเส้นทาง
+    image = models.ImageField(upload_to=product_image_path, null=True, blank=True) # ใช้ฟังก์ชันเพื่อกำหนดเส้นทาง
     daily_restock_quantity = models.IntegerField(default=50)
     def __str__(self):
         return self.name
