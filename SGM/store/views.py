@@ -13,6 +13,8 @@ import json
 from store.forms.product import ProductForm
 from django.utils import timezone
 from django.db.models import *
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate
 
 
 # Create your views here.
@@ -23,7 +25,26 @@ class Inventory(View):
 
 class SignUp(View):
     def get(self, request):
-        return render(request, "registration/sign_up.html", {"form": RegisterForm()})
+        return render(request, "./registration/sign-up.html", {"form": RegisterForm()})
+    def post(self, request):
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/sign-up')
+        return render(request, './registration/sign-up.html', {'form': form})
+class SignIn(View):
+    def get(self, request):
+        return render(request, './registration/login.html', {'form': AuthenticationForm})
+
+    def post(self, request):
+        print(request.POST)
+        form = AuthenticationForm(data=request.POST)
+        print(form.error_messages)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('/')
+        return render(request, './registration/login.html', {"form": form})
 
 class EmployeeHome(View):
     def get(self, request):

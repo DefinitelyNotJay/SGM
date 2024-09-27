@@ -1,0 +1,64 @@
+{% load tailwind_filters %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="" />
+  </head>
+  <style>
+    body {
+      font-family: 'Noto Sans Thai', sans-serif;
+  }
+  </style>
+  <body>
+    <h1 class='text-center mt-8 text-2xl font-semibold'>ลงทะเบียนพนักงาน</h1>
+    <form method="post" class="max-w-lg mx-auto mt-4 h-[620px] overflow-y-scroll">
+      {% csrf_token %}
+      <div class='flex flex-col p-1 gap-3'> 
+        <div class="flex flex-col p-1">
+          <label for='{{ form.username.id_for_label }}'>เบอร์โทรศัพท์</label>
+          {{form.username|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
+          <div class="text-red-500">{{form.username.errors}}</div>
+        </div>
+        <div class="flex flex-col p-1">
+          <label for='{{ form.first_name.id_for_label }}'>ชื่อ</label>
+          {{form.first_name|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
+          <div class="text-red-500">{{form.first_name.errors}}</div>
+        </div>
+        <div class="flex flex-col p-1">
+          <label for='{{ form.last_name.id_for_label }}'>นามสกุล</label>
+          {{form.last_name|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
+          <div class="text-red-500">{{form.last_name.errors}}</div>
+        </div>
+        <div class="flex flex-col p-1">
+          <label for='{{ form.email.id_for_label }}'>อีเมล</label>
+          {{form.email|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
+          <div class="text-red-500">{{form.email.errors}}</div>
+        </div>
+        <div class="flex gap-2 p-1">
+          <label for='{{ form.is_staff.id_for_label }}'>ผู้จัดการ</label>
+          {{form.is_staff|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
+          <div class="text-red-500">{{form.is_staff.errors}}</div>
+        </div>
+        <div class="flex flex-col p-1">
+          <label for='{{ form.password.id_for_label }}'>รหัสผ่าน</label>
+          {{form.password1|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
+          <div class="text-red-500">{{form.password1.errors}}</div>
+        </div>
+        <div class="flex flex-col p-1">
+          <label for='{{ form.password2.id_for_label }}'>ยืนยันรหัสผ่าน</label>
+          {{form.password2|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
+          <div class="text-red-500">{{form.password2.errors}}</div>
+        </div>
+        <button class="px-6 py-2 bg-[#393d3f] hover:bg-[#555] text-[#fdfdff] rounded-md">ยืนยัน</button>
+      </div>
+    </form>
+  </body>
+  <script src="https://cdn.tailwindcss.com"></script>
+</html>
