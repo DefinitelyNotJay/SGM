@@ -1,45 +1,50 @@
-{% extends "./employee_layout.html" %} {% block title %} Customer List {%
-endblock title %} {% block nav %} {% include "./navbarEMP.html" %} {% endblock
-nav %} {% block content %}
-<button class="px-4 py-2 rounded bg-blue-200">
-  <a href="/customer/new">สมัคร ALL member</a>
-</button>
-<table class="max-w-4xl bg-red-300 mx-auto mt-24">
-  <thead
-    class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-  >
-    <tr>
-      <th scope="col" class="px-6 py-3">ชื่อผู้ใช้/เบอร์โทรศัพท์</th>
-      <th scope="col" class="px-6 py-3">ชื่อเล่น</th>
-      <th scope="col" class="px-6 py-3">เพศ</th>
-      <th scope="col" class="px-6 py-3">หมายเหตุ</th>
-      <th scope="col" class="px-6 py-3">ดำเนินการ</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for customer in customers %}
-    <tr
-      class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 text-[#e7e7e7]"
+{% extends "./employee_layout.html" %} 
+{% block title %} 
+Customer List 
+{% endblock title %} 
+{% block nav %} 
+{% include "./navbarEMP.html" %} 
+{% endblock nav %} 
+{% block content %}
+<div class='w-full flex flex-col gap-2'>
+  <button class="px-4 py-2 text-2xl text-[#333] w-fit self-end rounded bg-[#c6c5b9]">
+    <a href="/customer/new">สมัครสมาชิก</a>
+  </button>
+  <table class="max-w-4xl  mx-auto border">
+    <thead
+      class="text-lg uppercase bg-[#546A7B] text-[#fdfdff]"
     >
-      <td class="px-6 py-4">{{customer.username}}</td>
-      <td class="px-6 py-4">{{customer.nickname}}</td>
-      <td class="px-6 py-4">{{customer.gender}}</td>
-      <td class="px-6 py-4">{{customer.notes}}</td>
-      <td class="px-6 py-4 flex gap-2">
-        <button class="px-2 hover:underline hover:text-[#FFBF69]">
-          <a href="/customer/{{ customer.id }}/">แก้ไข</a>
-        </button>
-        <button
-          id="{{ customer.id }}"
-          class="deletebutton hover:underline hover:text-[#FF4044]"
-        >
-          ลบ
-        </button>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+      <tr>
+        <th scope="col" class="px-6 py-3">ชื่อผู้ใช้/เบอร์โทรศัพท์</th>
+        <th scope="col" class="px-6 py-3">ชื่อเล่น</th>
+        <th scope="col" class="px-6 py-3">เพศ</th>
+        <th scope="col" class="px-6 py-3">ดำเนินการ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in customers %}
+      <tr
+        class="bg-[#fdfdff] border-b text-[#393d3f]"
+      >
+        <td class="px-6 py-4">{{customer.username}}</td>
+        <td class="px-6 py-4">{{customer.nickname}}</td>
+        <td class="px-6 py-4">{{customer.gender}}</td>
+        <td class="px-6 py-4 flex gap-2">
+          <button class="p-2 rounded-full bg-[#62929e] text-[#fdfdff]">
+            <a href="/customer/{{ customer.id }}/"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-pen"><path d="M11.5 15H7a4 4 0 0 0-4 4v2"/><path d="M21.378 16.626a1 1 0 0 0-3.004-3.004l-4.01 4.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/><circle cx="10" cy="7" r="4"/></svg></a>
+          </button>
+          <button
+            id="{{ customer.id }}"
+            class="deletebutton p-2 rounded-full bg-[#fa5252] text-[#fdfdff] "
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-x"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" x2="22" y1="8" y2="13"/><line x1="22" x2="17" y1="8" y2="13"/></svg>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock content %} {% block script %}
 <script>
   const deleteButtons = document.querySelectorAll(".deletebutton");
@@ -58,3 +63,16 @@ nav %} {% block content %}
   );
 </script>
 {% endblock script %}
+
+
+{% comment %} blue: {
+    100: "#e0e9ec",
+    200: "#c0d3d8",
+    300: "#a1bec5",
+    400: "#81a8b1",
+    500: "#62929e",
+    600: "#4e757e",
+    700: "#3b585f",
+    800: "#273a3f",
+    900: "#141d20"
+}, {% endcomment %}

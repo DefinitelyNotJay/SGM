@@ -12,13 +12,15 @@
     {% include "./navbarEMP.html" %}
 {% endblock nav %}
 {% block content %}
-<form method="post" class="flex flex-col flex-1 gap-3 mx-auto max-w-sm mt-20">
-    <h1 class="text-3xl  text-center font-semibold mb-4">
-    {% if isCreate %}
-        สมัครสมาชิกใหม่
-    {% else%}
-        แก้ไขข้อมูลสมาชิก
-    {% endif %}
+<div class='bg-[#dde1e5] w-fit p-4 mx-auto rounded-md'>
+    <h1 class='text-center text-2xl font-semibold'>
+        {% if isCreate %}
+            สมัครสมาชิกใหม่
+        {% else%}
+           แก้ไขข้อมูลสมาชิก
+        {% endif %}
+    </h1>
+<form method="post" class="flex flex-col flex-1 gap-3 mx-auto max-w-sm mt-4">
     {% csrf_token %}
     <div class="flex flex-col">
         <label for='{{ form.username.id_for_label }}'>ชื่อผู้ใช้หรือเบอร์โทรศัพท์</label>
@@ -38,7 +40,7 @@
     </div>
     <div class="flex flex-col">
         <label for='{{ form.notes.id_for_label }}'>หมายเหตุ</label>
-        {{form.notes|add_class:"p-2 border rounded focus:border-blue-300 resize-none"}}
+        {{form.notes|add_class:"p-2 border rounded focus:border-blue-300 h-40 resize-none"}}
         {{form.notes.errors}}
     </div>
 <div class="mx-auto">
@@ -46,7 +48,21 @@
    <button type="submit" class="bg-[#546A7B] hover:bg-[#768895] text-[#FDFDFF] px-4 py-2 w-fit rounded">ยืนยัน</button>
 </div>
 </form>
+</div>
 {% endblock content %}
 
+
+
+{% comment %} indigo: {
+    100: "#dde1e5",
+    200: "#bbc3ca",
+    300: "#98a6b0",
+    400: "#768895",
+    500: "#546a7b",
+    600: "#435562",
+    700: "#32404a",
+    800: "#222a31",
+    900: "#111519"
+}, {% endcomment %}
 
    
