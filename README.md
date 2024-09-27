@@ -1,3 +1,3 @@
-myvenv\Scripts\activate.bat <br>
-python manage.py makemigrations <br>
+myvenv\Scripts\activate.bat
+python manage.py makemigrations
 python manage.py migrate
