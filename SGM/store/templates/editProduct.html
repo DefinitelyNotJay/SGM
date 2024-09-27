@@ -24,7 +24,7 @@
                 class="w-1/2 aspect-square rounded-2xl object-cover mr-10">
         </div>
         <div class="grid gap-y-12  bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data" >
                 {% csrf_token %}
                 <div class="mb-4">
                     <label for="{{ form.name.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">
@@ -68,10 +68,13 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="{{ form.imageid_for_label }}" class="block text-gray-700  text-sm font-bold mb-2">
-                        {{ form.image.label }}
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="image">
+                        อัปโหลดภาพสินค้า
                     </label>
-                    {{ form.image }}
+                    <input type="file" name="image" id="image" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:shadow-outline" />
+                    {% if form.image.value %}
+                        <p>Currently: {{ form.image.value.name }}</p>
+                    {% endif %}
                 </div>
                 <div class="flex justify-between">
                     <div class="mt-4"><button type="submit"

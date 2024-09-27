@@ -26,4 +26,5 @@ urlpatterns = [
     path('deleteProduct/<int:product_id>/', DeleteProduct.as_view(), name='delete_product'),
     path('addProduct/', AddProduct.as_view(), name='addProduct'),
     path('ManageUser', ManageUserView.as_view(), name="ManageUser"),
+    path('generate_qrcode/', generate_qrcode, name='generate_qrcode'),
 ]

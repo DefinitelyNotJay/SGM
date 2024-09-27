@@ -15,8 +15,28 @@ from store.forms.product import ProductForm
 from django.utils import timezone
 from django.db.models import *
 from django.urls import reverse
-
+from promptpay import qrcode
 # Create your views here.
+def generate_qrcode(request):
+    id_or_phone_number = "0802695576"  # หมายเลขที่ต้องการ
+    amount = 100  # จำนวนเงิน
+
+    # สร้าง payload สำหรับหมายเลขโทรศัพท์และจำนวนเงิน
+    payload = qrcode.generate_payload(id_or_phone_number)
+    payload_with_amount = qrcode.generate_payload(id_or_phone_number, amount)
+
+    # ส่งออกเป็นภาพ PIL
+    img = qrcode.to_image(payload)
+    img_with_amount = qrcode.to_image(payload_with_amount)
+
+    # บันทึกเป็นไฟล์
+    img.save("qrcode-0802695576.png")
+    img_with_amount.save("qrcode-0802695576-with-amount.png")
+
+    # ส่งกลับเป็นไฟล์ภาพใน HttpResponse
+    response = HttpResponse(content_type="image/png")
+    img_with_amount.save(response, "PNG")  # เปลี่ยนให้ส่งภาพที่มีจำนวนเงิน
+    return response
 
 class Inventory(View):
     def get(self, request):
