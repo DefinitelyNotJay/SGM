@@ -25,6 +25,8 @@ from io import BytesIO
 class EmployeeHome(LoginRequiredMixin, View):
     login_url = '/login/'
     # permission_required = ['store.create_order', 'store.add_order', 'store.change_order', 'store.view_order']
+    def get(self, request):
+        return redirect('/payment')
 
 # Create your views here.
 
