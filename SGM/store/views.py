@@ -211,6 +211,7 @@ class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
 class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/login/'
     def test_func(self):
+        print(self.request.user.groups.all())
         return self.request.user.groups.filter(name='manager').exists()
 
     MONTHS_EN_TO_TH = {
@@ -331,3 +332,12 @@ class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
             form.save()  # บันทึกสินค้าใหม่
             return redirect('manageInventory') 
         return render(request, 'manager/addProduct.html', {'form': form})
+
+class AccountManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['store.add_customer', 'store.view_customer', 'store.delete_customer', 'store.change_customer']
+    login_url = '/login/'
+    def get(self, request):
+        customers = Customer.objects.all()
+        employees = User.objects.filter(is_staff=False)
+        context = {'customers': customers, 'employees': employees}
+        return render(request, 'manager/account.html', context)

@@ -1,0 +1,70 @@
+{% extends './layout.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block nav %}
+{% include './navbar_manager.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full h-full p-8">
+    <h1 class='text-2xl font-semibold'>จัดการบัญชี</h1>
+    <div class='w-full flex gap-6 mt-4'>
+        <table class="w-1/2 bg-white border border-gray-300 rounded-lg shadow-lg">
+            <thead class="bg-gray-100">
+              <tr class="text-left">
+                <th class="px-6 py-3 border-b-2 border-gray-300">เบอร์โทรศัพท์</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">ชื่อผู้ใช้งาน</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">วันเริ่มงาน</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">ดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for employee in employees %}
+              <tr class="border-b hover:bg-gray-50 transition duration-200">
+                <td class="px-6 py-4">{{ employee.username }}</td>
+                <td class="px-6 py-4">{{ employee.first_name }} {{ employee.last_name }}</td>
+                <td class="px-6 py-4">{{ employee.date_joined | date:"d-m-Y" }}</td>
+                <td class="px-6 py-4 flex gap-2">
+                  <button class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition duration-300">
+                    <a href="/customer/{{ customer.id }}/">แก้ไข</a>
+                  </button>
+                  <button id="{{ customer.id }}" class="deletebutton px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
+                    ลบ
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <table class="w-1/2 bg-white border border-gray-300 rounded-lg shadow-lg">
+            <thead class="bg-gray-100">
+              <tr class="text-left">
+                <th class="px-6 py-3 border-b-2 border-gray-300">เบอร์โทรศัพท์</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">ชื่อเล่น</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">เพศ</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">ดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for customer in customers %}
+              <tr class="border-b hover:bg-gray-50 transition duration-200">
+                <td class="px-6 py-4">{{ customer.username }}</td>
+                <td class="px-6 py-4">{{ customer.nickname }}</td>
+                <td class="px-6 py-4">{{ customer.gender }}</td>
+                <td class="px-6 py-4 flex gap-2">
+                  <button class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition duration-300">
+                    <a href="/customer/{{ customer.id }}/">แก้ไข</a>
+                  </button>
+                  <button id="{{ customer.id }}" class="deletebutton px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
+                    ลบ
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+    </div>
+</div>
+{% endblock %}
