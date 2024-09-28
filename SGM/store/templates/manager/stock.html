@@ -1,9 +1,9 @@
-{% extends "./employee_layout.html" %} 
+{% extends "./layout.html" %} 
 {% block title %} 
 Home Page 
 {% endblock %} 
 {% block nav %} 
-  {% include "./navbarEMP.html" %} 
+  {% include "./navbar_manager.html" %} 
 {% endblock nav%}
 {% block content %}
 <style>
@@ -16,7 +16,7 @@ Home Page
 }
 </style>
 
-<div class='w-full p-8 pt-0  flex flex-col gap-6'>
+<div class='w-full p-8  flex flex-col gap-6'>
     <h1 class='text-4xl font-bold'>คลังสินค้า</h1>
     <div class='w-full flex justify-between'>
        <div class='flex gap-3 w-full items-center'>
