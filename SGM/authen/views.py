@@ -4,6 +4,7 @@ from store.forms.authentication import *
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import Group
 # Create your views here.
 
 class SignUp(View):
@@ -12,7 +13,17 @@ class SignUp(View):
     def post(self, request):
         form = RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            print(user.is_staff)
+            employee_group = Group.objects.get(name='employee')
+            manager_group = Group.objects.get(name='manager')
+            print(employee_group.id, manager_group.id)
+            # add permission group to new create user
+            if user.is_staff:
+                user.groups.add(employee_group)
+            else:
+                user.groups.add(manager_group)
+            user.save()
             return redirect('/login/')
         return render(request, './registration/sign-up.html', {'form': form})
 class SignIn(View):

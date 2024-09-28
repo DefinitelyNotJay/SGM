@@ -64,8 +64,8 @@ class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
             all_categories = Category.objects.all()
             context = {'products': new_products, 'categories': all_categories}
             return render(request, "employee/stock.html", context)
+
     def post(self, request):
-        print(request.body)
         stock_amount = json.loads(request.body)
         for p in stock_amount:
             product = Product.objects.get(pk=p['id'])
@@ -73,8 +73,8 @@ class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
             product.save()
         return JsonResponse({'status': 'success'})
 
-class Payment(LoginRequiredMixin, View):
-    # permission_required = ['']
+class Payment(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['store.view_order', 'store.delete_order', 'store.change_order', 'store.delete_order']
     login_url = '/login/'
     def get(self, request, category=None):
         # มี query
@@ -100,7 +100,7 @@ class Payment(LoginRequiredMixin, View):
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
 class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['']
+    permission_required = ['store.create_order', 'store.delete_order', 'store.change_order', 'store.delete_order']
     login_url = '/login/'
 
     def post(self, request):
@@ -131,14 +131,14 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
         
 
 class ListCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['']
+    permission_required = ['store.view_customer']
     login_url = '/login/'
     def get(self, request):
         customers = Customer.objects.all()
         return render(request, "employee/all_customer.html", {"customers": customers})
 
 class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['']
+    permission_required = ['store.view_customer', 'store.create_customer', 'store.change_customer', 'store.delete_customer']
     login_url = '/login/'
     def get(self, request, customer_id=None):
         if(customer_id):
