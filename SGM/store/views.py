@@ -13,44 +13,24 @@ import json
 from store.forms.product import ProductForm
 from django.utils import timezone
 from django.db.models import *
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login, authenticate
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 # Create your views here.
 
-class Inventory(View):
+class Inventory(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         return render(request, "employee/customer_form.html", {"form": CustomerCreateForm()})
 
-class SignUp(View):
-    def get(self, request):
-        return render(request, "./registration/sign-up.html", {"form": RegisterForm()})
-    def post(self, request):
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/sign-up')
-        return render(request, './registration/sign-up.html', {'form': form})
-class SignIn(View):
-    def get(self, request):
-        return render(request, './registration/login.html', {'form': AuthenticationForm})
 
-    def post(self, request):
-        print(request.POST)
-        form = AuthenticationForm(data=request.POST)
-        print(form.error_messages)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('/')
-        return render(request, './registration/login.html', {"form": form})
-
-class EmployeeHome(View):
+class EmployeeHome(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         return render(request, "employee/home.html")
 
-class Stock(View):
+class Stock(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         categories = request.GET.getlist('category')  # รับ category จาก query parameters ที่อาจมีมากกว่า 1
         sort_filter = request.GET.get('sort_filter')  # รับตัวเลือกการกรองข้อมูล
@@ -93,7 +73,8 @@ class Stock(View):
             product.save()
         return JsonResponse({'status': 'success'})
 
-class Payment(View):
+class Payment(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request, category=None):
         # มี query
         if category is None:
@@ -116,7 +97,8 @@ class Payment(View):
             return render(request, 'employee/payment_bill.html', data)
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
-class PaymentBill(View):
+class PaymentBill(LoginRequiredMixin, View):
+    login_url = '/login/'
 
     def post(self, request):
         ordered_products = json.loads(request.body)
@@ -145,12 +127,14 @@ class PaymentBill(View):
 
         
 
-class ListCustomer(View):
+class ListCustomer(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         customers = Customer.objects.all()
         return render(request, "employee/all_customer.html", {"customers": customers})
 
-class ManageCustomer(View):
+class ManageCustomer(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request, customer_id=None):
         if(customer_id):
             # edit customer info
@@ -189,7 +173,8 @@ class ManageCustomer(View):
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
 
-class StatisticsView(View):
+class StatisticsView(LoginRequiredMixin, View):
+    login_url = '/login/'
     MONTHS_EN_TO_TH = {
         "January": "มกราคม",
         "February": "กุมภาพันธ์",
@@ -227,12 +212,14 @@ class StatisticsView(View):
 
         return render(request, 'statistics.html', {'customers': customers , 'products':products, 'allcustomer':allcustomer, 'current_month_name_th': current_month_name_th})
 
-class ViewStock(View):
+class ViewStock(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
         return render(request, 'index.html', {'products': products})
 
-class ManageInventory(View):
+class ManageInventory(LoginRequiredMixin, View):
+    login_url = '/login/'
     CATEGORY_EN_TO_TH = {
         "Beverages": "เครื่องดื่ม",
         "Snacks": "ขนม",
@@ -260,7 +247,8 @@ class ManageInventory(View):
         product_id = request.POST.get('product_id')  # รับ product_id จากฟอร์ม
         return redirect('editProduct', product_id=product_id)  # เปลี่ยนเส้นทางไปที่ view แก้ไขผลิตภัณฑ์
 
-class Editproduct(View):
+class Editproduct(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
         form = ProductForm(instance=product)  # สร้างฟอร์มจากอินสแตนซ์ของผลิตภัณฑ์
@@ -276,14 +264,16 @@ class Editproduct(View):
 
         return render(request, 'editProduct.html', {'form': form, 'product': product})  # หากฟอร์มไม่ถูกต้อง ให้แสดงฟอร์มอีกครั้ง
 
-class DeleteProduct(View):
+class DeleteProduct(LoginRequiredMixin, View):
+    login_url = '/login/'
     def post(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
         product.delete()  # ลบสินค้า
         return redirect('manageInventory')  # กลับไปที่หน้า manageInventory
 
 
-class AddProduct(View):
+class AddProduct(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request):
         form = ProductForm()
         return render(request, 'addProduct.html', {'form': form})
