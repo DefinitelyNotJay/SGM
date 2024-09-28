@@ -1,68 +1,63 @@
 {% extends "./employee_layout.html" %}
 {% load widget_tweaks %}
-{% block title %}
 
-{% if isCreate %}
-    Customer Register
-{% else %}
-    Customer Edit
-{% endif %}
+{% block title %}
+    {% if isCreate %}
+        Customer Register
+    {% else %}
+        Customer Edit
+    {% endif %}
 {% endblock title %}
+
 {% block nav %}
     {% include "./navbarEMP.html" %}
 {% endblock nav %}
+
 {% block content %}
-<div class='bg-[#dde1e5] w-fit p-4 mx-auto rounded-md'>
-    <h1 class='text-center text-2xl font-semibold'>
-        {% if isCreate %}
-            สมัครสมาชิกใหม่
-        {% else%}
-           แก้ไขข้อมูลสมาชิก
-        {% endif %}
-    </h1>
-<form method="post" class="flex flex-col flex-1 gap-3 mx-auto max-w-sm mt-4">
-    {% csrf_token %}
-    <div class="flex flex-col">
-        <label for='{{ form.username.id_for_label }}'>ชื่อผู้ใช้หรือเบอร์โทรศัพท์</label>
-        {{form.username|add_class:"p-2 border rounded focus:border-blue-300"}}
-        {{form.username.errors}}
+<div class="flex justify-center mt-10 ">
+    <form method="post" class=" bg-gray-100 shadow-md rounded-lg p-8 max-w-2xl w-full">
+        <h1 class="text-3xl text-center font-semibold mb-6">
+            {% if isCreate %}
+                สมัครสมาชิกใหม่
+            {% else %}
+                แก้ไขข้อมูลสมาชิก
+            {% endif %}
+        </h1>
+        {% csrf_token %}
         
-    </div>
-    <div class="flex flex-col">
-        <label for='{{ form.nickname.id_for_label }}'>ชื่อเล่น</label>
-        {{form.nickname|add_class:"p-2 border rounded focus:border-blue-300"}}
-        {{form.nickname.errors}}
-    </div>
-    <div class="flex flex-col">
-        <label for='{{ form.gender.id_for_label }}'>เพศ</label>
-        {{form.gender|add_class:"px-4 py-2 border w-fit rounded"}}
-        {{form.gender.errors}}
-    </div>
-    <div class="flex flex-col">
-        <label for='{{ form.notes.id_for_label }}'>หมายเหตุ</label>
-        {{form.notes|add_class:"p-2 border rounded focus:border-blue-300 h-40 resize-none"}}
-        {{form.notes.errors}}
-    </div>
-<div class="mx-auto">
-   <button type="button" class="bg-[#FF4044] hover:bg-[#ff6669] text-[#FDFDFF] px-4 py-2 w-fit rounded"><a href="/customer">ยกเลิก</a></button>
-   <button type="submit" class="bg-[#546A7B] hover:bg-[#768895] text-[#FDFDFF] px-4 py-2 w-fit rounded">ยืนยัน</button>
-</div>
-</form>
+        <div class="flex flex-col mb-4">
+            <label for="{{ form.username.id_for_label }}" class="mb-1 text-sm font-medium">ชื่อผู้ใช้หรือเบอร์โทรศัพท์</label>
+            {{ form.username|add_class:"p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" }}
+            <div class="text-red-600 text-sm mt-1">{{ form.username.errors }}</div>
+        </div>
+
+        <div class="flex flex-col mb-4">
+            <label for="{{ form.nickname.id_for_label }}" class="mb-1 text-sm font-medium">ชื่อเล่น</label>
+            {{ form.nickname|add_class:"p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" }}
+            <div class="text-red-600 text-sm mt-1">{{ form.nickname.errors }}</div>
+        </div>
+
+        <div class="flex flex-col mb-4">
+            <label for="{{ form.gender.id_for_label }}" class="mb-1 text-sm font-medium">เพศ</label>
+            {{ form.gender|add_class:"px-4 py-3 border w-fit rounded focus:outline-none focus:ring-2 focus:ring-blue-400" }}
+            <div class="text-red-600 text-sm mt-1">{{ form.gender.errors }}</div>
+        </div>
+
+        <div class="flex flex-col mb-4">
+            <label for="{{ form.notes.id_for_label }}" class="mb-1 text-sm font-medium">หมายเหตุ</label>
+            {{ form.notes|add_class:"p-1 border rounded  focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none" }}
+            <div class="text-red-600 text-sm mt-1">{{ form.notes.errors }}</div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+            <button type="submit"
+                class="bg-[#546A7B] hover:bg-[#768895] text-white px-4 py-2 rounded transition duration-200">
+                ยืนยัน
+            </button>
+            <button type="button" class="bg-[#FF4044] hover:bg-[#ff6669] text-white px-4 py-2 rounded transition duration-200">
+                <a href="/customer">ยกเลิก</a>
+            </button>
+        </div>
+    </form>
 </div>
 {% endblock content %}
-
-
-
-{% comment %} indigo: {
-    100: "#dde1e5",
-    200: "#bbc3ca",
-    300: "#98a6b0",
-    400: "#768895",
-    500: "#546a7b",
-    600: "#435562",
-    700: "#32404a",
-    800: "#222a31",
-    900: "#111519"
-}, {% endcomment %}
-
-   

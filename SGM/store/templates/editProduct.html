@@ -1,11 +1,5 @@
 {% extends 'layout.html' %}
 {% block head %}
-<style>
-    p {
-        margin-bottom: 1.25rem;
-        /* กำหนดระยะห่างด้านล่างเป็น 20px */
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -21,7 +15,7 @@
             <path d="M16 12H8" />
             <path d="m12 8-4 4 4 4" />
         </svg>
-        <p class="pt-1"> ย้อนกลับ </p>
+        <p class="pt-1"> กลับไปหน้ารายการสินค้า </p>
     </a>
     <div class="grid grid-cols-2  bg-white shadow-md rounded p-20 m-10 py-4">
         <div class="pl-2 pt-2">
@@ -30,9 +24,58 @@
                 class="w-1/2 aspect-square rounded-2xl object-cover mr-10">
         </div>
         <div class="grid gap-y-12  bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data" >
                 {% csrf_token %}
-                {{ form.as_p }}
+                <div class="mb-4">
+                    <label for="{{ form.name.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">
+                        {{ form.name.label }}
+                    </label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <p class="text-red-500 text-xs italic">{{ form.name.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.price.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">
+                        {{ form.price.label }}
+                    </label>
+                    {{ form.price }}
+                    {% if form.price.errors %}
+                    <p class="text-red-500 text-xs italic">{{ form.price.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.quantity_in_stock.id_for_label }}"
+                        class="block text-gray-700 text-sm font-bold mb-2">
+                        {{ form.quantity_in_stock.label }}
+                    </label>
+                    {{ form.quantity_in_stock }}
+                    {% if form.quantity_in_stock.errors %}
+                    <p class="text-red-500 text-xs italic">{{ form.quantity_in_stock.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.categories.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">
+                        {{ form.categories.label }}
+                    </label>
+                    {{ form.categories }}
+                    {% if form.categories.errors %}
+                    <p class="text-red-500 text-xs italic">{{ form.categories.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="image">
+                        อัปโหลดภาพสินค้า
+                    </label>
+                    <input type="file" name="image" id="image" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:shadow-outline" />
+                    {% if form.image.value %}
+                        <p>Currently: {{ form.image.value.name }}</p>
+                    {% endif %}
+                </div>
                 <div class="flex justify-between">
                     <div class="mt-4"><button type="submit"
                             class="bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded leading-tight">

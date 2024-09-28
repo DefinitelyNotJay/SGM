@@ -11,20 +11,20 @@
 <div class="m-7">
     <div class="border rounded px-6 py-2 flex justify-between text-center shadow-md mt-12">
         <a class="w-full" href="{% url 'manageInventory' %}">ทั้งหมด</a> |
-        <a class="w-full" href="{% url 'manageInvenCat' 'Beverages' %}">เครื่องดื่ม</a> |
-        <a class="w-full" href="{% url 'manageInvenCat' 'Snacks' %}">ขนม</a> |
-        <a class="w-full" href="{% url 'manageInvenCat' 'Ice-cream' %}">ไอศกรีม</a> |
-        <a class="w-full" href="{% url 'manageInvenCat' 'Household-item' %}">ของใช้ครัวเรือน</a>
+        <a class="w-full" href="{% url 'manageInvenCat' 'เครื่องดื่ม' %}">เครื่องดื่ม</a> |
+        <a class="w-full" href="{% url 'manageInvenCat' 'ขนม' %}">ขนม</a> |
+        <a class="w-full" href="{% url 'manageInvenCat' 'ไอศกรีม' %}">ไอศกรีม</a> |
+        <a class="w-full" href="{% url 'manageInvenCat' 'ของใช้ครัวเรือน' %}">ของใช้ครัวเรือน</a>
     </div>
     <div class="border rounded px-6 py-2 shadow-md mt-12">
         <div class="flex justify-between m-4 mr-6">
-            <h2 class="mt-5"> ประเภทสินค้า: {{translated_category_name}}</h2>
+            <h2 class="mt-5"> ประเภทสินค้า: {{category_name}}</h2>
             <a class="flex items-center bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-200 mr-16"
                 href="{% url 'addProduct' %}">
                 เพิ่มสินค้าใหม่
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-circle-plus ml-2"> 
+                    class="lucide lucide-circle-plus ml-2">
                     <circle cx="12" cy="12" r="10" />
                     <path d="M8 12h8" />
                     <path d="M12 8v8" />
@@ -62,7 +62,5 @@
         {% endfor %}
     </div>
 </div>
-
-
 
 {% endblock %}

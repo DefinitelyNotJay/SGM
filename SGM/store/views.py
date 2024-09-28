@@ -1,12 +1,13 @@
 from django.http.request import HttpRequest as HttpRequest
 from django.http.response import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, redirect
 from django.views import View
 from django.http import *
 from store.models import *
-from .forms.authentication import *
-from .forms.customer import *
-from .forms.order import *
+from store.forms.authentication import *
+from store.forms.customer import *
+from store.forms.order import *
+from store.forms.product import *
 from django.forms.models import model_to_dict
 from django.db.models import Sum, Count, F, Value
 from datetime import datetime
@@ -16,13 +17,25 @@ from store.forms.product import ProductForm
 from django.utils import timezone
 from django.db.models import *
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
-
+from django.urls import reverse
+from promptpay import qrcode
+from io import BytesIO
 
 # Create your views here.
-
 class EmployeeHome(LoginRequiredMixin, View):
     login_url = '/login/'
     # permission_required = ['store.create_order', 'store.add_order', 'store.change_order', 'store.view_order']
+
+# Create your views here.
+
+class Inventory(View):
+    def get(self, request):
+        print(Customer.objects.all())
+        return HttpResponse("123")
+
+class ManageUserView(View):
+    def get(self, request):
+        return render(request, "employee/customer_form.html", {"form": CustomerCreateForm()})
 
     def get(self, request):
         # print(request.user.has_perm('store.create_order'))
@@ -100,25 +113,25 @@ class Payment(LoginRequiredMixin, PermissionRequiredMixin, View):
             return render(request, 'employee/payment_bill.html', data)
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
+
+
 class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_order', 'store.add_order', 'store.change_order']
     login_url = '/login/'
-
     def post(self, request):
         ordered_products = json.loads(request.body)
         products = ordered_products.get('storage_products')
         amount = int(ordered_products.get('storage_amount'))
         total = float(ordered_products.get('total'))
-        customer_id = ordered_products.get('customer_id') # คือเบอร์โทร
+        customer_id = ordered_products.get('customer_id')
+        payment_method = ordered_products.get('payment_method')
         
-        # create order
         try:
-            customer = Customer.objects.filter(username=customer_id).first() #กรณีไม่มีมันจะเป็น null
-            order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID')
-            # create orderItem
+            customer = Customer.objects.filter(username=customer_id).first()
+            order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID', payment_method=payment_method)
+            
             for product in products:
                 OrderItem.objects.create(order=order, product=Product.objects.get(id=product['id']), amount=product['amount'])
-                # ลดจำนวน product ทีทูกซื้อไป
                 use_product = Product.objects.get(pk=product['id'])
                 quantity = use_product.quantity_in_stock
                 use_product.quantity_in_stock = quantity - product['amount']
@@ -129,7 +142,20 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
             print(e)
             return HttpResponse(e)
 
-        
+class GenerateQRCode(View):
+    def get(self, request):
+        amount = request.GET.get('amount')
+        customer_id = '0802695576'
+
+        payload_with_amount = qrcode.generate_payload(customer_id, float(amount))
+
+        img = qrcode.to_image(payload_with_amount)
+
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        return HttpResponse(buffer.getvalue(), content_type="image/png")
 
 class ListCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_customer']
@@ -166,7 +192,7 @@ class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
         form = CustomerCreateForm(request.POST)
         if form.is_valid:
             try:
-                customer = form.save()
+                form.save()
                 return redirect("/customer")
             except:
                 return redirect("/customer/new/")
@@ -241,25 +267,31 @@ class ManageInventory(LoginRequiredMixin, PermissionRequiredMixin, View):
         if category_name:
             category = get_object_or_404(Category, name=category_name)
             products = Product.objects.filter(categories=category)
-            translated_category_name = self.CATEGORY_EN_TO_TH.get(category_name, category_name)
+            category_name = category
             
         else:
             products = Product.objects.all()
-            translated_category_name = "ทั้งหมด"
+            category_name = "ทั้งหมด"
 
         return render(request, 'manageInventory.html', {
             'products': products,
             'category_name': category_name,
-            'translated_category_name': translated_category_name  # ส่งหมวดหมู่ที่ถูกเลือกไปยังเทมเพลต
         })
 
-    def post(self, request):
+    def post(self, request, category_name=None, *args, **kwargs):
         product_id = request.POST.get('product_id')  # รับ product_id จากฟอร์ม
         return redirect('editProduct', product_id=product_id)  # เปลี่ยนเส้นทางไปที่ view แก้ไขผลิตภัณฑ์
 
 class Editproduct(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.change_product']
     login_url = '/login/'
+        # if product_id:
+        #   # สร้าง URL สำหรับไปยัง view ที่ใช้แก้ไขผลิตภัณฑ์ โดยส่ง category_name ด้วย
+        #     return redirect(reverse('editProduct', kwargs={'product_id': product_id}))
+        # else:
+        #     # หากไม่มี product_id ให้ redirect กลับไปยังหน้าเดิม
+        #     return redirect('manage_inventory', category_name=category_name)
+
     def get(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
         form = ProductForm(instance=product)  # สร้างฟอร์มจากอินสแตนซ์ของผลิตภัณฑ์
