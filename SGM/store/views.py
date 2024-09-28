@@ -44,7 +44,7 @@ class ManageUserView(View):
         return redirect('/payment')
 
 class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['']
+    permission_required = ['store.view_order', 'store.add_order', 'store.change_order', 'store.delete_order']
     login_url = '/login/'
     
     def get(self, request):
@@ -56,7 +56,7 @@ class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
             products = Product.objects.all().order_by('quantity_in_stock')
             categories = Category.objects.all()
             context = {'products': products, 'categories': categories}
-            return render(request, "employee/stock.html", context)
+            return render(request, "manager/stock.html", context)
 
         # หากมีการเลือก filter
         else:
@@ -79,7 +79,7 @@ class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             all_categories = Category.objects.all()
             context = {'products': new_products, 'categories': all_categories}
-            return render(request, "employee/stock.html", context)
+            return render(request, "manager/stock.html", context)
 
     def post(self, request):
         stock_amount = json.loads(request.body)
@@ -248,7 +248,7 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
         current_month_name_th = self.MONTHS_EN_TO_TH.get(current_month_name_en, current_month_name_en)
 
 
-        return render(request, 'statistics.html', {'customers': customers , 'products':products, 'allcustomer':allcustomer, 'current_month_name_th': current_month_name_th})
+        return render(request, 'manager/statistics.html', {'customers': customers , 'products':products, 'allcustomer':allcustomer, 'current_month_name_th': current_month_name_th})
 
 class ViewStock(View):
     def get(self, request):
@@ -275,7 +275,7 @@ class ManageInventory(LoginRequiredMixin, PermissionRequiredMixin, View):
             products = Product.objects.all()
             category_name = "ทั้งหมด"
 
-        return render(request, 'manageInventory.html', {
+        return render(request, 'manager/manageInventory.html', {
             'products': products,
             'category_name': category_name,
         })
@@ -297,7 +297,7 @@ class Editproduct(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
         form = ProductForm(instance=product)  # สร้างฟอร์มจากอินสแตนซ์ของผลิตภัณฑ์
-        return render(request, 'editProduct.html', {'form': form, 'product': product})
+        return render(request, 'manager/editProduct.html', {'form': form, 'product': product})
 
     def post(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
@@ -307,7 +307,7 @@ class Editproduct(LoginRequiredMixin, PermissionRequiredMixin, View):
             form.save()  # บันทึกข้อมูลที่แก้ไข
             return redirect('manageInventory')  # เปลี่ยนเส้นทางกลับไปที่หน้า Manage Inventory
 
-        return render(request, 'editProduct.html', {'form': form, 'product': product})  # หากฟอร์มไม่ถูกต้อง ให้แสดงฟอร์มอีกครั้ง
+        return render(request, 'manager/editProduct.html', {'form': form, 'product': product})  # หากฟอร์มไม่ถูกต้อง ให้แสดงฟอร์มอีกครั้ง
 
 class DeleteProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.delete_product']
@@ -323,11 +323,11 @@ class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     def get(self, request):
         form = ProductForm()
-        return render(request, 'addProduct.html', {'form': form})
+        return render(request, 'manager/addProduct.html', {'form': form})
 
     def post(self, request):
         form = ProductForm(request.POST)
         if form.is_valid():
             form.save()  # บันทึกสินค้าใหม่
             return redirect('manageInventory') 
-        return render(request, 'addProduct.html', {'form': form})
+        return render(request, 'manager/addProduct.html', {'form': form})
