@@ -1,3 +1,5 @@
+from django.http.request import HttpRequest as HttpRequest
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.http import *
@@ -19,7 +21,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 # Create your views here.
 
 class EmployeeHome(LoginRequiredMixin, View):
-    
     login_url = '/login/'
     # permission_required = ['store.create_order', 'store.add_order', 'store.change_order', 'store.view_order']
 
@@ -74,7 +75,7 @@ class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
         return JsonResponse({'status': 'success'})
 
 class Payment(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['store.view_order', 'store.delete_order', 'store.change_order', 'store.delete_order']
+    permission_required = ['store.view_order', 'store.add_order', 'store.change_order']
     login_url = '/login/'
     def get(self, request, category=None):
         # มี query
@@ -100,7 +101,7 @@ class Payment(LoginRequiredMixin, PermissionRequiredMixin, View):
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
 class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['store.create_order', 'store.delete_order', 'store.change_order', 'store.delete_order']
+    permission_required = ['store.view_order', 'store.add_order', 'store.change_order']
     login_url = '/login/'
 
     def post(self, request):
@@ -138,8 +139,9 @@ class ListCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, "employee/all_customer.html", {"customers": customers})
 
 class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['store.view_customer', 'store.create_customer', 'store.change_customer', 'store.delete_customer']
+    permission_required = ['store.view_customer', 'store.add_customer', 'store.change_customer', 'store.delete_customer']
     login_url = '/login/'
+
     def get(self, request, customer_id=None):
         if(customer_id):
             # edit customer info
@@ -178,9 +180,11 @@ class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
 
-class StatisticsView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['']
+class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/login/'
+    def test_func(self):
+        return self.request.user.groups.filter(name='manager').exists()
+
     MONTHS_EN_TO_TH = {
         "January": "มกราคม",
         "February": "กุมภาพันธ์",
@@ -224,7 +228,7 @@ class ViewStock(View):
         return render(request, 'index.html', {'products': products})
 
 class ManageInventory(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['']
+    permission_required = ['store.view_product', 'store.add_product', 'store.change_product', 'store.delete_product']
     login_url = '/login/'
     CATEGORY_EN_TO_TH = {
         "Beverages": "เครื่องดื่ม",
@@ -254,7 +258,7 @@ class ManageInventory(LoginRequiredMixin, PermissionRequiredMixin, View):
         return redirect('editProduct', product_id=product_id)  # เปลี่ยนเส้นทางไปที่ view แก้ไขผลิตภัณฑ์
 
 class Editproduct(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['']
+    permission_required = ['store.change_product']
     login_url = '/login/'
     def get(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
@@ -272,7 +276,7 @@ class Editproduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, 'editProduct.html', {'form': form, 'product': product})  # หากฟอร์มไม่ถูกต้อง ให้แสดงฟอร์มอีกครั้ง
 
 class DeleteProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['']
+    permission_required = ['store.delete_product']
     login_url = '/login/'
     def post(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
@@ -281,7 +285,7 @@ class DeleteProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 
 class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['']
+    permission_required = ['store.add_product']
     login_url = '/login/'
     def get(self, request):
         form = ProductForm()

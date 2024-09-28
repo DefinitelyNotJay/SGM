@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Group
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 # Create your views here.
 
 class SignUp(View):
@@ -28,6 +29,8 @@ class SignUp(View):
         return render(request, './registration/sign-up.html', {'form': form})
 class SignIn(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('/')
         return render(request, './registration/login.html', {'form': AuthenticationForm})
 
     def post(self, request):
