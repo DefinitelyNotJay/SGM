@@ -24,6 +24,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='product',
             name='add_date',
-            field=models.DateTimeField(default=datetime.datetime(2024, 9, 28, 11, 52, 48, 153510)),
+            field=models.DateTimeField(default=datetime.datetime(2024, 9, 28, 10, 46, 20, 846843)),
         ),
     ]
