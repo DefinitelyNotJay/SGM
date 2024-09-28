@@ -1,0 +1,175 @@
+{% extends "./layout.html" %} 
+{% block title %} 
+Home Page 
+{% endblock %} 
+{% block nav %} 
+  {% include "./navbar_manager.html" %} 
+{% endblock nav%}
+{% block content %}
+<style>
+  @layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+</style>
+
+<div class='w-full p-8  flex flex-col gap-6'>
+    <h1 class='text-4xl font-bold'>คลังสินค้า</h1>
+    <div class='w-full flex justify-between'>
+       <div class='flex gap-3 w-full items-center'>
+            <div>
+                <select name="filter" id="category_filter" class='border px-3 py-2 rounded-md' onchange='selectCategory()'>
+                    <option value="" default>------</option>
+                    {% for c in categories  %}
+                        <option value='{{ c.name }}'>{{c.name}}</option>
+                    {% endfor %}
+                </select>
+                <select onchange='selectSortFilter()' name="filter" id="sort_filter" class='border px-3 py-2 rounded-md'>
+                    <option value="sales-asc">ยอดขาย น้อย-มาก</option>
+                    <option value="sales-desc">ยอดขาย มาก-น้อย</option>
+                    <option value="quantity-asc">ปริมาณ น้อย-มาก</option>
+                    <option value="quantity-desc">ปริมาณ มาก-น้อย</option>
+                </select>
+                
+            </div>
+            <div class='flex gap-3' id='category-area'>
+            </div>
+       </div>
+       <button onclick='submitAmountChange()' class='px-4 py-2 bg-[#393d3f] text-[#fdfdff] rounded-md'>บันทึก</button>
+    </div>
+    <div class='w-full h-full grid grid-cols-6 shadow-md overflow-y-scroll border p-8 rounded-xl gap-y-4'>
+        {% for p in  products %}
+        <div class='w-[165px] h-[160px]'>
+            <div onclick='location.href = "/editProduct/{{ p.id }}/"' class='w-[165px] h-[60px] bg-slate-200 hover:bg-gray-100 border border-b-0 border-t rounded-t-md cursor-pointer'>
+                <p class='font-bold text-xl text-center'>{{p.name}}</p>
+            </div>
+            <div class='flex flex-col justify-between border border-t-0 rounded-lg rounded-t-none  px-4 py-2'>
+                    <p class='text-center'>คงเหลือ <span>{{ p.quantity_in_stock }}</span> ชิ้น</p>
+                <div class='flex gap-3 justify-center items-center'>
+                    <span>เติม</span>
+                    <input type="number" value='{{ p.daily_restock_quantity }}' onchange="changeStockAmount('{{ p.id }}', this.value)" class='w-12 p-2 pb-0 border-b text-center focus:outline-none border-gray-700'>
+                    <span>ชิ้น</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %} 
+{% block script %}
+<script>
+    let categories = []
+    let add_stock_amount = []
+    const category_area = document.getElementById('category-area')
+    const localStorageData = getCategoryStorage()
+
+    if(localStorageData.categories){
+        categories = localStorageData.categories
+        for(let cate of categories){
+            addTag(cate)
+        }
+        for(let option of getSortFilter().getElementsByTagName('option')){
+            console.log(localStorageData)
+            console.log(option.value, "vs", localStorageData.sort_filter)
+            if(option.value === localStorageData.sort_filter){
+                option.selected = true
+            }
+        }
+    }
+
+    function getCategoryFilter(){
+        return document.getElementById('category_filter').value
+    }
+    function getSortFilter(){
+        return document.getElementById('sort_filter')
+    }
+
+    function setCategoryStorage(){
+        let x = getSortFilter()
+        console.log("sort_filter", x.value)
+        localStorage.setItem('categories', JSON.stringify({categories: [...categories], sort_filter: getSortFilter().value}))
+    }
+
+    function getCategoryStorage(){
+        console.log(JSON.parse(localStorage.getItem('categories')))
+        return JSON.parse(localStorage.getItem('categories'))
+    }
+
+    function deleteCategoryTag(category_target){
+        console.log("before", categories)
+        const pTags = category_area.getElementsByTagName('p')
+        categories = categories.filter(cate => cate !== category_target)
+        cate_area_elements = document.querySelector('#category-area')
+        for (let p of pTags){
+            if(p.textContent === category_target){
+                p.remove()
+                break
+            }
+        }
+        console.log("after", categories)
+        setCategoryStorage()
+        fetchTag()
+    }
+
+    function addTag(category_target){
+        const pTag = document.createElement('p')
+            pTag.textContent = category_target
+            pTag.id = category_target
+            pTag.className = `cursor-pointer hover:bg-gray-50 bg-gray-100 p-2 border rounded`
+            pTag.onclick = (e) => {
+                deleteCategoryTag(e.target.textContent)
+            }
+            category_area.appendChild(pTag)
+            setCategoryStorage()
+    }
+
+    function selectSortFilter(){
+        fetchTag()
+        setCategoryStorage()
+    }
+
+    function selectCategory(){
+        category_target = getCategoryFilter()
+        if(category_target && !categories.includes(category_target)){
+            categories = [...categories, category_target]
+            // create element
+            addTag(category_target)
+            fetchTag()
+            setCategoryStorage()
+        }
+    }
+
+    function fetchTag(){
+        let categories_str = categories.map(cate=>`category=${cate}`)
+        let categories_get = categories_str.join('&')
+        let sort_filter = document.getElementById('sort_filter').value
+        let sort_filter_get = sort_filter && `${categories.length <= 0 ? '' : '&'}sort_filter=${sort_filter}`
+        let url = `/stock/?${categories_get}${sort_filter_get}`
+        window.location.href = url
+        
+    }
+
+    function changeStockAmount(product_id, amount){
+        add_stock_amount = [...add_stock_amount, {'id': parseInt(product_id), 'amount': parseInt(amount)}]
+        console.log(add_stock_amount)
+    }
+
+    function submitAmountChange(){
+        fetch('/stock/', {
+            method: 'POST',
+            body: JSON.stringify(add_stock_amount),
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                'Content-Type': "application/json",
+            }
+        }).then(res=>res.json())
+        .then(data=> window.location.reload())
+    }
+
+
+</script>
+{% endblock  %}

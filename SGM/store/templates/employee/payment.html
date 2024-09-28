@@ -3,7 +3,13 @@
 Home Page 
 {% endblock %} 
 {% block nav %} 
-  {% include "./navbarEMP.html" %} 
+  
+  {% if user.is_staff %}
+    {% include "../manager/navbar_manager.html" %} 
+  {% else %}
+    {% include "./navbarEMP.html" %} 
+  {% endif %}
+    
 {% endblock nav%}
 {% block content %}
 <style>
