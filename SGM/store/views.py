@@ -254,7 +254,7 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
 class ViewStock(View):
     def get(self, request):
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
-        return render(request, 'index.html', {'products': products})
+        return render(request, 'customer/index.html', {'products': products})
 
 class ManageInventory(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_product', 'store.add_product', 'store.change_product', 'store.delete_product']

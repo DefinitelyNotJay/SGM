@@ -8,9 +8,8 @@ from . import views
 urlpatterns = [
     path("", include('authen.urls')),
     # customer
-    path('Viewproduct', ViewStock.as_view(), name="Viewproduct"),
+    path('', ViewStock.as_view(), name="Viewproduct"),
     # employee
-    path('', EmployeeHome.as_view()),
     path('stock/', Stock.as_view()),
     path('payment', Payment.as_view()),
     path('payment/bill', PaymentBill.as_view()),
