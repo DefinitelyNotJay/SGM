@@ -4,14 +4,48 @@
 {% endblock %}
 
 {% block nav %}
+
+{% if user.is_staff %}
 {% include './navbar_manager.html' %}
+{% else %}
+{% include 'employee/navbar_emp.html' %}
+{% endif %}
 {% endblock %}
 
 {% block content %}
 <div class="flex flex-col w-full h-full p-8">
-    <h1 class='text-2xl font-semibold'>จัดการบัญชี</h1>
+    <h1 class='text-2xl font-semibold'>จัดการบัญชี{{title}}</h1>
+    {% comment %} เพื่อไม่ให้ url เป็น /customer, /employee {% endcomment %}
+    
+   
+
+    <div class='flex gap-4 mt-4'>
+      
+      {% if user.is_staff %}
+      <a href="/customer">
+        <button class='px-4 py-2 bg-[#62929e] hover:bg-[#81a8b1] text-white rounded-md'>
+          ลูกค้า
+        </button>
+      </a>
+      
+        
+        <a href="/employee">
+          <button type='submit' class='px-4 py-2 bg-[#546a7b] hover:bg-[#768895] text-white rounded-md'>
+            พนักงาน
+          </button>
+        </a>
+      
+      {% endif %}
+        
+      
+      
+    </div>
+    
+      
+    
+    {% if employees %}
     <div class='w-full flex gap-6 mt-4'>
-        <table class="w-1/2 bg-white border border-gray-300 rounded-lg shadow-lg">
+        <table class="w-full bg-white border border-gray-300 rounded-lg shadow-lg">
             <thead class="bg-gray-100">
               <tr class="text-left">
                 <th class="px-6 py-3 border-b-2 border-gray-300">เบอร์โทรศัพท์</th>
@@ -28,17 +62,19 @@
                 <td class="px-6 py-4">{{ employee.date_joined | date:"d-m-Y" }}</td>
                 <td class="px-6 py-4 flex gap-2">
                   <button class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition duration-300">
-                    <a href="/customer/{{ customer.id }}/">แก้ไข</a>
+                    <a href="/employee/{{ employee.id }}/">แก้ไข</a>
                   </button>
-                  <button id="{{ customer.id }}" class="deletebutton px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
+                  <button id="{{ employee.id }}" class="deletebutton px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
                     ลบ
                   </button>
                 </td>
               </tr>
               {% endfor %}
             </tbody>
+            
           </table>
-          <table class="w-1/2 bg-white border border-gray-300 rounded-lg shadow-lg">
+          {% else %}
+          <table class="w-full bg-white border border-gray-300 mt-4 rounded-lg shadow-lg">
             <thead class="bg-gray-100">
               <tr class="text-left">
                 <th class="px-6 py-3 border-b-2 border-gray-300">เบอร์โทรศัพท์</th>
@@ -65,6 +101,35 @@
               {% endfor %}
             </tbody>
           </table>
+          {% endif %}
     </div>
 </div>
 {% endblock %}
+
+
+
+{% comment %} indigo: {
+    100: "#dde1e5",
+    200: "#bbc3ca",
+    300: "#98a6b0",
+    400: "#768895",
+    500: "#546a7b",
+    600: "#435562",
+    700: "#32404a",
+    800: "#222a31",
+    900: "#111519"
+}, {% endcomment %}
+
+
+{% comment %} 
+blue: {
+    100: "#e0e9ec",
+    200: "#c0d3d8",
+    300: "#a1bec5",
+    400: "#81a8b1",
+    500: "#62929e",
+    600: "#4e757e",
+    700: "#3b585f",
+    800: "#273a3f",
+    900: "#141d20"
+}, {% endcomment %}
