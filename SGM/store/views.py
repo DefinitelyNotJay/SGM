@@ -345,6 +345,7 @@ class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def delete(self, request, customer_id):
         # delete customer
+        print("delete_cus")
         try:
             Customer.objects.get(pk=customer_id).delete()
             return JsonResponse({"success": True})
@@ -365,30 +366,46 @@ class ManageEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, "manager/employee_form.html", {"form": CustomerCreateForm(), "isCreate": True})
 
         # get all customers
-    def post(self, request, emp_id):
+    def post(self, request, emp_id=None):
         if emp_id:
-            customer_instance = Customer.objects.get(pk=emp_id)
-            form = CustomerCreateForm(request.POST, instance=customer_instance)
-            if form.is_valid:
-                try:
-                    form.save()
-                    return redirect("/customer")
-                except:
-                    return HttpResponseServerError()
-        # create customer
-        form = CustomerCreateForm(request.POST)
-        if form.is_valid:
+            print(request.POST)
             try:
-                form.save()
-                return redirect("/customer")
-            except:
-                return redirect("/customer/new/")
-        return redirect("/customer")
+                # ดึง instance ของ User ที่ต้องการแก้ไข
+                employee_instance = User.objects.get(pk=emp_id)
+            except User.DoesNotExist:
+                return HttpResponseServerError("User not found.")
+            
+            # สร้างฟอร์มโดยใช้ instance ที่ต้องการแก้ไข และข้อมูลที่ส่งมาใน request.POST
+            form = UserUpdateForm(request.POST, instance=employee_instance)
+            
+            # ตรวจสอบความถูกต้องของฟอร์ม
+            if form.is_valid():
+                try:
+                    form.save()  # บันทึกการแก้ไขลงใน database
+                    return redirect("/employee")  # กลับไปที่หน้าแสดงรายการ employee
+                except Exception as e:
+                    return HttpResponseServerError(f"Error saving form: {str(e)}")
+            else:
+                # กรณีฟอร์มไม่ valid ให้แสดงฟอร์มและ error message
+                return render(request, 'manager/employee_form.html', {'form': form, 'errors': form.errors})
+        else:
+            return HttpResponseServerError("Employee ID not provided.")
+        # create customer
+        # เดี๋ยวืทำ
+        # form = CustomerCreateForm(request.POST)
+        # if form.is_valid:
+        #     try:
+        #         form.save()
+        #         return redirect("/customer")
+        #     except:
+        #         return redirect("/customer/new/")
+        # return redirect("/customer")
 
-    def delete(self, request, customer_id):
-        # delete customer
+    def delete(self, request, emp_id):
+        # delete emp
+        print("delete_emp")
         try:
-            Customer.objects.get(pk=customer_id).delete()
+            User.objects.get(pk=emp_id).delete()
             return JsonResponse({"success": True})
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")

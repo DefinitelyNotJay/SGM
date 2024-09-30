@@ -64,7 +64,7 @@
                   <button class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition duration-300">
                     <a href="/employee/{{ employee.id }}/">แก้ไข</a>
                   </button>
-                  <button id="{{ employee.id }}" class="deletebutton px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
+                  <button onclick="deleteUser('employee', '{{ employee.id }}')" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
                     ลบ
                   </button>
                 </td>
@@ -93,7 +93,7 @@
                   <button class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition duration-300">
                     <a href="/customer/{{ customer.id }}/">แก้ไข</a>
                   </button>
-                  <button id="{{ customer.id }}" class="deletebutton px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
+                  <button onclick="deleteUser('customer', '{{ customer.id }}')" class="deletebutton px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
                     ลบ
                   </button>
                 </td>
@@ -105,6 +105,21 @@
     </div>
 </div>
 {% endblock %}
+
+{% block script %}
+<script>
+  function deleteUser(role, id){
+    method: 'DELETE',
+    fetch(`/${role}/${id}/`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'  // ต้องใส่ 'X-CSRFToken' ใน headers
+    }
+    }).then(res=>res.json).then(data=>window.location.reload())
+  }
+</script>
+{% endblock script %}
 
 
 
