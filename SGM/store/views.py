@@ -20,6 +20,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.urls import reverse
 from promptpay import qrcode
 from io import BytesIO
+from django.contrib.auth.models import Permission
 
 # Create your views here.
 class EmployeeHome(LoginRequiredMixin, View):
@@ -166,51 +167,11 @@ class ListCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
         customers = Customer.objects.all()
         return render(request, "employee/all_customer.html", {"customers": customers})
 
-class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['store.view_customer', 'store.add_customer', 'store.change_customer', 'store.delete_customer']
-    login_url = '/login/'
-
-    def get(self, request, customer_id=None):
-        if(customer_id):
-            # edit customer info
-            customer_instance = Customer.objects.get(pk=customer_id)
-            edit_form = CustomerCreateForm(initial=model_to_dict(customer_instance), instance=customer_instance)
-            context = {"form": edit_form, "customer": customer_instance}
-            return render(request, "employee/customer_form.html", context)
-        return render(request, "employee/customer_form.html", {"form": CustomerCreateForm(), "isCreate": True})
-
-        # get all customers
-    def post(self, request, customer_id=None):
-        if customer_id:
-            customer_instance = Customer.objects.get(pk=customer_id)
-            form = CustomerCreateForm(request.POST, instance=customer_instance)
-            if form.is_valid:
-                try:
-                    form.save()
-                    return redirect("/customer")
-                except:
-                    return HttpResponseServerError()
-        # create customer
-        form = CustomerCreateForm(request.POST)
-        if form.is_valid:
-            try:
-                form.save()
-                return redirect("/customer")
-            except:
-                return redirect("/customer/new/")
-        return redirect("/customer")
-
-    def delete(self, request, customer_id):
-        # delete customer
-        try:
-            Customer.objects.get(pk=customer_id).delete()
-            return JsonResponse({"success": True})
-        except:
-            return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
 
 class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/login/'
     def test_func(self):
+        print(self.request.user.groups.all())
         return self.request.user.groups.filter(name='manager').exists()
 
     MONTHS_EN_TO_TH = {
@@ -253,7 +214,7 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
 class ViewStock(View):
     def get(self, request):
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
-        return render(request, 'index.html', {'products': products})
+        return render(request, 'customer/index.html', {'products': products})
 
 class ManageInventory(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_product', 'store.add_product', 'store.change_product', 'store.delete_product']
@@ -331,3 +292,120 @@ class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
             form.save()  # บันทึกสินค้าใหม่
             return redirect('manageInventory') 
         return render(request, 'manager/addProduct.html', {'form': form})
+
+class EmployeeManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required=['auth.add_user', 'auth.view_user', 'auth.change_user', 'auth.delete_user']
+    def get(self, request):
+        employees = User.objects.filter(is_staff=False)
+        context = {'title': 'พนักงาน', 'employees': employees}
+        return render(request, 'manager/account.html', context)
+
+class CustomerManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url='/login/'
+    permission_required = ['store.add_customer', 'store.view_customer', 'store.change_customer']
+    def get(self, request):
+        customers = Customer.objects.all()
+        context = {'title': 'ลูกค้า', 'customers': customers}
+        return render(request, 'manager/account.html', context)
+
+class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['store.view_customer', 'store.add_customer', 'store.change_customer', 'store.delete_customer']
+    login_url = '/login/'
+
+    def get(self, request, customer_id=None):
+        if(customer_id):
+            # edit customer info
+            customer_instance = Customer.objects.get(pk=customer_id)
+            edit_form = CustomerCreateForm(initial=model_to_dict(customer_instance), instance=customer_instance)
+            context = {"form": edit_form, "customer": customer_instance}
+            return render(request, "employee/customer_form.html", context)
+        return render(request, "employee/customer_form.html", {"form": CustomerCreateForm(), "isCreate": True})
+
+        # get all customers
+    def post(self, request, customer_id=None):
+        if customer_id:
+            customer_instance = Customer.objects.get(pk=customer_id)
+            form = CustomerCreateForm(request.POST, instance=customer_instance)
+            if form.is_valid:
+                try:
+                    form.save()
+                    return redirect("/customer")
+                except:
+                    return HttpResponseServerError()
+        # create customer
+        form = CustomerCreateForm(request.POST)
+        if form.is_valid:
+            try:
+                form.save()
+                return redirect("/customer")
+            except:
+                return redirect("/customer/new/")
+        return redirect("/customer")
+
+    def delete(self, request, customer_id):
+        # delete customer
+        print("delete_cus")
+        try:
+            Customer.objects.get(pk=customer_id).delete()
+            return JsonResponse({"success": True})
+        except:
+            return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
+
+class ManageEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required=['auth.add_user', 'auth.view_user', 'auth.change_user', 'auth.delete_user']
+    login_url = '/login/'
+
+    def get(self, request, emp_id):
+        if(emp_id):
+            # edit customer info
+            emp_ins = User.objects.get(pk=emp_id)
+            edit_form = RegisterForm(initial=model_to_dict(emp_ins), instance=emp_ins)
+            context = {"form": edit_form, "customer": emp_ins}
+            return render(request, "manager/employee_form.html", context)
+        return render(request, "manager/employee_form.html", {"form": CustomerCreateForm(), "isCreate": True})
+
+        # get all customers
+    def post(self, request, emp_id=None):
+        if emp_id:
+            print(request.POST)
+            try:
+                # ดึง instance ของ User ที่ต้องการแก้ไข
+                employee_instance = User.objects.get(pk=emp_id)
+            except User.DoesNotExist:
+                return HttpResponseServerError("User not found.")
+            
+            # สร้างฟอร์มโดยใช้ instance ที่ต้องการแก้ไข และข้อมูลที่ส่งมาใน request.POST
+            form = UserUpdateForm(request.POST, instance=employee_instance)
+            
+            # ตรวจสอบความถูกต้องของฟอร์ม
+            if form.is_valid():
+                try:
+                    form.save()  # บันทึกการแก้ไขลงใน database
+                    return redirect("/employee")  # กลับไปที่หน้าแสดงรายการ employee
+                except Exception as e:
+                    return HttpResponseServerError(f"Error saving form: {str(e)}")
+            else:
+                # กรณีฟอร์มไม่ valid ให้แสดงฟอร์มและ error message
+                return render(request, 'manager/employee_form.html', {'form': form, 'errors': form.errors})
+        else:
+            return HttpResponseServerError("Employee ID not provided.")
+        # create customer
+        # เดี๋ยวืทำ
+        # form = CustomerCreateForm(request.POST)
+        # if form.is_valid:
+        #     try:
+        #         form.save()
+        #         return redirect("/customer")
+        #     except:
+        #         return redirect("/customer/new/")
+        # return redirect("/customer")
+
+    def delete(self, request, emp_id):
+        # delete emp
+        print("delete_emp")
+        try:
+            User.objects.get(pk=emp_id).delete()
+            return JsonResponse({"success": True})
+        except:
+            return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")

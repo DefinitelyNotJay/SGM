@@ -1,15 +1,22 @@
 <!-- templates/product_list.html -->
-{% extends './layout.html' %}
+{% extends 'manager/layout.html' %}
 {% block head %}
 {% block title %} Product List {% endblock %}
 {% endblock %}
 
 {% block nav %}
-{% include './navbar_manager.html' %}
+{%if not user.is_authenticated %}
+    <p>employee nav</p>
+{% elif user.is_staff %}
+    {% include "manager/navbar_manager.html" %}
+{% else%}
+    {% include "employee/navbar_emp.html" %}
+{% endif %}
+    
 {% endblock %}
 
 {% block content %}
-<main class=" ml-7 mr-7 ">
+<main class="ml-7 mr-7 ">
     <section class="py-20"></section>
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2 class="font-manrope font-bold text-4xl text-black mb-8 max-lg:text-center">

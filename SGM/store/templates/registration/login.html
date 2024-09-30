@@ -26,14 +26,18 @@
         background-size: cover;"
     ></div>
     <div class="w-full flex flex-col gap-2 items-center bg-gradient-to-r from-white to-neutral-100">
-        <div class="flex items-center  h-fit mt-24 translate-x-0">
-            <div class="flex flex-col text-center cursor-default">
+        <a href="/" class='mt-24'>
+          <div class="flex items-center h-fit">
+            <div class="flex flex-col text-center cursor-pointer">
               <p class="logo tracking-widest text-5xl">VENA</p>
               <p class="tracking-[5px]">GROCERY STORE</p>
+              
             </div>
           </div>
+        </a>
         <div class=' mt-6 px-4 py-3'>
           <h1 class='text-left w-[250px] text-2xl font-semibold px-1'>เข้าสู่ระบบ</h1>
+          
       <form class="w-[250px] flex flex-col gap-2" method="post">
         {% csrf_token %}
         <div class="flex flex-col p-1 gap-1">
@@ -47,7 +51,10 @@
           <div class="text-red-500">{{form.password.errors}}</div>
         </div>
         <button type='submit' class='bg-[#393d3f] hover:bg-[#494949] px-4 py-2 rounded-md w-[98%] self-center text-[#e7e7e7]'>ยืนยัน</button>
-        <p class='text-sm text-neutral-600 tracking-wide mt-3'>หาก<span class='underline'>ไม่มีบัญชี</span>หรือ<span class="underline">ลืมรหัสผ่าน</span> <br>โปรดติดต่อผู้จัดการร้าน</p>
+        {% comment %} <p class='text-sm text-neutral-600 tracking-wide mt-3'>หาก<span class='underline'>ไม่มีบัญชี</span>หรือ<span class="underline">ลืมรหัสผ่าน</span>โปรดติดต่อผู้จัดการร้าน</p> {% endcomment %}
+        <a href="/" class='w-full mt-2'><p class='hover:underline mr-1 text-sm'>เลือกดูสินค้าของเรา  →</p>
+        
+          
       </form>
         </div>
       
