@@ -1,15 +1,78 @@
+{% load widget_tweaks %}
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        {{form}}
-    </body>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <style>
+    body {
+      font-family: 'Noto Sans Thai', sans-serif;
+  }
+  </style>
+  <body class="grid grid-cols-[2fr_1fr]">
+    <div
+      class="w-full h-screen"
+      id='bg-left'
+      style="
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;"
+    ></div>
+    <div class="w-full flex flex-col gap-2 items-center bg-gradient-to-r from-white to-neutral-100">
+        <a href="/" class='mt-24'>
+          <div class="flex items-center h-fit">
+            <div class="flex flex-col text-center cursor-pointer">
+              <p class="logo tracking-widest text-5xl">VENA</p>
+              <p class="tracking-[5px]">GROCERY STORE</p>
+              
+            </div>
+          </div>
+        </a>
+        <div class=' mt-6 px-4 py-3'>
+          <h1 class='text-left w-[250px] text-2xl font-semibold px-1'>เข้าสู่ระบบ</h1>
+          
+      <form class="w-[250px] flex flex-col gap-2" method="post">
+        {% csrf_token %}
+        <div class="flex flex-col p-1 gap-1">
+          {% comment %} <label for="{{ form.username.id_for_label }}">เบอร์โทรศัพท์</label> {% endcomment %}
+          {{form.username|attr:"placeholder:เบอร์โทรศัพท์"|add_class:"px-3 py-2 border rounded focus:border-blue-300 tracking-wider bg-white"}}
+          <div class="text-red-500">{{form.username.errors}}</div>
+        </div>
+        <div class="flex flex-col p-1 gap-1">
+          {% comment %} <label for="{{ form.username.id_for_label }}">รหัสผ่าน</label> {% endcomment %}
+          {{form.password|attr:"placeholder:รหัสผ่าน"|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
+          <div class="text-red-500">{{form.password.errors}}</div>
+        </div>
+        <button type='submit' class='bg-[#393d3f] hover:bg-[#494949] px-4 py-2 rounded-md w-[98%] self-center text-[#e7e7e7]'>ยืนยัน</button>
+        {% comment %} <p class='text-sm text-neutral-600 tracking-wide mt-3'>หาก<span class='underline'>ไม่มีบัญชี</span>หรือ<span class="underline">ลืมรหัสผ่าน</span>โปรดติดต่อผู้จัดการร้าน</p> {% endcomment %}
+        <a href="/" class='w-full mt-2'><p class='hover:underline mr-1 text-sm'>เลือกดูสินค้าของเรา  →</p>
+        
+          
+      </form>
+        </div>
+      
+    </div>
+    
+  </body>
+  <script>
+    const bgLeft = document.getElementById('bg-left')
+    const imageArray = [
+      "https://images.unsplash.com/photo-1601600576337-c1d8a0d1373c?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1601600576337-c1d8a0d1373c?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1643443578657-6170bfbb1920?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1611279522012-6c3e2d2c604f?q=80&w=2821&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1633949970272-3421a17b5e32?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    ]
+    const number = Math.floor(Math.random() * (imageArray.length))
+    console.log(imageArray[number])
+    bgLeft.style.backgroundImage = `url('${imageArray[number]}')`;
+
+  </script>
 </html>

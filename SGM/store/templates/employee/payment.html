@@ -3,7 +3,13 @@
 Home Page 
 {% endblock %} 
 {% block nav %} 
-  {% include "./navbarEMP.html" %} 
+  
+  {% if user.is_staff %}
+    {% include "../manager/navbar_manager.html" %} 
+  {% else %}
+    {% include "./navbar_emp.html" %} 
+  {% endif %}
+    
 {% endblock nav%}
 {% block content %}
 <style>
@@ -17,8 +23,9 @@ Home Page
 </style>
 <div class="w-full flex justify-between items-center px-4 mt-8">
   <p class="text-2xl font-bold">คิดเงิน</p>
-  <div>
-    <span id="amount">0</span><span> ชิ้น</span>
+  <div class='flex gap-2 items-center'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+    <span id="amount">0</span>
   </div>
  <form method="POST" action='/payment'>
   {% csrf_token %}
@@ -35,28 +42,30 @@ Home Page
   class="border rounded px-6 py-2 flex justify-between text-center shadow-md mt-12"
 >
   <a class="w-full" href="/payment">ทั้งหมด</a>|
-  <a class="w-full" href="/payment/beverage">เครื่องดื่ม</a>|
-  <a class="w-full" href="/payment/snack">ขนม</a>|
-  <a class="w-full" href="/payment/ice-cream">ไอศกรีม</a>|
-  <a class="w-full" href="/payment/household-item">ของใช้ครัวเรือน</a>
+  <a class="w-full" href="/payment/เครื่องดื่ม">เครื่องดื่ม</a>|
+  <a class="w-full" href="/payment/ขนม">ขนม</a>|
+  <a class="w-full" href="/payment/ไอศกรีม">ไอศกรีม</a>|
+  <a class="w-full" href="/payment/ของใช้ครัวเรือน">ของใช้ครัวเรือน</a>
 </div>
 
 <section class="grid grid-cols-3 mt-8 gap-x-6 gap-y-6">
   {% for product in products %}
   
   {% if product.quantity_in_stock > 0 %}
-  <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-12 shadow-md border flex flex-col gap-3 text-center">
+  <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="h-[400px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-12  flex flex-col gap-3 text-center">
     <input type="text" id='{{product.id}}' class='hidden' value='{{product.id}},{{product.name}},{{product.price}},{{product.quantity_in_stock}}'>
-    <p class="text-lg">{{ product.name }}</p>
-    <div class="bg-gray-300 h-44"></div>
-    <div class="flex items-center justify-center gap-2">
-      <div class="flex gap-2">
-        <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
-        <span>{{product.price}}</span> บาท
-      </div>
-      <div id='inputGroup-{{ product.id }}' class="hidden">
-        <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})" onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-12 resize-none border rounded-md py-1  text-center'>
-        <span>ชิ้น</span>
+    <div class="bg-gray-300 h-56"></div>
+    <div class="flex flex-col items-center justify-center gap-2">
+      <p class="text-lg">{{ product.name }}</p>
+      <div>
+        <div class="flex gap-2">
+          <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
+          <span>ราคา {{product.price}}</span> บาท
+          </div>
+          <div id='inputGroup-{{ product.id }}' class="hidden mt-1">
+            <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})" onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-12 resize-none border rounded-md py-1  text-center'>
+            <span>ชิ้น</span>
+        </div>
       </div>
 
     </div>
@@ -148,10 +157,10 @@ Home Page
     const product_input = document.querySelector(`#inputGroup-${product_id}`)
     if(isActive){
       product_input.classList.remove('hidden')
-      document.getElementById(`product-${product_id}`).classList.add("bg-gray-200")
+      document.getElementById(`product-${product_id}`).classList.add("bg-gray-100")
       setProductAmount(product_id, 1)
     }else {
-      document.getElementById(`product-${product_id}`).classList.remove("bg-gray-200")
+      document.getElementById(`product-${product_id}`).classList.remove("bg-gray-100")
       product_input.classList.add('hidden')
     }
   }
