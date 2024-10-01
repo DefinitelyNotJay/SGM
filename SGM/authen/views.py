@@ -36,11 +36,18 @@ class SignIn(View):
     def post(self, request):
         print(request.POST)
         form = AuthenticationForm(data=request.POST)
+        print("user", form.get_user())
         print(form.error_messages)
         if form.is_valid():
+            # เรียก user หลังจากที่ฟอร์ม valid แล้ว
             user = form.get_user()
+            print("user", user)
+
+            # ทำการ login
             login(request, user)
             return redirect('/')
+        print(form.errors)  # ใช้ form.errors เพื่อดูข้อความ error ของแต่ละฟิลด์
+        form.add_error("password", "เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง")
         return render(request, './registration/login.html', {"form": form})
 
 class SignOut(View):

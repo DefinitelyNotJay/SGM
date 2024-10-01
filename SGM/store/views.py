@@ -334,11 +334,10 @@ class ManageCustomer(View):
         form_auth = CustomerUserForm(request.POST)
         if form.is_valid() and form_auth.is_valid():
             try:
-            
                 username = form_auth.cleaned_data.get('username')
                 first_name = form_auth.cleaned_data.get('first_name')
                 last_name = form_auth.cleaned_data.get('last_name')
-                password = form_auth.cleaned_data.get('password')
+                password = form_auth.cleaned_data.get('password1')
 
                 # สร้าง User
                 user = User.objects.create(
@@ -347,6 +346,7 @@ class ManageCustomer(View):
                     last_name=last_name
                 )
                 user.set_password(password)
+                print("password", user.password)
                 user.save()
 
                 # บันทึกข้อมูล user_id ลงใน customer instance
@@ -356,7 +356,7 @@ class ManageCustomer(View):
 
                 return redirect("/customer")
             except Exception as e:
-                print(e)
+                form.add_error("password", "เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง")
                 return render(request, 'employee/customer_form.html', {"form": form, "form_auth": form_auth, "isCreate": True})
         else:
             # แสดงผล errors ของฟอร์มเมื่อ validation ไม่ผ่าน
