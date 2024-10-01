@@ -334,13 +334,13 @@ class ManageCustomer(View):
         form_auth = CustomerUserForm(request.POST)
         if form.is_valid() and form_auth.is_valid():
             try:
-                # ดึงข้อมูลจาก form_auth
+            
                 username = form_auth.cleaned_data.get('username')
                 first_name = form_auth.cleaned_data.get('first_name')
                 last_name = form_auth.cleaned_data.get('last_name')
                 password = form_auth.cleaned_data.get('password')
 
-                # สร้าง User instance
+                # สร้าง User
                 user = User.objects.create(
                     username=username, 
                     first_name=first_name, 

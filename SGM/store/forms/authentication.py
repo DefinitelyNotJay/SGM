@@ -68,6 +68,13 @@ class CustomerUserForm(forms.Form):
         cleaned_data = super().clean()
         pass1 = cleaned_data.get('password1')
         pass2 = cleaned_data.get('password2')
+        
+        user = User.objects.filter(username=cleaned_data.get('username'))
+        if(user.exists()):
+            message = 'มีเบอร์โทรนี้อยู่ในระบบแล้ว'
+            self.add_error("username", message)
+      
+
         if pass1 != pass2:
             message = 'รหัสผ่านทั้ง 2 ช่องต้องตรงกัน'
             self.add_error("password1", message)

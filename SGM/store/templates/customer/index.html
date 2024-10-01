@@ -22,12 +22,16 @@
     4 items-center text-bold">
     {% if not user.is_authenticated %}
     <a href="/customer/new"
-    class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+    class="ml-4 flex text-lg justify-center gap-1 text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 bg-sky-50 shadow-white">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+    <p>สมัครสมาชิก</p>
     </a>
     <a href="/login/"
-    class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+    class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 gap-1 text-lg bg-sky-50 shadow-white">
+
      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+     <p>เข้าสู่ระบบ</p>
+     
     </a>
 
     {% else %}
