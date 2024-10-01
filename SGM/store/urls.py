@@ -8,15 +8,14 @@ from . import views
 urlpatterns = [
     path("", include('authen.urls')),
     # customer
-    path('Viewproduct', ViewStock.as_view(), name="Viewproduct"),
+    path('', ViewStock.as_view(), name="Viewproduct"),
     # employee
-    path('', EmployeeHome.as_view()),
     path('stock/', Stock.as_view()),
     path('payment', Payment.as_view()),
     path('payment/bill', PaymentBill.as_view()),
     path('payment/generate-qrcode', GenerateQRCode.as_view(), name='generate_qrcode'),
     path('payment/<str:category>', Payment.as_view()),
-    path('customer/', ListCustomer.as_view(), name="customer"),
+    path('customer/', CustomerManagement.as_view(), name="customer"),
     path('customer/new/', ManageCustomer.as_view()),
     path('customer/<int:customer_id>/', ManageCustomer.as_view(), name="new-customer"),
     # manager
@@ -27,4 +26,6 @@ urlpatterns = [
     path('deleteProduct/<int:product_id>/', DeleteProduct.as_view(), name='delete_product'),
     path('addProduct/', AddProduct.as_view(), name='addProduct'),
     path('ManageUser', ManageUserView.as_view(), name="ManageUser"),
+    path('employee', EmployeeManagement.as_view(), name='employee-management'),
+    path('employee/<int:emp_id>/', ManageEmployee.as_view(), name='employee-management'),
 ]

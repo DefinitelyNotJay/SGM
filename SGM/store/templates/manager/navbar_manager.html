@@ -11,15 +11,25 @@
 </style>
 
 <div class="flex justify-between h-[6rem] px-10 shadow items-center bg-slate-400 select-none">
-    <div class="flex items-center animate-pulse h-fit">
-      <div class="flex flex-col text-center cursor-default">
-        <p class="logo tracking-widest text-3xl">VENA</p>
-        <p class="tracking-[5px] text-xs">GROCERY STORE</p>
-      </div>
-    </div>
+    
+        <a href="/">
+            <div class="flex items-center animate-pulse h-fit cursor-pointer">
+                <div class="flex flex-col text-center">
+                  <p class="logo tracking-widest text-3xl">VENA</p>
+                  <p class="tracking-[5px] text-xs">GROCERY STORE</p>
+                </div>
+              </div>
+        </a>
+    
     <p class='text-xl font-semibold cursor-default select-none'>{{ user.first_name }} {{user.last_name}}</p>
     <div class="flex space-x-
     4 items-center text-bold">
+    {% if not user.is_authenticated %}
+    <a href="/login/"
+    class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+    </a>    
+    {% else %}
     <a href="/statistics"
             class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-column"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
@@ -45,7 +55,7 @@
             </svg>
         </a>
         <!-- กำหนด path -->
-        <a href="/manageAccount"
+        <a href="/employee"
             class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -74,5 +84,6 @@
                 <line x1="21" x2="9" y1="12" y2="12" />
             </svg>
         </a>
+        {% endif %}
     </div>
 </div>

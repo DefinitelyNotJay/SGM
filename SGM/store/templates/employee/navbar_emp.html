@@ -17,8 +17,15 @@
         <p class="tracking-[5px] text-xs">GROCERY STORE</p>
       </div>
     </div>
-    <p class='text-xl font-semibold cursor-default select-none'>{{ user.first_name }} {{user.last_name}}</p>
+    {% comment %} <p class='text-xl font-semibold cursor-default select-none'>{{ user.first_name }} {{user.last_name}}</p> {% endcomment %}
     <div class="flex space-x-4 items-center text-bold">
+        
+        {% if not user.is_authenticated %}
+        <a href="/login/"
+        class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+        </a>    
+        {% else %}
         <!-- กำหนด path -->
         <a href="/payment"
             class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
@@ -53,5 +60,6 @@
                 <line x1="21" x2="9" y1="12" y2="12" />
             </svg>
         </a>
+        {% endif %}
     </div>
 </div>

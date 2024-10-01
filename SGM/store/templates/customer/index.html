@@ -1,0 +1,160 @@
+<!-- templates/product_list.html -->
+{% extends 'manager/layout.html' %}
+{% block head %}
+<title>Product List</title>
+{% endblock %}
+{% block nav %}
+{%if not user.is_authenticated %}
+{% comment %} ใส่ nav สำหรับ visitor {% endcomment %}
+<div class='w-full bg-[#2ec4b6] flex justify-between h-[6rem] px-10 shadow items-center select-none'>
+    <a href="/">
+        <div class="flex items-center animate-pulse h-fit cursor-pointer">
+            <div class="flex flex-col text-center">
+                <p class="logo tracking-widest text-3xl">VENA</p>
+                <p class="tracking-[5px] text-xs">GROCERY STORE</p>
+            </div>
+        </div>
+    </a>
+
+    <p class='text-xl font-semibold cursor-default select-none'>{{ user.first_name }} {{user.last_name}}</p>
+    <div class="flex space-x-
+    4 items-center text-bold">
+        {% if not user.is_authenticated %}
+        <a href="/customer/new"
+            class="ml-4 flex text-lg justify-center gap-1 text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-user-plus">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <line x1="19" x2="19" y1="8" y2="14" />
+                <line x1="22" x2="16" y1="11" y2="11" />
+            </svg>
+            <p>สมัครสมาชิก</p>
+        </a>
+        <a href="/login/"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 gap-1 text-lg bg-sky-50 shadow-white">
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-log-in">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" x2="3" y1="12" y2="12" />
+            </svg>
+            <p>เข้าสู่ระบบ</p>
+
+        </a>
+
+        {% else %}
+        <a href="/payment"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-scan-barcode">
+                <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                <path d="M8 7v10" />
+                <path d="M12 7v10" />
+                <path d="M17 7v10" />
+            </svg>
+        </a>
+        <!-- กำหนด path-->
+        <a href="/stock/"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-blacktransform hover:scale-[120%] hover:text-sky-500  transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-truck">
+                <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+                <path d="M15 18H9" />
+                <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+                <circle cx="17" cy="18" r="2" />
+                <circle cx="7" cy="18" r="2" />
+            </svg>
+        </a>
+        <!-- กำหนด path-->
+        <a href="/manageInventory"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-blacktransform hover:scale-[120%] hover:text-sky-500  transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-archive">
+                <rect width="20" height="5" x="2" y="3" rx="1" />
+                <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+                <path d="M10 12h4" />
+            </svg>
+        </a>
+        <!-- กำหนด path -->
+        <a href="/employee"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-user-round-cog">
+                <path d="M2 21a8 8 0 0 1 10.434-7.62" />
+                <circle cx="10" cy="8" r="5" />
+                <circle cx="18" cy="18" r="3" />
+                <path d="m19.5 14.3-.4.9" />
+                <path d="m16.9 20.8-.4.9" />
+                <path d="m21.7 19.5-.9-.4" />
+                <path d="m15.2 16.9-.9-.4" />
+                <path d="m21.7 16.5-.9.4" />
+                <path d="m15.2 19.1-.9.4" />
+                <path d="m19.5 21.7-.4-.9" />
+                <path d="m16.9 15.2-.4-.9" />
+            </svg>
+        </a>
+        <!-- กำหนด path -->
+        <a href="/logout"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-log-out">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% elif user.is_staff %}
+{% include "manager/navbar_manager.html" %}
+{% else%}
+{% include "employee/navbar_emp.html" %}
+{% endif %}
+
+{% endblock %}
+
+{% block content %}
+<main class="ml-7 mr-7 ">
+    <section class="py-10"></section>
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 class="font-manrope font-bold text-4xl text-black mb-8 max-lg:text-center">
+            สินค้าทั้งหมด
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {% for product in products %}
+            <a href="javascript:;"
+                class="mx-auto sm:mr-0 group cursor-pointer lg:mx-auto bg-white transition-all duration-500">
+                <div class="">
+                    <img src="https://pagedone.io/asset/uploads/1700726158.png" alt="face cream image"
+                        class="w-full aspect-square rounded-2xl object-cover">
+                </div>
+                <div class="mt-5">
+                    <div class="flex items-center justify-between">
+                        <h6
+                            class="font-semibold text-xl leading-8 text-black transition-all duration-500 group-hover:text-indigo-600">
+                            {{product.name}} </h6>
+                        <h6 class="font-semibold text-xl leading-8 text-indigo-600">{{product.price}} </h6>
+                    </div>
+                    <p class="mt-2 font-normal text-sm leading-6 text-gray-500">สินค้าคงเหลือ
+                        {{product.quantity_in_stock}} ชิ้น</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    </section>
+</main>
+{% endblock %}
