@@ -36,13 +36,6 @@ class Inventory(View):
         print(Customer.objects.all())
         return HttpResponse("123")
 
-class ManageUserView(View):
-    def get(self, request):
-        return render(request, "employee/customer_form.html", {"form": CustomerCreateForm()})
-
-    def get(self, request):
-        # print(request.user.has_perm('store.create_order'))
-        return redirect('/payment')
 
 class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_order', 'store.add_order', 'store.change_order', 'store.delete_order']
@@ -309,39 +302,68 @@ class CustomerManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
         context = {'title': 'ลูกค้า', 'customers': customers}
         return render(request, 'manager/account.html', context)
 
-class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = ['store.view_customer', 'store.add_customer', 'store.change_customer', 'store.delete_customer']
-    login_url = '/login/'
+class ManageCustomer(View):
+    # permission_required = ['store.view_customer', 'store.add_customer', 'store.change_customer', 'store.delete_customer']
+    # login_url = '/login/'
 
     def get(self, request, customer_id=None):
+        # สร้าง customer, user
         if(customer_id):
             # edit customer info
             customer_instance = Customer.objects.get(pk=customer_id)
             edit_form = CustomerCreateForm(initial=model_to_dict(customer_instance), instance=customer_instance)
             context = {"form": edit_form, "customer": customer_instance}
             return render(request, "employee/customer_form.html", context)
-        return render(request, "employee/customer_form.html", {"form": CustomerCreateForm(), "isCreate": True})
+        return render(request, "employee/customer_form.html", {"form": CustomerCreateForm(), "form_auth": CustomerUserForm(), "isCreate": True})
 
         # get all customers
     def post(self, request, customer_id=None):
         if customer_id:
             customer_instance = Customer.objects.get(pk=customer_id)
             form = CustomerCreateForm(request.POST, instance=customer_instance)
-            if form.is_valid:
+            if form.is_valid():
                 try:
                     form.save()
                     return redirect("/customer")
-                except:
+                except Exception as e:
+                    print(e)
                     return HttpResponseServerError()
+        
         # create customer
         form = CustomerCreateForm(request.POST)
-        if form.is_valid:
+        form_auth = CustomerUserForm(request.POST)
+        if form.is_valid() and form_auth.is_valid():
             try:
-                form.save()
+                username = form_auth.cleaned_data.get('username')
+                first_name = form_auth.cleaned_data.get('first_name')
+                last_name = form_auth.cleaned_data.get('last_name')
+                password = form_auth.cleaned_data.get('password1')
+
+                # สร้าง User
+                user = User.objects.create(
+                    username=username, 
+                    first_name=first_name, 
+                    last_name=last_name
+                )
+                user.set_password(password)
+                print("password", user.password)
+                user.save()
+
+                # บันทึกข้อมูล user_id ลงใน customer instance
+                customer = form.save(commit=False)
+                customer.user_id = user.id
+                customer.save()
+
                 return redirect("/customer")
-            except:
-                return redirect("/customer/new/")
-        return redirect("/customer")
+            except Exception as e:
+                form.add_error("password", "เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง")
+                return render(request, 'employee/customer_form.html', {"form": form, "form_auth": form_auth, "isCreate": True})
+        else:
+            # แสดงผล errors ของฟอร์มเมื่อ validation ไม่ผ่าน
+            print(form.errors)
+            print(form_auth.errors)
+            return render(request, 'employee/customer_form.html', {"form": form, "form_auth": form_auth, "isCreate": True})
+
 
     def delete(self, request, customer_id):
         # delete customer
@@ -351,6 +373,17 @@ class ManageCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
             return JsonResponse({"success": True})
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
+
+class ManageUserView(View):
+    # ไม่ใช่อันสร้างหลัก
+    def get(self, request):
+        form = CustomerCreateForm()
+        return render(request, "employee/customer_form.html", {"form": form})
+
+    def get(self, request):
+        # print(request.user.has_perm('store.create_order'))
+        return redirect('/payment')
+
 
 class ManageEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required=['auth.add_user', 'auth.view_user', 'auth.change_user', 'auth.delete_user']
