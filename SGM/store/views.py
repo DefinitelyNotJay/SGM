@@ -21,6 +21,9 @@ from django.urls import reverse
 from promptpay import qrcode
 from io import BytesIO
 from django.contrib.auth.models import Permission
+from .s3 import upload_file, get_client
+from store.utils.sort import sort_products
+
 
 # Create your views here.
 class EmployeeHome(LoginRequiredMixin, View):
@@ -44,36 +47,8 @@ class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request):
         categories = request.GET.getlist('category')  # รับ category จาก query parameters ที่อาจมีมากกว่า 1
         sort_filter = request.GET.get('sort_filter')  # รับตัวเลือกการกรองข้อมูล
-
-        # กรณีไม่มีการเลือก category หรือ sort_filter ใด ๆ
-        if not categories and not sort_filter:
-            products = Product.objects.all().order_by('quantity_in_stock')
-            categories = Category.objects.all()
-            context = {'products': products, 'categories': categories}
-            return render(request, "manager/stock.html", context)
-
-        # หากมีการเลือก filter
-        else:
-            new_products = Product.objects.all()
-
-            # มี sort_filter
-            if sort_filter:
-                if sort_filter == 'sales-asc':
-                    new_products = Product.objects.annotate(total_sold=Sum('orderitem__amount')).order_by('total_sold')
-                elif sort_filter == 'sales-desc':
-                    new_products = Product.objects.annotate(total_sold=Sum('orderitem__amount')).order_by('-total_sold')
-                elif sort_filter == 'quantity-asc':
-                    new_products = Product.objects.order_by('quantity_in_stock')
-                elif sort_filter == 'quantity-desc':
-                    new_products = Product.objects.order_by('-quantity_in_stock')
-
-            # มี categories
-            if categories:
-                new_products = new_products.filter(categories__name__in=categories).distinct()
-
-            all_categories = Category.objects.all()
-            context = {'products': new_products, 'categories': all_categories}
-            return render(request, "manager/stock.html", context)
+        context = sort_products(categories, sort_filter)
+        return render(request, "manager/stock.html", context)
 
     def post(self, request):
         stock_amount = json.loads(request.body)
@@ -86,18 +61,14 @@ class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
 class Payment(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_order', 'store.add_order', 'store.change_order']
     login_url = '/login/'
-    def get(self, request, category=None):
+    def get(self, request):
         # มี query
-        print(request.user.has_perm("store.view_order"))
-        if category is None:
-            products = Product.objects.all()
-        else:
-            # ทั้งหมด
-            products = Product.objects.filter(categories__name=category)
-        return render(request, "employee/payment.html", {"products": products})
+        categories = request.GET.getlist('category') if 'category' in request.GET else None  # รับ category จาก query parameters ที่อาจมีมากกว่า 1
+        sort_filter = request.GET['sort_filter'] if 'sort_filter' in request.GET else None  # รับตัวเลือกการกรองข้อมูล
+        context = sort_products(categories, sort_filter)
+        return render(request, 'employee/payment.html', context)
     def post(self, request):
         post_data = request.POST.get('ordered_products')
-        print(post_data)
         data = json.loads(post_data)
         if data:
             total = 0
@@ -116,6 +87,7 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     def post(self, request):
         ordered_products = json.loads(request.body)
+        print(ordered_products)
         products = ordered_products.get('storage_products')
         amount = int(ordered_products.get('storage_amount'))
         total = float(ordered_products.get('total'))
@@ -123,7 +95,7 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
         payment_method = ordered_products.get('payment_method')
         
         try:
-            customer = Customer.objects.filter(username=customer_id).first()
+            customer = Customer.objects.filter(user__username=customer_id).first()
             order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID', payment_method=payment_method)
             
             for product in products:
@@ -206,6 +178,22 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 class ViewStock(View):
     def get(self, request):
+        # s3 = boto3.resource(
+        # 's3',
+        # aws_access_key_id= os.getenv('aws_access_key_id'),
+        # aws_secret_access_key=os.getenv('aws_secret_access_key'),
+        # aws_session_token= os.getenv('aws_session_token'),
+        #     )
+
+        # bucket = s3.Bucket('serversidesgm')
+        # for obj in bucket.objects.all():
+        #     print(obj.key)
+
+        # for bucket in s3.buckets.all():
+        #     print(bucket.name)
+        
+        # data=
+        
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
         return render(request, 'customer/index.html', {'products': products})
 
@@ -280,11 +268,25 @@ class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, 'manager/addProduct.html', {'form': form})
 
     def post(self, request):
+        print(request.POST)
+        print(request.FILES)
         form = ProductForm(request.POST)
+        if(not request.FILES):
+            form.add_error("image", "โปรดใส่ภาพสินค้า")
+            return render(request, 'manager/addProduct.html', {'form': form})
+        
         if form.is_valid():
-            form.save()  # บันทึกสินค้าใหม่
-            return redirect('manageInventory') 
+            product = form.save()  # บันทึกสินค้าใหม่
+            image_file = request.FILES['image']
+            sucess = upload_file(image_file, 'serverside-sgm')
+            if sucess:
+                image_url = f'https://serverside-sgm.s3.amazonaws.com/{image_file.name}'
+                product.image_url = image_url
+                product.save()
+                return redirect('manageInventory')
+        # มีรูป, form ไม่ valid
         return render(request, 'manager/addProduct.html', {'form': form})
+        
 
 class EmployeeManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
@@ -356,7 +358,6 @@ class ManageCustomer(View):
 
                 return redirect("/customer")
             except Exception as e:
-                form.add_error("password", "เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง")
                 return render(request, 'employee/customer_form.html', {"form": form, "form_auth": form_auth, "isCreate": True})
         else:
             # แสดงผล errors ของฟอร์มเมื่อ validation ไม่ผ่าน
