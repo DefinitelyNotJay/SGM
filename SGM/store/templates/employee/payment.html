@@ -45,7 +45,11 @@ Home Page
   {% for product in products %}
   
   {% if product.quantity_in_stock > 0 %}
+<<<<<<< Updated upstream
   <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-12 shadow-md border flex flex-col gap-3 text-center">
+=======
+  <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="border h-[340px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-12  flex flex-col gap-3 text-center">
+>>>>>>> Stashed changes
     <input type="text" id='{{product.id}}' class='hidden' value='{{product.id}},{{product.name}},{{product.price}},{{product.quantity_in_stock}}'>
     <p class="text-lg">{{ product.name }}</p>
     <div class="bg-gray-300 h-44"></div>
