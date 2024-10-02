@@ -1,12 +1,11 @@
-{% extends "./employee_layout.html" %} 
-{% block title %} Customer List 
-{%endblock title %} 
-{% block nav %} 
-    {% include "./navbarEMP.html" %} 
-{% endblock nav %} 
+{% extends "./employee_layout.html" %}
+{% block title %} Customer List {% endblock title %}
+{% block nav %}
+{% include "./navbar_emp.html" %}
+{% endblock nav %}
 {% block content %}
 
-<div class= "w-[850px] mx-auto">
+<div class="w-[850px] mx-auto">
     <p class='text-2xl text-center font-semibold p-2'>รายการออเดอร์</p>
     <div class="h-[380px] overflow-y-scroll rounded-lg">
         <table class="min-w-full min-h-[300px] table-fixed">
@@ -36,79 +35,116 @@
             <span>จำนวนทั้งหมด <span>{{ storage_amount }}</span> ชิ้น</span>
             <div>
                 <label for="customer_number">เบอร์ลูกค้า</label>
-                <input type="text" id='customer_number' class="px-3 py-2 border self-center font-medium rounded-md w-[130px]">
+                <input type="text" id='customer_number'
+                    class="px-3 py-2 border self-center font-medium rounded-md w-[130px]">
             </div>
-            <span>ราคารวม <span>{{ total }}</span> บาท
-            
+            <span>ราคารวม <span>{{ total }}</span> บาท</span>
         </div>
-        
-        
+
         <div class="flex gap-4 w-fit mx-auto py-4">
-            <button onclick="window.history.back()" class='text-lg px-4 py-2 border rounded-md text-[#333] bg-[#c6c5b9] hover:bg-[#d1d1c7]'>กลับ</button>
-            <button class='text-lg px-4 py-2 border rounded-md text-[#FDFDFF] bg-[#546a7b] hover:bg-[#768895]' onclick='paymentHandler()'>ชำระเงิน</button>
+            <button onclick="window.history.back()"
+                class='text-lg px-4 py-2 border rounded-md text-[#333] bg-[#c6c5b9] hover:bg-[#d1d1c7]'>กลับ</button>
+            <button class='text-lg px-4 py-2 border rounded-md text-[#FDFDFF] bg-[#546a7b] hover:bg-[#768895]'
+                onclick='showPaymentOptions()'>ชำระเงิน</button>
         </div>
     </div>
-    
+
+    <!-- Payment Options Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">เลือกวิธีการชำระเงิน</h3>
+                <div class="mt-2 px-7 py-3">
+                    <button id="qrCodeBtn" class="px-4 py-2 m-4 bg-blue-500 text-white rounded hover:bg-blue-700 mr-2">QR
+                        Code (Pompal)</button>
+                    <button id="cashBtn"
+                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">เงินสด</button>
+                    <button onclick="closePaymentModal()" class='px-4 py-2 mt-2 text-white rounded bg-gray-500 hover:bg-gray-700'>กลับ</button>
+                </div>
+            </div>
+        </div>
     </div>
-{% endblock content %} 
+
+    <!-- QR Code Modal -->
+    <div id="qrCodeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">สแกน QR Code เพื่อชำระเงิน</h3>
+                <div class="mt-2 px-7 py-3">
+                    <img id="qrCodeImage" src="" alt="QR Code" class="mx-auto">
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="confirmQRPayment"
+                        class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        ยืนยันการชำระเงิน
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
 {% block script %}
 <script>
-    // ดึงข้อมูล order มา
-    const ordered_product = JSON.parse(localStorage.getItem("ordered_product"))
+    const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
 
-    if(!ordered_product){
-        alert("ไม่พบข้อมูลสินค้า")
-        localStorage.removeItem('ordered_product')
-        window.location.href = "/payment"
+    if (!ordered_product) {
+        alert("ไม่พบข้อมูลสินค้า");
+        localStorage.removeItem('ordered_product');
+        window.location.href = "/payment";
     }
 
-    function paymentHandler(){
+    function showPaymentOptions() {
+        document.getElementById('paymentModal').classList.remove('hidden');
+    }
 
-        const customer_id = document.getElementById('customer_number').value
-        alert(customer_id)
+    document.getElementById('qrCodeBtn').addEventListener('click', function () {
+        document.getElementById('paymentModal').classList.add('hidden');
+        fetchQRCode();
+    });
+
+    document.getElementById('cashBtn').addEventListener('click', function () {
+        document.getElementById('paymentModal').classList.add('hidden');
+        paymentHandler('CASH');
+    });
+
+    document.getElementById('confirmQRPayment').addEventListener('click', function () {
+        document.getElementById('qrCodeModal').classList.add('hidden');
+        paymentHandler('QR');
+    });
+
+    function fetchQRCode() {
+        const customer_id = document.getElementById('customer_number').value;
+        fetch(`/payment/generate-qrcode?amount={{ total }}&customer_id=${customer_id}`)
+            .then(response => response.blob())
+            .then(blob => {
+                const imageUrl = URL.createObjectURL(blob);
+                document.getElementById('qrCodeImage').src = imageUrl;
+                document.getElementById('qrCodeModal').classList.remove('hidden');
+            });
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentModal').classList.add('hidden');
+    }
+
+
+    function paymentHandler(paymentMethod) {
+        const customer_id = document.getElementById('customer_number').value;
         fetch(`/payment/bill`, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
             },
-            body:JSON.stringify({...ordered_product, 'total': '{{ total }}', 'customer_id': customer_id || 0})
-          },
-          ).then((res)=>{
-            res.json().then(data=>{
-                localStorage.removeItem("ordered_product")
-                window.location.href = '/payment'
-            })
-            }
-          )
+            body: JSON.stringify({ ...ordered_product, 'total': '{{ total }}', 'customer_id': customer_id || 0, 'payment_method': paymentMethod })
+        }).then((res) => {
+            res.json().then(data => {
+                localStorage.removeItem("ordered_product");
+                window.location.href = '/payment';
+            });
+        });
     }
-
-
 </script>
 {% endblock script %}
-    
-
-{% comment %} yellow: {
-    100: "#f4f3f1",
-    200: "#e8e8e3",
-    300: "#dddcd5",
-    400: "#d1d1c7",
-    500: "#c6c5b9",
-    600: "#9e9e94",
-    700: "#77766f",
-    800: "#4f4f4a",
-    900: "#282725"
-}, {% endcomment %}
-
-{% comment %} 
-indigo: {
-    100: "#dde1e5",
-    200: "#bbc3ca",
-    300: "#98a6b0",
-    400: "#768895",
-    500: "#546a7b",
-    600: "#435562",
-    700: "#32404a",
-    800: "#222a31",
-    900: "#111519"
-}, {% endcomment %}

@@ -2,13 +2,6 @@ from django import forms
 from store.models import Category, Product
 
 class ProductForm(forms.ModelForm):
-    CATEGORY_EN_TO_TH = {
-        "Beverages": "เครื่องดื่ม",
-        "Snacks": "ขนม",
-        "Ice-cream": "ไอศกรีม",
-        "Household-item": "ของใช้ครัวเรือน",
-    }
-
     quantity_in_stock = forms.IntegerField(
         label='จำนวนในสต็อก',  # เปลี่ยนชื่อ label
         widget=forms.NumberInput(attrs={
@@ -41,21 +34,13 @@ class ProductForm(forms.ModelForm):
             'class': 'shadow border rounded w-full mb-4 py-2 px-3 text-gray-700 leading-tight focus:shadow-outline'
         })
     )
+    
+    image = forms.ImageField(
+        label='อัปโหลดภาพสินค้า',  # เปลี่ยนชื่อ label
+        required=False
+    )
 
     class Meta:
         model = Product
-        fields = ['name', 'price', 'quantity_in_stock', 'categories']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # แปลชื่อหมวดหมู่
-        self.fields['categories'].choices = self.get_translated_categories()
-
-    def get_translated_categories(self):
-        # ดึงหมวดหมู่ทั้งหมดจากฐานข้อมูล
-        categories = Category.objects.all()
-        # สร้างรายการตัวเลือกที่แปลเป็นภาษาไทย
-        translated_choices = [
-            (cat.id, self.CATEGORY_EN_TO_TH.get(cat.name, cat.name)) for cat in categories
-        ]
-        return translated_choices
+        fields = ['name', 'price', 'quantity_in_stock', 'categories', 'image']
+        

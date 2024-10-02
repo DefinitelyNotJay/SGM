@@ -16,12 +16,14 @@
       }
     </style>
 
-    {% block nav %} {% endblock %} {% block head %} {% endblock head %}
+    {% block nav %} {% endblock %} 
+    {% block head %} {% endblock head %}
   </head>
 
   <body class="w-screen">
     <div class="px-14 py-8">{% block content %} {% endblock content %}</div>
   </body>
+  
   {% block script %}
   <script src="/"></script>
   {% endblock %}

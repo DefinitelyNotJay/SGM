@@ -1,9 +1,9 @@
-{% extends "./employee_layout.html" %} 
+{% extends "./layout.html" %} 
 {% block title %} 
 Home Page 
 {% endblock %} 
 {% block nav %} 
-  {% include "./navbarEMP.html" %} 
+  {% include "./navbar_manager.html" %} 
 {% endblock nav%}
 {% block content %}
 <style>
@@ -16,7 +16,7 @@ Home Page
 }
 </style>
 
-<div class='w-full p-8 pt-0  flex flex-col gap-6'>
+<div class='w-full p-8  flex flex-col gap-6'>
     <h1 class='text-4xl font-bold'>คลังสินค้า</h1>
     <div class='w-full flex justify-between'>
        <div class='flex gap-3 w-full items-center'>
@@ -49,6 +49,7 @@ Home Page
             <div class='flex flex-col justify-between border border-t-0 rounded-lg rounded-t-none  px-4 py-2'>
                     <p class='text-center'>คงเหลือ <span>{{ p.quantity_in_stock }}</span> ชิ้น</p>
                 <div class='flex gap-3 justify-center items-center'>
+                    <span>เติม</span>
                     <input type="number" value='{{ p.daily_restock_quantity }}' onchange="changeStockAmount('{{ p.id }}', this.value)" class='w-12 p-2 pb-0 border-b text-center focus:outline-none border-gray-700'>
                     <span>ชิ้น</span>
                 </div>
