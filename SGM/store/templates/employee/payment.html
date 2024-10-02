@@ -68,25 +68,23 @@ Home Page
   
 
 
-<section class="grid grid-cols-5 mt-8 gap-x-6 gap-y-6">
+<section class="grid grid-cols-4 mt-8 gap-x-6 gap-y-6">
   {% for product in products %}
-  
   {% if product.quantity_in_stock > 0 %}
   <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="border h-[360px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-12  flex flex-col gap-3 text-center">
     <input type="text" id='{{product.id}}' class='hidden' value='{{product.id}},{{product.name}},{{product.price}},{{product.quantity_in_stock}}'>
     <img class="h-48 object-center object-cover" src='{{ product.image_url }}'/>
-    <div class="flex flex-col items-center justify-center gap-2">
-      <p class="text-lg text-start">{{ product.name }}</p>
+    <div class="flex flex-col items-center justify-center gap-2 mt-4">
+      <p class="text-xl font-medium text-start">{{ product.name }}</p>
       <div>
         <div class="flex gap-2 items-center">
           {% comment %} <p>เหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p> {% endcomment %}
           <span>{{product.price}}</span> บาท
           <div id='inputGroup-{{ product.id }}' class="hidden mt-1">
-            <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})" onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-12 resize-none border rounded-md py-1  text-center'>
+            <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})" onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-8 resize-none border rounded-md py-0.5 text-center'>
             <span>ชิ้น</span>
         </div>
-          </div>
-          
+          </div> 
       </div>
 
     </div>
@@ -271,10 +269,13 @@ Home Page
     const product_input = document.querySelector(`#inputGroup-${product_id}`)
     if(isActive){
       product_input.classList.remove('hidden')
-      document.getElementById(`product-${product_id}`).classList.add("bg-gray-100")
+      document.getElementById(`product-${product_id}`).classList.add("bg-[#98a6ae]")
+      document.getElementById(`product-${product_id}`).classList.remove("hover:bg-gray-50")
       setProductAmount(product_id, 1)
     }else {
-      document.getElementById(`product-${product_id}`).classList.remove("bg-gray-100")
+      document.getElementById(`product-${product_id}`).classList.remove("bg-[#98a6ae]")
+      document.getElementById(`product-${product_id}`).classList.add("hover:bg-gray-50")
+      
       product_input.classList.add('hidden')
     }
   }
@@ -315,3 +316,16 @@ Home Page
 
 </script>
 {% endblock script %}
+
+{% comment %} 
+indigo: {
+    100: "#dde1e4",
+    200: "#bbc3c9",
+    300: "#98a6ae",
+    400: "#768893",
+    500: "#546a78",
+    600: "#435560",
+    700: "#324048",
+    800: "#222a30",
+    900: "#111518"
+}, {% endcomment %}
