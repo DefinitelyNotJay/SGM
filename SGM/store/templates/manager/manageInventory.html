@@ -35,7 +35,7 @@
 
         {% for product in products %}
         <div class="border rounded px-6 py-2 grid grid-cols-5 gap-1 items-center text-center  shadow-md mt-12">
-            <img src="https://pagedone.io/asset/uploads/1700726158.png" alt="face cream image"
+            <img src="{{ product.image_url }}" alt="face cream image"
                 class="w-24 aspect-square rounded-2xl object-cover m-2 ml-16">
             <p> {{ product.name }}</p>
             <p>ราคา {{product.price}} บาท</p>

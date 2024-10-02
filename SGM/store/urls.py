@@ -11,10 +11,9 @@ urlpatterns = [
     path('', ViewStock.as_view(), name="Viewproduct"),
     # employee
     path('stock/', Stock.as_view()),
-    path('payment', Payment.as_view()),
+    path('payment/', Payment.as_view()),
     path('payment/bill', PaymentBill.as_view()),
     path('payment/generate-qrcode', GenerateQRCode.as_view(), name='generate_qrcode'),
-    path('payment/<str:category>', Payment.as_view()),
     path('customer/', CustomerManagement.as_view(), name="customer"),
     path('customer/new/', ManageCustomer.as_view()),
     path('customer/<int:customer_id>/', ManageCustomer.as_view(), name="new-customer"),
