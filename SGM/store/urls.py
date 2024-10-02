@@ -18,6 +18,7 @@ urlpatterns = [
     path('customer/', CustomerManagement.as_view(), name="customer"),
     path('customer/new/', ManageCustomer.as_view()),
     path('customer/<int:customer_id>/', ManageCustomer.as_view(), name="new-customer"),
+    path('customer/viewcustomer/<int:customer_id>/', Viewcustomer.as_view()),
     # manager
     path('statistics', StatisticsView.as_view(), name="statistics"),
     path('manageInventory', ManageInventory.as_view(), name="manageInventory"),

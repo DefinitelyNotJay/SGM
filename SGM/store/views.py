@@ -36,7 +36,6 @@ class Inventory(View):
         print(Customer.objects.all())
         return HttpResponse("123")
 
-
 class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_order', 'store.add_order', 'store.change_order', 'store.delete_order']
     login_url = '/login/'
@@ -442,3 +441,8 @@ class ManageEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
             return JsonResponse({"success": True})
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
+        
+class Viewcustomer(View):
+    def get(self, request):
+        
+        return render(request, 'customer/viewpoin.html',{})
