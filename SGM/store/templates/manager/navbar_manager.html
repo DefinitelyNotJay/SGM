@@ -21,7 +21,7 @@
               </div>
         </a>
     
-    <p class='text-xl font-semibold cursor-default select-none'>{{ user.first_name }} {{user.last_name}}</p>
+    {% comment %} <p class='text-xl font-semibold cursor-default select-none'>{{ user.first_name }} {{user.last_name}}</p> {% endcomment %}
     <div class="flex space-x-
     4 items-center text-bold">
     {% if not user.is_authenticated %}

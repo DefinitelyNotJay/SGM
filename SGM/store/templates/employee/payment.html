@@ -21,63 +21,72 @@ Home Page
   }
 }
 </style>
-<div class="w-full flex justify-between items-center px-4 mt-8">
-  <p class="text-2xl font-bold">คิดเงิน</p>
+
+  <p class="text-4xl font-semibold ml-8 tracking-wide">ชำระเงิน</p> 
+  <div class="w-full flex justify-between items-center px-4 mt-6 border-b pb-4">
+    {% comment %} 1 {% endcomment %}
+      <div class='flex gap-3 items-center'>
+          <div class='border-r border-gray-400 pr-4'>
+            <select name="filter" id="category_filter" class='border px-3 py-2 rounded-md' onchange='selectCategory()'>
+              <option value="" default>------</option>
+              {% for c in categories  %}
+                  <option value='{{ c.name }}'>{{c.name}}</option>
+              {% endfor %}
+          </select>
+          <select onchange='selectSortFilter()' name="filter" id="sort_filter" class='border px-3 py-2 rounded-md'>
+              <option value="sales-asc">ยอดขาย น้อย-มาก</option>
+              <option value="sales-desc">ยอดขาย มาก-น้อย</option>
+              <option value="quantity-asc">ปริมาณ น้อย-มาก</option>
+              <option value="quantity-desc">ปริมาณ มาก-น้อย</option>
+          </select>
+          </div>
+          <div class='flex gap-3' id='category-area'></div>
+      </div>
+
+ 
+   {% comment %} 3 {% endcomment %}
+ 
+  {% comment %} 4 {% endcomment %}
+ <form method="POST" action='/payment/' class='flex gap-8'>
+  {% csrf_token %}
   <div class='flex gap-2 items-center'>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
     <span id="amount">0</span>
   </div>
- <form method="POST" action='/payment/'>
-  {% csrf_token %}
-  <input type="text" class='hidden' name='ordered_products' id='ordered_products'>
+  <div class='flex gap-2'>
+    <input type="text" class='hidden' name='ordered_products' id='ordered_products'>
   <button type="button" onclick="clearSelectedProduct()" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
     รีเซ็ต
   </button>
   <button type="submit" onclick="processPayment()" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
     ยืนยัน
   </button>
+  </div>
  </form>
 </div>
-<div class='w-full flex justify-between'>
-  <div class='flex gap-3 w-full items-center'>
-       <div>
-           <select name="filter" id="category_filter" class='border px-3 py-2 rounded-md' onchange='selectCategory()'>
-               <option value="" default>------</option>
-               {% for c in categories  %}
-                   <option value='{{ c.name }}'>{{c.name}}</option>
-               {% endfor %}
-           </select>
-           <select onchange='selectSortFilter()' name="filter" id="sort_filter" class='border px-3 py-2 rounded-md'>
-               <option value="sales-asc">ยอดขาย น้อย-มาก</option>
-               <option value="sales-desc">ยอดขาย มาก-น้อย</option>
-               <option value="quantity-asc">ปริมาณ น้อย-มาก</option>
-               <option value="quantity-desc">ปริมาณ มาก-น้อย</option>
-           </select>
-           
-       </div>
-       <div class='flex gap-3' id='category-area'>
-       </div>
-  </div>
-</div>
 
-<section class="grid grid-cols-4 mt-8 gap-x-6 gap-y-6">
+  
+
+
+<section class="grid grid-cols-5 mt-8 gap-x-6 gap-y-6">
   {% for product in products %}
   
   {% if product.quantity_in_stock > 0 %}
   <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="border h-[360px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-12  flex flex-col gap-3 text-center">
     <input type="text" id='{{product.id}}' class='hidden' value='{{product.id}},{{product.name}},{{product.price}},{{product.quantity_in_stock}}'>
-    <img class="h-44 object-center object-cover" src='{{ product.image_url }}'/>
+    <img class="h-48 object-center object-cover" src='{{ product.image_url }}'/>
     <div class="flex flex-col items-center justify-center gap-2">
-      <p class="text-lg">{{ product.name }}</p>
+      <p class="text-lg text-start">{{ product.name }}</p>
       <div>
-        <div class="flex gap-2">
-          <p>คงเหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p>
-          <span>ราคา {{product.price}}</span> บาท
-          </div>
+        <div class="flex gap-2 items-center">
+          {% comment %} <p>เหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p> {% endcomment %}
+          <span>{{product.price}}</span> บาท
           <div id='inputGroup-{{ product.id }}' class="hidden mt-1">
             <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})" onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-12 resize-none border rounded-md py-1  text-center'>
             <span>ชิ้น</span>
         </div>
+          </div>
+          
       </div>
 
     </div>
@@ -154,7 +163,7 @@ Home Page
       const pTag = document.createElement('p')
           pTag.textContent = category_target
           pTag.id = category_target
-          pTag.className = `cursor-pointer hover:bg-gray-50 bg-gray-100 p-2 border rounded`
+          pTag.className = `cursor-pointer border-gray-200 hover:bg-gray-100 p-2 border rounded`
           pTag.onclick = (e) => {
               deleteCategoryTag(e.target.textContent)
           }
