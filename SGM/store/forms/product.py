@@ -37,8 +37,10 @@ class ProductForm(forms.ModelForm):
     
     image = forms.ImageField(
         label='อัปโหลดภาพสินค้า',  # เปลี่ยนชื่อ label
+        required=False
     )
 
     class Meta:
         model = Product
         fields = ['name', 'price', 'quantity_in_stock', 'categories', 'image']
+        

@@ -21,6 +21,8 @@ from django.urls import reverse
 from promptpay import qrcode
 from io import BytesIO
 from django.contrib.auth.models import Permission
+from .s3 import upload_file, get_client
+
 
 # Create your views here.
 class EmployeeHome(LoginRequiredMixin, View):
@@ -206,6 +208,22 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 class ViewStock(View):
     def get(self, request):
+        # s3 = boto3.resource(
+        # 's3',
+        # aws_access_key_id= os.getenv('aws_access_key_id'),
+        # aws_secret_access_key=os.getenv('aws_secret_access_key'),
+        # aws_session_token= os.getenv('aws_session_token'),
+        #     )
+
+        # bucket = s3.Bucket('serversidesgm')
+        # for obj in bucket.objects.all():
+        #     print(obj.key)
+
+        # for bucket in s3.buckets.all():
+        #     print(bucket.name)
+        
+        # data=
+        
         products = Product.objects.all()  # ดึงสินค้าทั้งหมด
         return render(request, 'customer/index.html', {'products': products})
 
@@ -280,11 +298,25 @@ class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, 'manager/addProduct.html', {'form': form})
 
     def post(self, request):
+        print(request.POST)
+        print(request.FILES)
         form = ProductForm(request.POST)
+        if(not request.FILES):
+            form.add_error("image", "โปรดใส่ภาพสินค้า")
+            return render(request, 'manager/addProduct.html', {'form': form})
+        
         if form.is_valid():
-            form.save()  # บันทึกสินค้าใหม่
-            return redirect('manageInventory') 
+            product = form.save()  # บันทึกสินค้าใหม่
+            image_file = request.FILES['image']
+            sucess = upload_file(image_file, 'serverside-sgm')
+            if sucess:
+                image_url = f'https://serverside-sgm.s3.amazonaws.com/{image_file.name}'
+                product.image_url = image_url
+                product.save()
+                return redirect('manageInventory')
+        # มีรูป, form ไม่ valid
         return render(request, 'manager/addProduct.html', {'form': form})
+        
 
 class EmployeeManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
@@ -356,7 +388,6 @@ class ManageCustomer(View):
 
                 return redirect("/customer")
             except Exception as e:
-                form.add_error("password", "เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง")
                 return render(request, 'employee/customer_form.html', {"form": form, "form_auth": form_auth, "isCreate": True})
         else:
             # แสดงผล errors ของฟอร์มเมื่อ validation ไม่ผ่าน
