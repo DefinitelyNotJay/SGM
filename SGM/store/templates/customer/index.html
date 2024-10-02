@@ -1,8 +1,6 @@
 <!-- templates/product_list.html -->
 {% extends 'manager/layout.html' %}
-{% block head %}
 {% block title %} Product List {% endblock %}
-{% endblock %}
 
 {% block nav %}
 {%if not user.is_authenticated %}
@@ -97,13 +95,33 @@
 {% endblock %}
 
 {% block content %}
-<main class="ml-7 mr-7 ">
-    <section class="py-20"></section>
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2 class="font-manrope font-bold text-4xl text-black mb-8 max-lg:text-center">
-            สินค้าทั้งหมด
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<main class="py-12 p-16">
+
+        {% comment %} <a class="w-full" href="/">ทั้งหมด</a> |
+        <a class="w-full" href="/?category=เครื่องดื่ม">เครื่องดื่ม</a> |
+        <a class="w-full" href="/?category=ขนม">ขนม</a> |
+        <a class="w-full" href="/?category=ไอศกรีม">ไอศกรีม</a> |
+        <a class="w-full" href="?category=ของใช้ครัวเรือน">ของใช้ครัวเรือน</a> {% endcomment %}
+        <div class='flex gap-4 items-center'>
+            <h1 class='text-4xl font-semibold ml-8'>เลือกดูสินค้า</h1>
+            <select name="" class='w-fit text-center border p-2 text-xl rounded-md' onchange="window.location.href=`/?category=${this.options[this.selectedIndex].value}`" id="">
+                <option value="">เลือกประเภท</option>
+                <option value="">หน้าหลัก</option>
+                <option value="all">ทั้งหมด</option>
+                {% for cate in categories %}
+                <option value="{{ cate.name }}">{{ cate.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col gap-4 mt-12">
+        <div class='flex items-center'>
+            <h2 class=" font-semibold text-3xl text-black max-lg:text-center">
+                {{title}}
+            </h2>
+           
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
             {% for product in products %}
             <a href="javascript:;"
                 class="mx-auto sm:mr-0 group cursor-pointer lg:mx-auto bg-white transition-all duration-500">
@@ -124,6 +142,34 @@
             </a>
             {% endfor %}
         </div>
+        
+        {% if products_new %}
+        <h2 class=" font-semibold text-3xl text-black mb-8 max-lg:text-center">
+            มาใหม่
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+            {% for product in products %}
+            <a href="javascript:;"
+                class="mx-auto sm:mr-0 group cursor-pointer lg:mx-auto bg-white transition-all duration-500">
+                <div class="">
+                    <img src="https://pagedone.io/asset/uploads/1700726158.png" alt="face cream image"
+                        class="w-full aspect-square rounded-2xl object-cover">
+                </div>
+                <div class="mt-5">
+                    <div class="flex items-center justify-between">
+                        <h6
+                            class="font-semibold text-xl leading-8 text-black transition-all duration-500 group-hover:text-indigo-600">
+                            {{product.name}} </h6>
+                        <h6 class="font-semibold text-xl leading-8 text-indigo-600">{{product.price}} </h6>
+                    </div>
+                    <p class="mt-2 font-normal text-sm leading-6 text-gray-500">สินค้าคงเหลือ
+                        {{product.quantity_in_stock}} ชิ้น</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+            
     </div>
     </section>
 </main>
