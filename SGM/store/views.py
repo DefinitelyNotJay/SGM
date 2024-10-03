@@ -276,7 +276,8 @@ class DeleteProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
         product.delete()  # ลบสินค้า
-        return redirect('manageInventory')  # กลับไปที่หน้า manageInventory
+        # return redirect('manageInventory')  # กลับไปที่หน้า manageInventory
+        return JsonResponse({"success": True})
 
 
 class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -310,7 +311,7 @@ class EmployeeManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     permission_required=['auth.add_user', 'auth.view_user', 'auth.change_user', 'auth.delete_user']
     def get(self, request):
-        employees = User.objects.filter(is_staff=False)
+        employees = User.objects.filter(Q(is_staff=False) & Q(customer=None))
         context = {'title': 'พนักงาน', 'employees': employees}
         return render(request, 'manager/account.html', context)
 

@@ -15,9 +15,10 @@
       font-family: 'Noto Sans Thai', sans-serif;
   }
   </style>
-  <body>
+  <body class='h-screen'>
+    {% include "manager/navbar_manager.html" %}
     <h1 class='text-center mt-8 text-2xl font-semibold'>ลงทะเบียนพนักงาน</h1>
-    <form method="post" class="max-w-lg mx-auto mt-4 h-[620px] overflow-y-scroll">
+    <form method="post" class="max-w-sm mx-auto mt-4 h-[550px]overflow-y-scroll">
       {% csrf_token %}
       <div class='flex flex-col p-1 gap-3'> 
         <div class="flex flex-col p-1">
@@ -39,11 +40,6 @@
           <label for='{{ form.email.id_for_label }}'>อีเมล</label>
           {{form.email|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
           <div class="text-red-500">{{form.email.errors}}</div>
-        </div>
-        <div class="flex gap-2 p-1">
-          <label for='{{ form.is_staff.id_for_label }}'>ผู้จัดการ</label>
-          {{form.is_staff|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
-          <div class="text-red-500">{{form.is_staff.errors}}</div>
         </div>
         <div class="flex flex-col p-1">
           <label for='{{ form.password.id_for_label }}'>รหัสผ่าน</label>

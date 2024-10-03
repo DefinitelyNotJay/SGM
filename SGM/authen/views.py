@@ -13,17 +13,12 @@ class SignUp(View):
         return render(request, "./registration/sign-up.html", {"form": RegisterForm()})
     def post(self, request):
         form = RegisterForm(request.POST)
+        print(form.data)
         if form.is_valid():
             user = form.save()
-            print(user.is_staff)
+            user.set_password(form.cleaned_data.get("password1"))
             employee_group = Group.objects.get(name='employee')
-            manager_group = Group.objects.get(name='manager')
-            print(employee_group.id, manager_group.id)
-            # add permission group to new create user
-            if user.is_staff:
-                user.groups.add(employee_group)
-            else:
-                user.groups.add(manager_group)
+            user.groups.add(employee_group)
             user.save()
             return redirect('/login/')
         return render(request, './registration/sign-up.html', {'form': form})
