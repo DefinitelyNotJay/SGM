@@ -8,7 +8,6 @@ class ProductForm(forms.ModelForm):
             'class': 'shadow appearance-none border rounded w-full mb-4 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
         }),
         min_value=0,  # กำหนดค่าต่ำสุดถ้าต้องการ
-        initial=0     # กำหนดค่าเริ่มต้นถ้าต้องการ
     )
 
     name = forms.CharField(
@@ -24,7 +23,6 @@ class ProductForm(forms.ModelForm):
             'class': 'shadow border rounded w-full mb-4 py-2 px-3 text-gray-700 leading-tight focus:shadow-outline'
         }),
         min_value=0,  # กำหนดค่าต่ำสุดถ้าต้องการ
-        initial=0     # กำหนดค่าเริ่มต้นถ้าต้องการ
     )
 
     categories = forms.ModelMultipleChoiceField(

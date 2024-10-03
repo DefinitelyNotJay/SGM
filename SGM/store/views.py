@@ -178,24 +178,25 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 class ViewStock(View):
     def get(self, request):
-        # s3 = boto3.resource(
-        # 's3',
-        # aws_access_key_id= os.getenv('aws_access_key_id'),
-        # aws_secret_access_key=os.getenv('aws_secret_access_key'),
-        # aws_session_token= os.getenv('aws_session_token'),
-        #     )
-
-        # bucket = s3.Bucket('serversidesgm')
-        # for obj in bucket.objects.all():
-        #     print(obj.key)
-
-        # for bucket in s3.buckets.all():
-        #     print(bucket.name)
+        categories_obj = Category.objects.all().values("name")
+        categories = [cate.get("name") for cate in categories_obj]
+        category = request.GET.get("category")
+        title = ''
+        products_new = []
+        if category is None:
+            products = Product.objects.all().annotate(total_sale=Sum(F('orderitem__amount'))).order_by('-total_sale')[:5]  # ดึงสินค้าทั้งหมด
+            products_new = Product.objects.all().order_by('-add_date')[:5]
+            title='ขายดีประจำวัน'
+        elif category=='all':
+            products = Product.objects.all()
+            title='ทั้งหมด'
+        else:
+            if category not in categories:
+                return redirect('/')
         
-        # data=
-        
-        products = Product.objects.all()  # ดึงสินค้าทั้งหมด
-        return render(request, 'customer/index.html', {'products': products})
+            products = Product.objects.filter(categories__name=category)
+            title = category
+        return render(request, 'customer/index.html', {'products': products, "products_new": products_new, "title": title, "categories": categories_obj})
 
 class ManageInventory(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_product', 'store.add_product', 'store.change_product', 'store.delete_product']
@@ -244,9 +245,22 @@ class Editproduct(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
         form = ProductForm(request.POST, instance=product)  # สร้างฟอร์มจากข้อมูลที่ส่งมา
-
         if form.is_valid():
-            form.save()  # บันทึกข้อมูลที่แก้ไข
+            product = form.save()  # บันทึกข้อมูลที่แก้ไข
+            # delete old image
+            if product.image_url:
+                image_key = (product.image_url).split('/')[-1]
+                client = get_client()
+                client.delete_object(Bucket="serverside-sgm", Key=image_key)
+            # put new image to bucket
+            image_file = request.FILES.get('image')
+            sucess = upload_file(image_file, 'serverside-sgm')
+            if sucess:
+                # save new image path to image_url field
+                image_url = f'https://serverside-sgm.s3.amazonaws.com/{image_file.name}'
+                product.image_url = image_url
+                product.save()
+            
             return redirect('manageInventory')  # เปลี่ยนเส้นทางกลับไปที่หน้า Manage Inventory
 
         return render(request, 'manager/editProduct.html', {'form': form, 'product': product})  # หากฟอร์มไม่ถูกต้อง ให้แสดงฟอร์มอีกครั้ง

@@ -8,7 +8,7 @@ from . import views
 urlpatterns = [
     path("", include('authen.urls')),
     # customer
-    path('', ViewStock.as_view(), name="Viewproduct"),
+    path('', ViewStock.as_view(), name="view-product"),
     # employee
     path('stock/', Stock.as_view()),
     path('payment/', Payment.as_view()),
