@@ -332,9 +332,14 @@ class ManageCustomer(View):
         if(customer_id):
             # edit customer info
             customer_instance = Customer.objects.get(pk=customer_id)
+            user_instance = User.objects.get(customer__id=customer_id)
+
             edit_form = CustomerCreateForm(initial=model_to_dict(customer_instance), instance=customer_instance)
-            context = {"form": edit_form, "customer": customer_instance}
+            auth_form = CustomerUserForm(initial=model_to_dict(user_instance))
+
+            context = {"form": edit_form, "customer": customer_instance, "form_auth": auth_form}
             return render(request, "employee/customer_form.html", context)
+        
         return render(request, "employee/customer_form.html", {"form": CustomerCreateForm(), "form_auth": CustomerUserForm(), "isCreate": True})
 
         # get all customers

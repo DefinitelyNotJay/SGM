@@ -135,9 +135,9 @@
             },
             body: JSON.stringify({ ...ordered_product, 'total': '{{ total }}', 'customer_id': customer_id || 0, 'payment_method': paymentMethod })
         }).then((res) => {
-            res.json().then(async data => {
+            res.json().then(data => {
                 localStorage.removeItem("ordered_product");
-                const sweetRes = await Swal.fire({
+                Swal.fire({
                     title: 'ชำระเงินสำเร็จ !',
                     icon: 'success',
                     showConfirmButton: false,

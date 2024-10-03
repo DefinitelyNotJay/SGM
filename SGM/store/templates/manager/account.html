@@ -71,11 +71,13 @@
                 <td class="px-6 py-4">{{ employee.first_name }} {{ employee.last_name }}</td>
                 <td class="px-6 py-4">{{ employee.date_joined | date:"d-m-Y" }}</td>
                 <td class="px-6 py-4 flex gap-2">
-                  <button class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition duration-300">
-                    <a href="/employee/{{ employee.id }}/">แก้ไข</a>
+                  <button class="p-2  text-white bg-[#393d3f] hover:bg-stone-500 rounded transition duration-300">
+                    <a href="/employee/{{ employee.id }}/">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-line"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+                    </a>
                   </button>
-                  <button onclick="deleteUser('employee', '{{ employee.id }}')" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
-                    ลบ
+                  <button onclick="deleteUser('employee', '{{ employee.id }}')" class="p-2  hover:bg-[#fdfdff] bg-red-600 hover:text-[#333] text-[#fdfdff] border rounded  transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                   </button>
                 </td>
               </tr>
@@ -100,11 +102,13 @@
                 <td class="px-6 py-4">{{ customer.nickname }}</td>
                 <td class="px-6 py-4">{{ customer.gender }}</td>
                 <td class="px-6 py-4 flex gap-2">
-                  <button class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition duration-300">
-                    <a href="/customer/{{ customer.id }}/">แก้ไข</a>
+                  <button class="p-2  text-white bg-[#393d3f] hover:bg-stone-500 rounded transition duration-300">
+                    <a href="/customer/{{ customer.id }}/">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-line"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+                    </a>
                   </button>
-                  <button onclick="deleteUser('customer', '{{ customer.id }}')" class="deletebutton px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300">
-                    ลบ
+                  <button onclick="deleteUser('customer', '{{ customer.id }}')" class="p-2  hover:bg-[#fdfdff] bg-red-600 hover:text-[#333] text-[#fdfdff] border rounded  transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                   </button>
                 </td>
               </tr>
@@ -117,16 +121,41 @@
 {% endblock %}
 
 {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   function deleteUser(role, id){
-    method: 'DELETE',
-    fetch(`/${role}/${id}/`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}'  // ต้องใส่ 'X-CSRFToken' ใน headers
-    }
-    }).then(res=>res.json).then(data=>window.location.reload())
+    Swal.fire({
+      title: "โปรดยืนยันการลบบัญชีอีกครั้ง",
+      text:"บัญชีที่ถูกลบจะไม่สามารถกู้คืนในภายหลังได้",
+      icon: "warning",
+      showCancelButton: true,
+      showCloseButton: true,
+      focusConfirm: false,
+      cancelButtonText: `ยกเลิก `,
+      confirmButtonText: `ลบสินค้า`,
+      confirmButtonColor: "#546a7b",
+      cancelButtonColor: "#d33",
+    }).then(result=>{
+      if(result.isConfirmed){
+        fetch(`/${role}/${id}/`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'  // ต้องใส่ 'X-CSRFToken' ใน headers
+        }
+        })
+          .then(res=>res.json()
+          .then(result=>{
+            Swal.fire({
+              title: 'ดำเนินการสำเร็จ',
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1500
+            }).then(result=>window.location.reload())
+        })
+        )  
+      }
+    })
   }
 </script>
 {% endblock script %}
