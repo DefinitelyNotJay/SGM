@@ -6,7 +6,7 @@
 {% block content %}
 
 <div class="w-[850px] mx-auto">
-    <p class='text-2xl text-center font-semibold p-2'>รายการออเดอร์</p>
+    <p class='text-2xl text-center font-semibold p-2' onclick="sweet()">รายการออเดอร์</p>
     <div class="h-[380px] overflow-y-scroll rounded-lg">
         <table class="min-w-full min-h-[300px] table-fixed">
             <thead class="text-gray-700 bg-gray-200 sticky top-0 w-full">
@@ -86,15 +86,10 @@
 {% endblock content %}
 
 {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
-
-    if (!ordered_product) {
-        alert("ไม่พบข้อมูลสินค้า");
-        localStorage.removeItem('ordered_product');
-        window.location.href = "/payment";
-    }
-
+    
     function showPaymentOptions() {
         document.getElementById('paymentModal').classList.remove('hidden');
     }
@@ -140,11 +135,20 @@
             },
             body: JSON.stringify({ ...ordered_product, 'total': '{{ total }}', 'customer_id': customer_id || 0, 'payment_method': paymentMethod })
         }).then((res) => {
-            res.json().then(data => {
+            res.json().then(async data => {
                 localStorage.removeItem("ordered_product");
-                window.location.href = '/payment';
+                const sweetRes = await Swal.fire({
+                    title: 'ชำระเงินสำเร็จ !',
+                    text: '',
+                    icon: 'success',
+                    confirmButtonText: 'ตกลง'
+                  });
+                if(sweetRes.isConfirmed){
+                    window.location.href =  '/payment'
+                }
             });
         });
     }
+
 </script>
 {% endblock script %}
