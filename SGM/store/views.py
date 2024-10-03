@@ -244,8 +244,13 @@ class Editproduct(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def post(self, request, product_id):
         product = get_object_or_404(Product, id=product_id)
+
         form = ProductForm(request.POST, instance=product)  # สร้างฟอร์มจากข้อมูลที่ส่งมา
         if form.is_valid():
+            # เช็คก่อนว่า input image มารึป่าว
+            if not request.FILES:
+                form.save()
+                return redirect('/manageInventory')
             product = form.save()  # บันทึกข้อมูลที่แก้ไข
             # delete old image
             if product.image_url:
@@ -282,8 +287,7 @@ class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, 'manager/addProduct.html', {'form': form})
 
     def post(self, request):
-        print(request.POST)
-        print(request.FILES)
+        print('files :', request.FILES)
         form = ProductForm(request.POST)
         if(not request.FILES):
             form.add_error("image", "โปรดใส่ภาพสินค้า")

@@ -126,7 +126,7 @@
             <a href="javascript:;"
                 class="mx-auto sm:mr-0 group cursor-pointer lg:mx-auto bg-white transition-all duration-500">
                 <div class="">
-                    <img src="https://pagedone.io/asset/uploads/1700726158.png" alt="face cream image"
+                    <img src='{{ product.image_url }}' alt="face cream image"
                         class="w-full aspect-square rounded-2xl object-cover">
                 </div>
                 <div class="mt-5">
@@ -136,8 +136,7 @@
                             {{product.name}} </h6>
                         <h6 class="font-semibold text-xl leading-8 text-indigo-600">{{product.price}} </h6>
                     </div>
-                    <p class="mt-2 font-normal text-sm leading-6 text-gray-500">สินค้าคงเหลือ
-                        {{product.quantity_in_stock}} ชิ้น</p>
+                    <p class="mt-2 font-normal text-sm leading-6 text-gray-500">สินค้าคงเหลือ {{product.quantity_in_stock}} ชิ้น</p>
                 </div>
             </a>
             {% endfor %}
@@ -152,7 +151,7 @@
             <a href="javascript:;"
                 class="mx-auto sm:mr-0 group cursor-pointer lg:mx-auto bg-white transition-all duration-500">
                 <div class="">
-                    <img src="https://pagedone.io/asset/uploads/1700726158.png" alt="face cream image"
+                    <img src='{{ product.image_url }}' alt="face cream image"
                         class="w-full aspect-square rounded-2xl object-cover">
                 </div>
                 <div class="mt-5">
@@ -162,8 +161,7 @@
                             {{product.name}} </h6>
                         <h6 class="font-semibold text-xl leading-8 text-indigo-600">{{product.price}} </h6>
                     </div>
-                    <p class="mt-2 font-normal text-sm leading-6 text-gray-500">สินค้าคงเหลือ
-                        {{product.quantity_in_stock}} ชิ้น</p>
+                    <p class="mt-2 font-normal text-sm leading-6 text-gray-500">สินค้าคงเหลือ {{product.quantity_in_stock}} ชิ้น</p>
                 </div>
             </a>
             {% endfor %}
