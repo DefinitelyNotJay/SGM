@@ -3,7 +3,6 @@ from django.db.models import *
 
 
 def sort_products(categories, sort_filter):
-            # กรณีไม่มีการเลือก category หรือ sort_filter ใด ๆ
         context = {}
         products = []
         product_categories = Category.objects.all()
