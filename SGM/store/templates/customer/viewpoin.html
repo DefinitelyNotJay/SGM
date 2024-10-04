@@ -1,4 +1,4 @@
-<!-- templates/product_list.html -->
+<!-- templates/viewpoin.html -->
 {% extends 'manager/layout.html' %}
 {% block head %}
 <title>Product List</title>
@@ -144,41 +144,15 @@
                 </tr>
             </thead>
             <tbody>
+                {% for customer in top_customers_data %}
                 <tr class="border-b">
-                    <td class="p-3">1</td>
+                    <td class="p-3">{{forloop.counter}}</td>
                     <td class="p-3">John Doe</td>
                     <td class="p-3">0865552566</td>
-                    <td class="p-3">6,000.-</td>
-                    <td class="p-3">120 คะแนน</td>
+                    <td class="p-3">{{customer.total_spent}}.-</td>
+                    <td class="p-3">{{customer.total_point}} คะแนน</td>
                 </tr>
-                <tr class="border-b">
-                    <td class="p-3">2</td>
-                    <td class="p-3">Jane Smith</td>
-                    <td class="p-3">0865552566</td>
-                    <td class="p-3">5,500.-</td>
-                    <td class="p-3">110 คะแนน</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="p-3">3</td>
-                    <td class="p-3">Bob Johnson</td>
-                    <td class="p-3">0802695576</td>
-                    <td class="p-3">5,000.-</td>
-                    <td class="p-3">100 คะแนน</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="p-3">4</td>
-                    <td class="p-3">Alice Brown</td>
-                    <td class="p-3">0865552566</td>
-                    <td class="p-3">4,000.-</td>
-                    <td class="p-3">80 คะแนน</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="p-3">5</td>
-                    <td class="p-3">Charlie Davis</td>
-                    <td class="p-3">0865552566</td>
-                    <td class="p-3">3,000.-</td>
-                    <td class="p-3">60 คะแนน</td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -187,16 +161,16 @@
     <div class="max-w-4xl mx-auto bg-teal-100 p-4 rounded-lg shadow mt-4 flex justify-between items-center">
         <div>
             <p class="font-bold">ชื่อ เบอร์</p>
-            <p>Bob Johnson</p>
-            <p>0802695576</p>
+            <p>{{ user.first_name }} {{user.last_name}}</p>
+            <p>{{user.username}}</p>
         </div>
         <div>
             <p class="text-gray-600">ยอดค่าใช้จ่าย</p>
-            <p class="text-3xl font-bold text-teal-500">5,000 บาท</p>
+            <p class="text-3xl font-bold text-teal-500">{{my_spent}} บาท</p>
         </div>
         <div>
             <p class="text-gray-600">คะแนนสะสมของคุณ</p>
-            <p class="text-3xl font-bold text-teal-500">100 คะแนน</p>
+            <p class="text-3xl font-bold text-teal-500">{{mypoints}}</p>
         </div>
     </div>
     </section>

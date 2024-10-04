@@ -25,6 +25,7 @@ from .s3 import upload_file, get_client
 from store.utils.sort import sort_products
 
 
+
 # Create your views here.
 class EmployeeHome(LoginRequiredMixin, View):
     login_url = '/login/'
@@ -424,7 +425,7 @@ class ManageEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
         else:
             return HttpResponseServerError("Employee ID not provided.")
         # create customer
-        # เดี๋ยวืทำ
+        # เดี๋ยวทำ
         # form = CustomerCreateForm(request.POST)
         # if form.is_valid:
         #     try:
@@ -443,7 +444,26 @@ class ManageEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
         
-class Viewcustomer(View):
+class Viewpoint(View):
     def get(self, request):
-        
-        return render(request, 'customer/viewpoin.html',{})
+        # หน้าดูคะแนน
+        customer = request.user.id
+        # ยอดที่ใช้จ่ายของลูกค้าคนปัจจุบัน
+        my_spent = Order.objects.filter(customer=customer, status=Order.StatusChoices.PAID).aggregate(Sum('total_price'))['total_price__sum'] or 0
+        # คำนวณคะแนนของลูกค้าคนปัจจุบัน (1 point per 50 THB spent)
+        mypoints = my_spent // 50  
+
+        # ดึงข้อมูลลูกค้าที่มียอดใช้จ่ายมากที่สุด 5 คน พร้อมคะแนน
+        top_customers_data = Order.objects.filter( customer__isnull=False, status='PAID'
+        ).values('customer').annotate(total_spent=Sum('total_price')).order_by('-total_spent')[:5]
+
+          # คำนวณคะแนนสำหรับลูกค้าแต่ละคน
+        for customer_data in top_customers_data:
+            customer_data['total_point'] = customer_data['total_spent'] // 50  # คำนวณคะแนน
+
+
+        return render(request, 'customer/viewpoin.html', {
+            'my_spent': my_spent, 
+            'mypoints': mypoints,
+            'top_customers_data': top_customers_data,
+        })
