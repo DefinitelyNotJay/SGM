@@ -81,3 +81,25 @@ class CustomerUserForm(forms.Form):
             self.add_error("password1", message)
             self.add_error("password2", message)
         return cleaned_data
+    
+
+
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput())
+    new_password = forms.CharField(widget=forms.PasswordInput())
+    confirm_password = forms.CharField(widget=forms.PasswordInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_pass = cleaned_data.get('new_password')
+        confirm_pass = cleaned_data.get('confirm_password')
+
+        if new_pass != confirm_pass:
+            message = 'รหัสผ่านทั้ง 2 ช่องต้องตรงกัน'
+            self.add_error("password1", message)
+            self.add_error("password2", message)
+        return cleaned_data
+        
+        
+
+

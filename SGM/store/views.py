@@ -307,7 +307,7 @@ class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, 'manager/addProduct.html', {'form': form})
         
 
-class EmployeeManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
+class EmployeeList(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     permission_required=['auth.add_user', 'auth.view_user', 'auth.change_user', 'auth.delete_user']
     def get(self, request):
@@ -315,7 +315,7 @@ class EmployeeManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
         context = {'title': 'พนักงาน', 'employees': employees}
         return render(request, 'manager/account.html', context)
 
-class CustomerManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
+class CustomerList(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url='/login/'
     permission_required = ['store.add_customer', 'store.view_customer', 'store.change_customer']
     def get(self, request):
@@ -326,7 +326,6 @@ class CustomerManagement(LoginRequiredMixin, PermissionRequiredMixin, View):
 class ManageCustomer(View):
     # permission_required = ['store.view_customer', 'store.add_customer', 'store.change_customer', 'store.delete_customer']
     # login_url = '/login/'
-
     def get(self, request, customer_id=None):
         # สร้าง customer, user
         if(customer_id):
@@ -410,21 +409,25 @@ class ManageUserView(View):
         return redirect('/payment')
 
 
-class ManageEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required=['auth.add_user', 'auth.view_user', 'auth.change_user', 'auth.delete_user']
+class ManageEmployee(LoginRequiredMixin, View):
+    # มาเพิ่ม permission ด้วย
     login_url = '/login/'
-
-    def get(self, request, emp_id):
+    def get(self, request, emp_id=None):
         if(emp_id):
-            # edit customer info
+            # แก้ไขบัญชีพนักงาน
             emp_ins = User.objects.get(pk=emp_id)
             edit_form = RegisterForm(initial=model_to_dict(emp_ins), instance=emp_ins)
-            context = {"form": edit_form, "customer": emp_ins}
+            password_form = ChangePasswordForm()
+            context = {"form": edit_form, "password_form": password_form, "customer": emp_ins}
             return render(request, "manager/employee_form.html", context)
-        return render(request, "manager/employee_form.html", {"form": CustomerCreateForm(), "isCreate": True})
+        else:
+            # สร้างบัญชีพนักงานใหม่
+            password_form = ChangePasswordForm()
+            form = RegisterForm()
+            context = {"form": form, "password_form": password_form, "isCreate": True}
+            return render(request, 'manager/employee_form.html', context,)
 
-        # get all customers
-    def post(self, request, emp_id=None):
+    def post(self, request, emp_id):
         if emp_id:
             print(request.POST)
             try:
@@ -440,24 +443,15 @@ class ManageEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
             if form.is_valid():
                 try:
                     form.save()  # บันทึกการแก้ไขลงใน database
-                    return redirect("/employee")  # กลับไปที่หน้าแสดงรายการ employee
+                    return redirect("/")  # กลับไปที่หน้าแสดงรายการ employee
                 except Exception as e:
                     return HttpResponseServerError(f"Error saving form: {str(e)}")
             else:
                 # กรณีฟอร์มไม่ valid ให้แสดงฟอร์มและ error message
                 return render(request, 'manager/employee_form.html', {'form': form, 'errors': form.errors})
-        else:
-            return HttpResponseServerError("Employee ID not provided.")
+      
         # create customer
-        # เดี๋ยวืทำ
-        # form = CustomerCreateForm(request.POST)
-        # if form.is_valid:
-        #     try:
-        #         form.save()
-        #         return redirect("/customer")
-        #     except:
-        #         return redirect("/customer/new/")
-        # return redirect("/customer")
+
 
     def delete(self, request, emp_id):
         # delete emp
@@ -467,3 +461,6 @@ class ManageEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
             return JsonResponse({"success": True})
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
+    
+
+  

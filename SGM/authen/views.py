@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from django.views import View
 from store.forms.authentication import *
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+
+
 # Create your views here.
 
 class SignUp(View):
@@ -49,4 +51,24 @@ class SignOut(View):
     def get(self, request):
         logout(request)
         return redirect('/login')
+
+class ChangePassword(View):
+    def get(self, request):
+        password_form = ChangePasswordForm()
+        context = {'form': password_form}
+        return render(request, 'registration/change-password.html', context)
+    def post(self, request):
+        form = ChangePasswordForm(request.POST)
+        user = User.objects.get(pk=request.user.id)
+        if form.is_valid():
+            if not request.user.check_password(form.cleaned_data['old_password']):
+                print('why bro')
+                form.add_error("old_password", "รหัสผ่านเก่าไม่ถูกต้อง")
+                context = {'form': form}
+                return render(request, 'registration/change-password.html', context)
+            user.set_password(form.cleaned_data['confirm_password'])
+            user.save()
+        return redirect('/')
+
+        
 
