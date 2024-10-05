@@ -24,13 +24,13 @@ from .s3 import upload_file, get_client
 from store.utils.sort import sort_products
 
 
+
 # Create your views here.
 
 class Inventory(View):
     def get(self, request):
         print(Customer.objects.all())
         return HttpResponse("123")
-
 
 class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_order', 'store.add_order', 'store.change_order', 'store.delete_order']
@@ -494,6 +494,27 @@ class ManageEmployee(LoginRequiredMixin, UserPassesTestMixin, View):
             return JsonResponse({"success": True})
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
-    
+        
+class Viewpoint(View):
+    def get(self, request):
+        # หน้าดูคะแนน
+        customer = request.user.id
+        # ยอดที่ใช้จ่ายของลูกค้าคนปัจจุบัน
+        my_spent = Order.objects.filter(customer=customer, status=Order.StatusChoices.PAID).aggregate(Sum('total_price'))['total_price__sum'] or 0
+        # คำนวณคะแนนของลูกค้าคนปัจจุบัน (1 point per 50 THB spent)
+        mypoints = my_spent // 50  
 
-  
+        # ดึงข้อมูลลูกค้าที่มียอดใช้จ่ายมากที่สุด 5 คน พร้อมคะแนน
+        top_customers_data = Order.objects.filter( customer__isnull=False, status='PAID'
+        ).values('customer').annotate(total_spent=Sum('total_price')).order_by('-total_spent')[:5]
+
+          # คำนวณคะแนนสำหรับลูกค้าแต่ละคน
+        for customer_data in top_customers_data:
+            customer_data['total_point'] = customer_data['total_spent'] // 50  # คำนวณคะแนน
+
+
+        return render(request, 'customer/viewpoin.html', {
+            'my_spent': my_spent, 
+            'mypoints': mypoints,
+            'top_customers_data': top_customers_data,
+        })
