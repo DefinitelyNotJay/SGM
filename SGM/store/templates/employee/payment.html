@@ -21,6 +21,7 @@ Home Page
   }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <p class="text-4xl font-semibold ml-8 tracking-wide">ชำระเงิน</p> 
   <div class="w-full flex justify-between items-center px-4 mt-6 border-b pb-4">
@@ -47,7 +48,7 @@ Home Page
    {% comment %} 3 {% endcomment %}
  
   {% comment %} 4 {% endcomment %}
- <form method="POST" action='/payment/' class='flex gap-8'>
+ <form method="POST" id='payment_form' action='/payment/' class='flex gap-8'>
   {% csrf_token %}
   <div class='flex gap-2 items-center'>
     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
@@ -58,7 +59,7 @@ Home Page
   <button type="button" onclick="clearSelectedProduct()" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
     รีเซ็ต
   </button>
-  <button type="submit" onclick="processPayment()" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
+  <button type="submit" onclick="processPayment(event)" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
     ยืนยัน
   </button>
   </div>
@@ -90,11 +91,11 @@ Home Page
     </div>
   </div>
   {% else %}
-  <div id="product-{{ product.id }}" class="h-[300px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
-    <p class="text-lg">{{ product.name }}</p>
-    <div class="bg-gray-300 h-44"></div>
-    <div class="flex items-center justify-center gap-6">
-      <p>สินค้าหมด</p>
+  <div id="product-{{ product.id }}" class="h-[360px] rounded-md hover:cursor-pointer bg-[#616465] text-[#fdfdff] py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
+    <img class="h-48 object-center object-cover" src='{{ product.image_url }}'/>
+    <div class="flex items-center flex-col justify-center gap-6">
+      <p class="text-xl font-medium text-start">{{ product.name }}</p>
+      <p class='text-lg text-start'>สินค้าหมด</p>
     </div>
   </div>
   {% endif %}
@@ -307,10 +308,24 @@ Home Page
     localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
   }
 
-  function processPayment(){
+  function processPayment(e){
+    e.preventDefault()
+    if(amount <= 0 ){
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: "ไม่มีสินค้าในตะกร้า",
+        icon: 'warning',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'ตกลง'
+    })
+    return;
+    }
     const ordered_product = localStorage.getItem("ordered_product")
     const input_field = document.getElementById('ordered_products')
+    const payment_form = document.getElementById('payment_form')
     input_field.value = ordered_product
+    payment_form.submit()
+    
   }
 
 
@@ -328,4 +343,17 @@ indigo: {
     700: "#324048",
     800: "#222a30",
     900: "#111518"
+}, {% endcomment %}
+
+{% comment %} 
+black: {
+    100: "#d7d8d9",
+    200: "#b0b1b2",
+    300: "#888b8c",
+    400: "#616465",
+    500: "#393d3f",
+    600: "#2e3132",
+    700: "#222526",
+    800: "#171819",
+    900: "#0b0c0d"
 }, {% endcomment %}

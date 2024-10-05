@@ -1,3 +1,4 @@
+from typing import Any
 from django.contrib.auth.models import User
 from django.forms.models import ModelForm
 from django.contrib.auth.forms import UserCreationForm
@@ -11,53 +12,18 @@ from django.forms import Form
 from django import forms
 
  
-class RegisterForm(UserCreationForm):
+class EmployeeCreateForm(UserCreationForm):
     class Meta:
         model = User
         fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
 
-
-
 class UserUpdateForm(forms.ModelForm):
-    password1 = forms.CharField(
-        label="Password", 
-        widget=forms.PasswordInput, 
-        required=False
-    )
-    password2 = forms.CharField(
-        label="Password confirmation", 
-        widget=forms.PasswordInput, 
-        required=False
-    )
-
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "email", "is_staff"]
+        fields = ["username", "first_name", "last_name", "email"]
 
-    def clean_password2(self):
-        password1 = self.cleaned_data.get('password1')
-        password2 = self.cleaned_data.get('password2')
-        
-        if password1 or password2:
-            if password1 != password2:
-                raise forms.ValidationError("Passwords don't match.")
-        
-        return password2
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        
-        # ตรวจสอบว่ามีการอัปเดต password หรือไม่
-        password = self.cleaned_data.get('password1')
-        if password:
-            user.set_password(password)
-        
-        if commit:
-            user.save()
-        return user
 
 class CustomerUserForm(forms.Form):
-    
     username = forms.CharField(max_length=10)
     password1 = forms.CharField(widget=forms.PasswordInput())
     password2 = forms.CharField(widget=forms.PasswordInput())
@@ -80,3 +46,25 @@ class CustomerUserForm(forms.Form):
             self.add_error("password1", message)
             self.add_error("password2", message)
         return cleaned_data
+    
+
+
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput())
+    new_password = forms.CharField(widget=forms.PasswordInput())
+    confirm_password = forms.CharField(widget=forms.PasswordInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_pass = cleaned_data.get('new_password')
+        confirm_pass = cleaned_data.get('confirm_password')
+
+        if new_pass != confirm_pass:
+            message = 'รหัสผ่านทั้ง 2 ช่องต้องตรงกัน'
+            self.add_error("password1", message)
+            self.add_error("password2", message)
+        return cleaned_data
+        
+        
+
+

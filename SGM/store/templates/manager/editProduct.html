@@ -1,5 +1,8 @@
 {% extends './layout.html' %}
 
+{% block nav %}
+    {% include "manager/navbar_manager.html" %}
+{% endblock nav %}
 {% block content %}
 
 
@@ -15,13 +18,13 @@
         </svg>
         <p class="pt-1"> กลับไปหน้ารายการสินค้า </p>
     </div>
-    <div class="grid grid-cols-2  bg-white shadow-md rounded p-20 m-10 py-4">
+    <div class="grid grid-cols-2 bg-white shadow-md rounded-md p-20 m-10 py-8">
         <div class="pl-2 pt-2">
             <h1 class="text-2xl font-bold mb-8">แก้ไขสินค้า</h1>
             <img src="{{ product.image_url }}" alt="face cream image"
                 class="w-1/2 aspect-square rounded-2xl object-cover mr-10">
         </div>
-        <div class="grid gap-y-12  bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ">
+        <div class="grid gap-y-12  bg-white border rounded-md px-8 pt-6 pb-8 mb-4 ">
             <form method="post" enctype="multipart/form-data" >
                 {% csrf_token %}
                 <div class="mb-4">
@@ -74,25 +77,72 @@
                         <p>Currently: {{ form.image.value.name }}</p>
                     {% endif %}
                 </div>
+
                 <div class="flex justify-between">
-                    <div class="mt-4"><button type="submit"
-                            class="bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded leading-tight">
+                        <button type="button" onclick='showDialog("{{ product.id }}")'
+                            class="bg-[#fdfdff] hover:bg-red-500 text-[#333] hover:text-white hover:border-red-500 border border-gray-300 font-bold py-2 px-4 rounded leading-tight">
+                            ลบสินค้า
+                        </button>
+                    
+                    <div class="">
+                        <button type="submit"
+                            class="bg-[#546a7b] hover:bg-[#98a6ae] text-white font-bold py-2 px-4 rounded leading-tight">
                             บันทึกการแก้ไข
-                        </button></div>
+                        </button>
+                    </div>
+                </div>
 
             </form>
+         
 
-            <form method="post" action="{% url 'delete_product' product.id %}" class="mt-4">
-                {% csrf_token %}
-                <button type="submit"
-                    class="bg-black hover:bg-red-800 text-white font-bold py-2 px-4 rounded leading-tight">
-                    ลบสินค้า
-                </button>
-            </form>
-        </div>
+           
+       
     </div>
 </div>
 </div>
 </div>
 
 {% endblock %}
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function showDialog(product_id){
+        Swal.fire({
+            title: "โปรดยืนยันการลบสินค้าอีกครั้ง",
+            text:"สินค้าที่ถูกลบจะไม่สามารถกู้คืนในภายหลังได้",
+            icon: "warning",
+            showCancelButton: true,
+            showCloseButton: true,
+            focusConfirm: false,
+            cancelButtonText: `ยกเลิก `,
+            confirmButtonText: `ลบสินค้า`,
+            confirmButtonColor: "#546a7b",
+            cancelButtonColor: "#d33",
+          }).then((res)=>{
+            console.log(res)
+            if(res.isConfirmed){
+                fetch(`/deleteProduct/${product_id}/`, {
+                    method: "POST",
+                    headers: {
+                      "X-CSRFToken": "{{ csrf_token }}",
+                    }
+                }).then((res)=>res.json().then(result=>{
+                    if(result.success){
+                        Swal.fire({
+                            icon: "success",
+                            title: "สินค้าถูกลบแล้ว",
+                            showConfirmButton: false,
+                            timer: 1300
+                          }).then(res=>window.location.href='/manageInventory');
+                    }
+                }))
+                .catch(err=>alert(err))
+               
+            }
+          });
+          
+    }
+</script>
+    
+
+{% endblock script %}
