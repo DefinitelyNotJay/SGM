@@ -15,10 +15,9 @@
 {% block content %}
 <div class="flex flex-col w-full h-full p-8">
     <h1 class='text-2xl font-semibold'>จัดการบัญชี{{title}}</h1>
-    {% comment %} เพื่อไม่ให้ url เป็น /customer, /employee {% endcomment %}
-    
-      {% if user.is_staff %}
+      
       <div class='flex justify-between pr-8 mt-4'>
+        {% if user.is_staff %}
       <div class='flex gap-4'>
         <a href="/customer">
           <button class='px-4 py-2 bg-[#62929e] hover:bg-[#81a8b1] text-white rounded-md'>
@@ -33,15 +32,20 @@
           </a>
           
         </div>
-        
+        {% endif %}
+
         {% if employees %}
-          <a href="/sign-up">
+          <a href="/employee/new/">
             <button class='flex gap-1 font-semibold px-4 py-4 bg-[#393d3f] hover:bg-[#333] text-white rounded-md'><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-plus"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> เพิ่มบัญชีพนักงาน</button>
+          </a>
+          {% elif customers %}
+          <a href="/customer/new/">
+            <button class='flex gap-1 font-semibold px-4 py-4 bg-[#393d3f] hover:bg-[#333] text-white rounded-md'><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-plus"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> เพิ่มบัญชีลูกค้า</button>
           </a>
         {% endif %}
           
       </div>
-      {% endif %}
+      
   
     {% if employees %}
     <div class='w-full flex gap-6 mt-4'>
@@ -49,7 +53,7 @@
             <thead class="bg-gray-100">
               <tr class="text-left">
                 <th class="px-6 py-3 border-b-2 border-gray-300">เบอร์โทรศัพท์</th>
-                <th class="px-6 py-3 border-b-2 border-gray-300">ชื่อผู้ใช้งาน</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">ชื่อ - นามสกุล</th>
                 <th class="px-6 py-3 border-b-2 border-gray-300">วันเริ่มงาน</th>
                 {% if user.is_staff %}
                   <th class="px-6 py-3 border-b-2 border-gray-300">ดำเนินการ</th>
@@ -65,11 +69,6 @@
                 <td class="px-6 py-4">{{ employee.date_joined | date:"d-m-Y" }}</td>
                 {% if user.is_staff %}
                   <td class="px-6 py-4 flex gap-2">
-                    <button class="p-2  text-white bg-[#393d3f] hover:bg-stone-500 rounded transition duration-300">
-                      <a href="/employee/{{ employee.id }}/">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-line"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
-                      </a>
-                    </button>
                     <button onclick="deleteUser('employee', '{{ employee.id }}')" class="p-2  hover:bg-[#fdfdff] bg-red-600 hover:text-[#333] text-[#fdfdff] border rounded  transition duration-300">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                     </button>
@@ -86,9 +85,11 @@
             <thead class="bg-gray-100">
               <tr class="text-left">
                 <th class="px-6 py-3 border-b-2 border-gray-300">เบอร์โทรศัพท์</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">ชื่อ</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">นามสกุล</th>
                 <th class="px-6 py-3 border-b-2 border-gray-300">ชื่อเล่น</th>
                 <th class="px-6 py-3 border-b-2 border-gray-300">เพศ</th>
-                <th class="px-6 py-3 border-b-2 border-gray-300">หมายเหตุ</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">วันที่สมัคร</th>
                 {% if user.is_staff %}
                   <th class="px-6 py-3 border-b-2 border-gray-300">ดำเนินการ</th>
                 {% endif %}
@@ -98,16 +99,21 @@
               {% for customer in customers %}
               <tr class="border-b hover:bg-gray-50 transition duration-200">
                 <td class="px-6 py-4">{{ customer.user.username }}</td>
+                <td class="px-6 py-4">{{ customer.user.first_name }}</td>
+                <td class="px-6 py-4">{{ customer.user.last_name }}</td>
                 <td class="px-6 py-4">{{ customer.nickname }}</td>
-                <td class="px-6 py-4">{{ customer.gender }}</td>
-                <td class="px-6 py-4">{{ customer.notes }}</td>
-                {% if user.is_staff %}
+                <td class="px-6 py-4">
+                  {% if customer.gender == 'M' %}
+                    ชาย
+                    {% elif customer.gender == 'F' %}
+                    หญิง
+                    {% else %}
+                    อื่นๆ
+                  {% endif %}
+                </td>
+                <td class="px-6 py-4">{{ customer.join_date | date:"d-m-Y" }}</td>
+                {% if perms.auth.add_user %}
                 <td class="px-6 py-4 flex gap-2">
-                  <button class="p-2  text-white bg-[#393d3f] hover:bg-stone-500 rounded transition duration-300">
-                    <a href="/customer/{{ customer.id }}/">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-line"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
-                    </a>
-                  </button>
                   <button onclick="deleteUser('customer', '{{ customer.id }}')" class="p-2  hover:bg-[#fdfdff] bg-red-600 hover:text-[#333] text-[#fdfdff] border rounded  transition duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                   </button>

@@ -1,6 +1,6 @@
 <!-- templates/product_list.html -->
 {% extends 'manager/layout.html' %}
-{% block title %} Product List {% endblock %}
+{% block title %} สินค้า {% endblock %}
 
 {% block nav %}
 {%if not user.is_authenticated %}
@@ -88,7 +88,7 @@
     </div>
     {% elif user.customer%}
         <a href="/logout/">ออกจากระบบ</a>
-        <a href="/profile/">แก้ไขบัญชี</a>
+        <a href="{% url 'edit-customer' customer_id=user.customer.id %}">แก้ไขบัญชี</a>
     {% elif user.is_staff %}
     {% include "manager/navbar_manager.html" %}
 {% else %}

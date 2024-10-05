@@ -12,9 +12,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 
 class SignUp(View):
     def get(self, request):
-        return render(request, "./registration/sign-up.html", {"form": RegisterForm()})
+        return render(request, "./registration/sign-up.html", {"form": EmployeeCreateForm()})
+    
     def post(self, request):
-        form = RegisterForm(request.POST)
+        form = EmployeeCreateForm(request.POST)
         print(form.data)
         if form.is_valid():
             user = form.save()
