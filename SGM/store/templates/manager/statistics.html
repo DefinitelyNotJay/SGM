@@ -49,7 +49,7 @@
                     <tr
                         class="text-black transform hover:scale-[105%] hover:text-cyan-600 transition-transform duration-100 text-sm bg-stone-200">
                         <td class="border pl-7 px-4 py-2  shadow-md ">{{ customer.name }}</td>
-                        <td class="border pl-7 px-4 py-2 shadow-md"> customer.phone </td>
+                        <td class="border pl-7 px-4 py-2 shadow-md"> {{customer.user_id.form_auth.username}} </td>
                         <td class="border pl-7 px-4 py-2 shadow-md">{{ customer.total_spent }} บาท</td>
                     </tr>
                     {% endfor %}

@@ -80,8 +80,6 @@ class Payment(LoginRequiredMixin, PermissionRequiredMixin, View):
             return render(request, 'employee/payment_bill.html', data)
         return JsonResponse({"status": "error", "message": "ไม่มีสินค้าที่เลือก"})
 
-
-
 class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_order', 'store.add_order', 'store.change_order']
     login_url = '/login/'
@@ -161,7 +159,6 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
             order__date__month=current_month,
             order__date__year=current_year,
             total_spent__isnull=False)
-       
         products = Product.objects.annotate(bestseller=Sum('orderitem__amount')).filter(
             orderitem__order__date__month=current_month,
             orderitem__order__date__year=current_year,
