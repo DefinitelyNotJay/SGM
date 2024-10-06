@@ -161,7 +161,7 @@
                 class="mx-auto sm:mr-0 group cursor-pointer lg:mx-auto bg-white transition-all duration-500">
                 <div class="">
                     <img src='{{ product.image_url }}' alt="face cream image"
-                        class="w-full aspect-square rounded-2xl object-cover">
+                        class="w-32 h-32  aspect-square rounded-2xl object-cover">
                 </div>
                 <div class="mt-5">
                     <div class="flex items-center justify-between">
@@ -186,7 +186,7 @@
                 class="mx-auto sm:mr-0 group cursor-pointer lg:mx-auto bg-white transition-all duration-500">
                 <div class="">
                     <img src='{{ product.image_url }}' alt="face cream image"
-                        class="w-full aspect-square rounded-2xl object-cover">
+                        class="w-32 h-32 aspect-square rounded-2xl object-cover">
                 </div>
                 <div class="mt-5">
                     <div class="flex items-center justify-between">
@@ -200,6 +200,7 @@
             </a>
             {% endfor %}
         </div>
+        {% endif %}
             
     </div>
     </section>

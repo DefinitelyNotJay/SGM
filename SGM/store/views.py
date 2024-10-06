@@ -502,13 +502,16 @@ class Viewpoint(View):
         mypoints = my_spent // 50  
 
         # ดึงข้อมูลลูกค้าที่มียอดใช้จ่ายมากที่สุด 5 คน พร้อมคะแนน
-        top_customers_data = Order.objects.filter( customer__isnull=False, status='PAID'
-        ).values('customer').annotate(total_spent=Sum('total_price')).order_by('-total_spent')[:5]
-
+        top_customers_data = (
+            Order.objects.filter(customer__isnull=False, status='PAID')
+            .select_related('customer__user')  # ใช้ select_related() ก่อน
+            .values('customer', 'customer__user__first_name', 'customer__user__last_name','customer__user__username')  # เพิ่มฟิลด์ที่ต้องการ
+            .annotate(total_spent=Sum('total_price'))
+            .order_by('-total_spent')[:5]
+        )
           # คำนวณคะแนนสำหรับลูกค้าแต่ละคน
         for customer_data in top_customers_data:
             customer_data['total_point'] = customer_data['total_spent'] // 50  # คำนวณคะแนน
-
 
         return render(request, 'customer/viewpoin.html', {
             'my_spent': my_spent, 

@@ -19,6 +19,8 @@ urlpatterns = [
     path('customer/', CustomerList.as_view(), name="customer-list"),
     path('customer/new/', CreateCustomer.as_view(), name="new-customer"),
     path('customer/<int:customer_id>/', ManageCustomer.as_view(), name="edit-customer"),
+    path('customer/viewpoint/',  Viewpoint.as_view(), name="Viewpoint"),
+
     # manager
     path('statistics', StatisticsView.as_view(), name="statistics"),
     path('manageInventory', ManageInventory.as_view(), name="manageInventory"),
@@ -27,6 +29,7 @@ urlpatterns = [
     path('deleteProduct/<int:product_id>/', DeleteProduct.as_view(), name='delete_product'),
     path('addProduct/', AddProduct.as_view(), name='addProduct'),
     # path('ManageUser/', ManageUserView.as_view(), name="ManageUser"),
+
     path('employee/', EmployeeList.as_view(), name='employee-list'),
     path('employee/new/', CreateEmployee.as_view(), name='employee-create'),
     path('employee/<int:emp_id>/', ManageEmployee.as_view(), name='employee-edit'),
