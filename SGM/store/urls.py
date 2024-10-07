@@ -19,7 +19,7 @@ urlpatterns = [
     path('customer/', CustomerList.as_view(), name="customer-list"),
     path('customer/new/', CreateCustomer.as_view(), name="new-customer"),
     path('customer/<int:customer_id>/', ManageCustomer.as_view(), name="edit-customer"),
-    path('customer/viewpoint/',  Viewpoint.as_view(), name="Viewpoint"),
+    path('customer/viewpoint/',  Viewpoint.as_view(), name="viewpoint"),
 
     # manager
     path('statistics', StatisticsView.as_view(), name="statistics"),

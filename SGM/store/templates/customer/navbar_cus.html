@@ -1,0 +1,67 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sulphur+Point:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+    .logo {
+        font-family: "Sulphur Point", sans-serif;
+        font-weight: 700;
+        font-style: normal;
+    }
+</style>
+
+<div class="flex justify-between h-[6rem] px-10 shadow items-center bg-[#58d0c5]">
+    <div class="flex items-center animate-pulse h-fit">
+      <div class="flex flex-col text-center cursor-pointer text-black" onclick="location.href='/'">
+        <p class="logo tracking-widest text-3xl">VENA</p>
+        <p class="tracking-[5px] text-xs">GROCERY STORE</p>
+      </div>
+    </div>
+    {% comment %} <p class='text-xl font-semibold cursor-default select-none'>{{ user.first_name }} {{user.last_name}}</p> {% endcomment %}
+    <div class="flex space-x-4 items-center text-bold">
+        
+        {% if not user.is_authenticated %}
+        <a href="/login/"
+        class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+        </a>    
+        {% else %}
+        <!-- กำหนด path -->
+        
+        <!-- กำหนด path -->
+        <a href="{% url 'viewpoint'%}"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg>
+        </a>
+        <!-- กำหนด path -->
+        <a href="{% url 'edit-customer' customer_id=user.customer.id %}"
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-pen"><path d="M11.5 15H7a4 4 0 0 0-4 4v2"/><path d="M21.378 16.626a1 1 0 0 0-3.004-3.004l-4.01 4.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/><circle cx="10" cy="7" r="4"/></svg>
+        </a>
+        <!-- กำหนด path -->
+        <a href='{% url "sign-out" %}'
+            class="ml-4 flex justify-center text-center text-bold px-4 py-2 items-center rounded-full text-black transform hover:scale-[120%] hover:text-sky-500 transition-transform duration-100 text-sm bg-sky-50 shadow-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-log-out">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+
+{% comment %} teal: {
+    100: "#d5f3f0",
+    200: "#abe7e2",
+    300: "#82dcd3",
+    400: "#58d0c5",
+    500: "#2ec4b6",
+    600: "#259d92",
+    700: "#1c766d",
+    800: "#124e49",
+    900: "#092724"
+}, {% endcomment %}

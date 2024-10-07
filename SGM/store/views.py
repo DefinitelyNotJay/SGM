@@ -513,7 +513,7 @@ class Viewpoint(View):
         for customer_data in top_customers_data:
             customer_data['total_point'] = customer_data['total_spent'] // 50  # คำนวณคะแนน
 
-        return render(request, 'customer/viewpoin.html', {
+        return render(request, 'customer/viewpoint.html', {
             'my_spent': my_spent, 
             'mypoints': mypoints,
             'top_customers_data': top_customers_data,
