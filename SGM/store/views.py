@@ -22,6 +22,7 @@ from io import BytesIO
 from django.contrib.auth.models import Group, User
 from .s3 import upload_file, get_client
 from store.utils.sort import sort_products
+from store.forms.CategoryForm import *
 
 
 
@@ -190,13 +191,9 @@ class ViewStock(View):
 class ManageInventory(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_product', 'store.add_product', 'store.change_product', 'store.delete_product']
     login_url = '/login/'
-    CATEGORY_EN_TO_TH = {
-        "Beverages": "เครื่องดื่ม",
-        "Snacks": "ขนม",
-        "Ice-cream": "ไอศกรีม",
-        "Household-item": "ของใช้ครัวเรือน",
-    }
+
     def get(self, request, category_name=None):
+        categories = Category.objects.all()  # ดึงหมวดหมู่ทั้งหมดมา
         # ถ้ามีการระบุหมวดหมู่ใน URL ให้ทำการกรองสินค้าตามหมวดหมู่
         if category_name:
             category = get_object_or_404(Category, name=category_name)
@@ -210,6 +207,7 @@ class ManageInventory(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, 'manager/manageInventory.html', {
             'products': products,
             'category_name': category_name,
+            'categories': categories,
         })
 
     def post(self, request, category_name=None, *args, **kwargs):
@@ -289,7 +287,56 @@ class AddProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
                 return redirect('manageInventory')
         # มีรูป, form ไม่ valid
         return render(request, 'manager/addProduct.html', {'form': form})
+    
+class ManageCategories(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['store.view_category']
+    login_url = '/login/'
 
+    def get(self, request):
+        categories = Category.objects.all()
+        return render(request, 'manager/manageCategories.html', {'categories': categories})
+
+class AddCategory(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['store.add_category']
+    login_url = '/login/'
+
+    def get(self, request):
+        form = CategoryForm()
+        return render(request, 'manager/addCategory.html', {'form': form})
+
+    def post(self, request):
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('manageCategories')
+        return render(request, 'manager/addCategory.html', {'form': form})
+
+class EditCategory(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['store.change_category']
+    login_url = '/login/'
+
+    def get(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        form = CategoryForm(instance=category)
+        return render(request, 'manager/addCategory.html', {'form': form, 'category': category})
+
+    def post(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect('manageCategories')
+        return render(request, 'manager/addCategory.html', {'form': form, 'category': category})
+
+class DeleteCategory(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['store.delete_category']
+    login_url = '/login/'
+
+    def post(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        category.delete()
+        return redirect('manageCategories')
+    
 class CustomerList(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url='/login/'
     permission_required = ['store.add_customer', 'store.view_customer', 'store.change_customer']

@@ -8,18 +8,31 @@
 {% block content %}
 <div class="m-7">
     <div class="border rounded px-6 py-2 flex justify-between text-center shadow-md mt-12">
-        <a class="w-full" href="{% url 'manageInventory' %}">ทั้งหมด</a> |
-        <a class="w-full" href="{% url 'manageInvenCat' 'เครื่องดื่ม' %}">เครื่องดื่ม</a> |
-        <a class="w-full" href="{% url 'manageInvenCat' 'ขนม' %}">ขนม</a> |
-        <a class="w-full" href="{% url 'manageInvenCat' 'ไอศกรีม' %}">ไอศกรีม</a> |
-        <a class="w-full" href="{% url 'manageInvenCat' 'ของใช้ครัวเรือน' %}">ของใช้ครัวเรือน</a>
+        <select name="filter" id="category_filter" class='border px-3 py-2 rounded-md' onchange='selectCategory()'>
+            <option value="" default>------</option>
+            {% for c in categories %}
+            <option value='{{ c.name }}'>{{ c.name }}</option>
+            {% endfor %}
+        </select>
+        <h2 class=" px-6 py-2 flex justify-between text-center "> ประเภทสินค้า: {{category_name}}</h2>
     </div>
+
     <div class="border rounded px-6 py-2 shadow-md mt-12">
         <div class="flex justify-between m-4 mr-6">
-            <h2 class="mt-5"> ประเภทสินค้า: {{category_name}}</h2>
             <a class="flex items-center bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-200 mr-16"
                 href="{% url 'addProduct' %}">
                 เพิ่มสินค้าใหม่
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-circle-plus ml-2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M8 12h8" />
+                    <path d="M12 8v8" />
+                </svg>
+            </a>
+            <a class="flex items-center bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200 mr-16"
+                href="{% url 'manageCategories' %}">
+                จัดการประเภทสินค้า
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="lucide lucide-circle-plus ml-2">
@@ -60,5 +73,20 @@
         {% endfor %}
     </div>
 </div>
+{% block script %}
+<script>
+    function selectCategory() {
+        const filter = document.getElementById('category_filter').value;
+        if (filter) {
+            // สร้าง URL โดยตรงโดยใช้ filter แทนที่จะส่งค่าเป็น ''
+            window.location.href = `/manageInventory/${filter}`;
+        } else {
+            window.location.href = `{% url 'manageInventory' %}`;
+        }
+    }
+</script>
+
+
+{% endblock %}
 
 {% endblock %}

@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import *
 from .views import *
-from . import views
 
 
 urlpatterns = [
@@ -27,7 +26,14 @@ urlpatterns = [
     path('manageInventory/<str:category_name>/', ManageInventory.as_view(), name='manageInvenCat'),
     path('editProduct/<int:product_id>/', Editproduct.as_view(), name="editProduct"),
     path('deleteProduct/<int:product_id>/', DeleteProduct.as_view(), name='delete_product'),
-    path('addProduct/', AddProduct.as_view(), name='addProduct'),
+    path('addProduct/', AddProduct.as_view(), name='addProduct'),  
+    path('manageCategories/', ManageCategories.as_view(), name='manageCategories'),
+    path('addCategory/', AddCategory.as_view(), name='addCategory'),
+    path('editCategory/<int:pk>/', EditCategory.as_view(), name='editCategory'),
+    path('deleteCategory/<int:pk>/', DeleteCategory.as_view(), name='deleteCategory'),
+
+
+    # path('ManageUser/', ManageUserView.as_view(), name="ManageUser"), # หน้าจัดการผู้ใช้/', AddProduct.as_view(), name='addProduct',
     # path('ManageUser/', ManageUserView.as_view(), name="ManageUser"),
 
     path('employee/', EmployeeList.as_view(), name='employee-list'),

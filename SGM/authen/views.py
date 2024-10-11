@@ -25,6 +25,7 @@ class SignUp(View):
             user.save()
             return redirect('/login/')
         return render(request, './registration/sign-up.html', {'form': form})
+    
 class SignIn(View):
     def get(self, request):
         if request.user.is_authenticated:
