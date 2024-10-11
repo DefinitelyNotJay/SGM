@@ -2,7 +2,6 @@ import boto3
 import os
 from dotenv import load_dotenv
 from botocore.exceptions import ClientError
-import logging
 
 
 def get_client():
@@ -41,7 +40,6 @@ def upload_file(file_obj, bucket, object_name=None):
         response = s3_client.upload_fileobj(file_obj, bucket, object_name)
         print(response)
     except ClientError as e:
-        logging.error(e)
         return False
     return True
 
