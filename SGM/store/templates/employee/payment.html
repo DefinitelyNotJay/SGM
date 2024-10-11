@@ -1,80 +1,91 @@
-{% extends "./employee_layout.html" %} 
-{% block title %} 
-Home Page 
-{% endblock %} 
-{% block nav %} 
-  
-  {% if user.is_staff %}
-    {% include "../manager/navbar_manager.html" %} 
-  {% else %}
-    {% include "./navbar_emp.html" %} 
-  {% endif %}
-    
+{% extends "./employee_layout.html" %}
+{% block title %}
+Home Page
+{% endblock %}
+{% block nav %}
+
+{% if user.is_staff %}
+{% include "../manager/navbar_manager.html" %}
+{% else %}
+{% include "./navbar_emp.html" %}
+{% endif %}
+
 {% endblock nav%}
 {% block content %}
 <style>
   @layer base {
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
   }
-}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <p class="text-4xl font-semibold ml-8 tracking-wide">ชำระเงิน</p> 
-  <div class="w-full flex justify-between items-center px-4 mt-6 border-b pb-4">
-    {% comment %} 1 {% endcomment %}
-      <div class='flex gap-3 items-center'>
-          <div class='border-r border-gray-400 pr-4'>
-            <select name="filter" id="category_filter" class='border px-3 py-2 rounded-md' onchange='selectCategory()'>
-              <option value="" default>------</option>
-              {% for c in categories  %}
-                  <option value='{{ c.name }}'>{{c.name}}</option>
-              {% endfor %}
-          </select>
-          <select onchange='selectSortFilter()' name="filter" id="sort_filter" class='border px-3 py-2 rounded-md'>
-              <option value="sales-asc">ยอดขาย น้อย-มาก</option>
-              <option value="sales-desc">ยอดขาย มาก-น้อย</option>
-              <option value="quantity-asc">ปริมาณ น้อย-มาก</option>
-              <option value="quantity-desc">ปริมาณ มาก-น้อย</option>
-          </select>
-          </div>
-          <div class='flex gap-3' id='category-area'></div>
-      </div>
+<p class="text-4xl font-semibold ml-8 tracking-wide">ชำระเงิน</p>
+<div class="w-full flex justify-between items-center px-4 mt-6 border-b pb-4">
+  {% comment %} 1 {% endcomment %}
+  <div class='flex gap-3 items-center'>
+    <div class='border-r border-gray-400 pr-4'>
+      <select name="filter" id="category_filter" class='border px-3 py-2 rounded-md' onchange='selectCategory()'>
+        <option value="" default>------</option>
+        {% for c in categories %}
+        <option value='{{ c.name }}'>{{c.name}}</option>
+        {% endfor %}
+      </select>
+      <select onchange='selectSortFilter()' name="filter" id="sort_filter" class='border px-3 py-2 rounded-md'>
+        <option value="sales-asc">ยอดขาย น้อย-มาก</option>
+        <option value="sales-desc">ยอดขาย มาก-น้อย</option>
+        <option value="quantity-asc">ปริมาณ น้อย-มาก</option>
+        <option value="quantity-desc">ปริมาณ มาก-น้อย</option>
+      </select>
+    </div>
+    <div class='flex gap-3' id='category-area'></div>
+  </div>
 
- 
-   {% comment %} 3 {% endcomment %}
- 
+
+  {% comment %} 3 {% endcomment %}
+
   {% comment %} 4 {% endcomment %}
- <form method="POST" id='payment_form' action='/payment/' class='flex gap-8'>
-  {% csrf_token %}
-  <div class='flex gap-2 items-center'>
-    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-    <span id="amount">0</span>
-  </div>
-  <div class='flex gap-2'>
-    <input type="text" class='hidden' name='ordered_products' id='ordered_products'>
-  <button type="button" onclick="clearSelectedProduct()" class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
-    รีเซ็ต
-  </button>
-  <button type="submit" onclick="processPayment(event)" class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
-    ยืนยัน
-  </button>
-  </div>
- </form>
+  <form method="POST" id='payment_form' action='/payment/' class='flex gap-8'>
+    {% csrf_token %}
+    <div class='flex gap-2 items-center'>
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="lucide lucide-shopping-cart">
+        <circle cx="8" cy="21" r="1" />
+        <circle cx="19" cy="21" r="1" />
+        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+      </svg>
+      <span id="amount">0</span>
+    </div>
+    <div class='flex gap-2'>
+      <input type="text" class='hidden' name='ordered_products' id='ordered_products'>
+      <button type="button" onclick="clearSelectedProduct()"
+        class="px-8 py-2 bg-[#fdfdff] hover:bg-gray-100 border text-[#333] rounded-md">
+        รีเซ็ต
+      </button>
+      <button type="submit" onclick="processPayment(event)"
+        class="px-8 py-2 bg-[#393d3f] hover:bg-[#222] text-[#fff] rounded-md">
+        ยืนยัน
+      </button>
+    </div>
+  </form>
 </div>
 
-  
+
 
 
 <section class="grid grid-cols-4 mt-8 gap-x-6 gap-y-6">
   {% for product in products %}
   {% if product.quantity_in_stock > 0 %}
-  <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}" class="border h-[360px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-12  flex flex-col gap-3 text-center">
-    <input type="text" id='{{product.id}}' class='hidden' value='{{product.id}},{{product.name}},{{product.price}},{{product.quantity_in_stock}}'>
-    <img class="h-48 object-center object-cover" src='{{ product.image_url }}'/>
+  <div onclick="selectProduct({{ product.id }})" id="product-{{ product.id }}"
+    class="border h-[360px] rounded-md hover:cursor-pointer hover:bg-gray-50 py-8 px-12  flex flex-col gap-3 text-center">
+    <input type="text" id='{{product.id}}' class='hidden'
+      value='{{product.id}},{{product.name}},{{product.price}},{{product.quantity_in_stock}}'>
+    <img class="h-48 object-center object-cover" src='{{ product.image_url }}' />
     <div class="flex flex-col items-center justify-center gap-2 mt-4">
       <p class="text-xl font-medium text-start">{{ product.name }}</p>
       <div>
@@ -82,27 +93,30 @@ Home Page
           {% comment %} <p>เหลือ <span>{{product.quantity_in_stock}}</span> ชิ้น</p> {% endcomment %}
           <span>{{product.price}}</span> บาท
           <div id='inputGroup-{{ product.id }}' class="hidden mt-1">
-            <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})" onclick="event.stopPropagation()" type="number" required value=1 class='z-0 w-8 resize-none border rounded-md py-0.5 text-center'>
+            <input id='input-{{ product.id }}' onchange="updateAmountChange({{ product.id }})"
+              onclick="event.stopPropagation()" type="number" required value=1
+              class='z-0 w-8 resize-none border rounded-md py-0.5 text-center'>
             <span>ชิ้น</span>
+          </div>
         </div>
-          </div> 
       </div>
 
     </div>
   </div>
   {% else %}
-  <div id="product-{{ product.id }}" class="h-[360px] rounded-md hover:cursor-pointer bg-[#616465] text-[#fdfdff] py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
-    <img class="h-48 object-center object-cover" src='{{ product.image_url }}'/>
+  <div id="product-{{ product.id }}"
+    class="h-[360px] rounded-md hover:cursor-pointer bg-[#616465] text-[#fdfdff] py-8 px-16 shadow-md border flex flex-col gap-3 text-center">
+    <img class="h-48 object-center object-cover" src='{{ product.image_url }}' />
     <div class="flex items-center flex-col justify-center gap-6">
       <p class="text-xl font-medium text-start">{{ product.name }}</p>
       <p class='text-lg text-start'>สินค้าหมด</p>
     </div>
   </div>
   {% endif %}
-    
+
   {% endfor %}
 </section>
-{% endblock content %} 
+{% endblock content %}
 {% block script %}
 <script>
   let categories = []
@@ -110,90 +124,90 @@ Home Page
   const category_area = document.getElementById('category-area')
   const localStorageData = getCategoryStorage()
 
-  if(localStorageData.categories){
-      categories = localStorageData.categories
-      for(let cate of categories){
-          addTag(cate)
+  if (localStorageData.categories) {
+    categories = localStorageData.categories
+    for (let cate of categories) {
+      addTag(cate)
+    }
+    for (let option of getSortFilter().getElementsByTagName('option')) {
+      console.log(localStorageData)
+      console.log(option.value, "vs", localStorageData.sort_filter)
+      if (option.value === localStorageData.sort_filter) {
+        option.selected = true
       }
-      for(let option of getSortFilter().getElementsByTagName('option')){
-          console.log(localStorageData)
-          console.log(option.value, "vs", localStorageData.sort_filter)
-          if(option.value === localStorageData.sort_filter){
-              option.selected = true
-          }
+    }
+  }
+
+  function getCategoryFilter() {
+    return document.getElementById('category_filter').value
+  }
+  function getSortFilter() {
+    return document.getElementById('sort_filter')
+  }
+
+  function setCategoryStorage() {
+    let x = getSortFilter()
+    console.log("sort_filter", x.value)
+    localStorage.setItem('categories', JSON.stringify({ categories: [...categories], sort_filter: getSortFilter().value }))
+  }
+
+  function getCategoryStorage() {
+    console.log(JSON.parse(localStorage.getItem('categories')))
+    return JSON.parse(localStorage.getItem('categories'))
+  }
+
+  function deleteCategoryTag(category_target) {
+    console.log("before", categories)
+    const pTags = category_area.getElementsByTagName('p')
+    categories = categories.filter(cate => cate !== category_target)
+    cate_area_elements = document.querySelector('#category-area')
+    for (let p of pTags) {
+      if (p.textContent === category_target) {
+        p.remove()
+        break
       }
+    }
+    console.log("after", categories)
+    setCategoryStorage()
+    fetchTag()
   }
 
-  function getCategoryFilter(){
-      return document.getElementById('category_filter').value
-  }
-  function getSortFilter(){
-      return document.getElementById('sort_filter')
-  }
-
-  function setCategoryStorage(){
-      let x = getSortFilter()
-      console.log("sort_filter", x.value)
-      localStorage.setItem('categories', JSON.stringify({categories: [...categories], sort_filter: getSortFilter().value}))
-  }
-
-  function getCategoryStorage(){
-      console.log(JSON.parse(localStorage.getItem('categories')))
-      return JSON.parse(localStorage.getItem('categories'))
+  function addTag(category_target) {
+    const pTag = document.createElement('p')
+    pTag.textContent = category_target
+    pTag.id = category_target
+    pTag.className = `cursor-pointer border-gray-200 hover:bg-gray-100 p-2 border rounded`
+    pTag.onclick = (e) => {
+      deleteCategoryTag(e.target.textContent)
+    }
+    category_area.appendChild(pTag)
+    setCategoryStorage()
   }
 
-  function deleteCategoryTag(category_target){
-      console.log("before", categories)
-      const pTags = category_area.getElementsByTagName('p')
-      categories = categories.filter(cate => cate !== category_target)
-      cate_area_elements = document.querySelector('#category-area')
-      for (let p of pTags){
-          if(p.textContent === category_target){
-              p.remove()
-              break
-          }
-      }
-      console.log("after", categories)
-      setCategoryStorage()
+  function selectSortFilter() {
+    fetchTag()
+    setCategoryStorage()
+  }
+
+  function selectCategory() {
+    category_target = getCategoryFilter()
+    if (category_target && !categories.includes(category_target)) {
+      categories = [...categories, category_target]
+      // create element
+      addTag(category_target)
       fetchTag()
-  }
-
-  function addTag(category_target){
-      const pTag = document.createElement('p')
-          pTag.textContent = category_target
-          pTag.id = category_target
-          pTag.className = `cursor-pointer border-gray-200 hover:bg-gray-100 p-2 border rounded`
-          pTag.onclick = (e) => {
-              deleteCategoryTag(e.target.textContent)
-          }
-          category_area.appendChild(pTag)
-          setCategoryStorage()
-  }
-
-  function selectSortFilter(){
-      fetchTag()
       setCategoryStorage()
+    }
   }
 
-  function selectCategory(){
-      category_target = getCategoryFilter()
-      if(category_target && !categories.includes(category_target)){
-          categories = [...categories, category_target]
-          // create element
-          addTag(category_target)
-          fetchTag()
-          setCategoryStorage()
-      }
-  }
+  function fetchTag() {
+    let categories_str = categories.map(cate => `category=${cate}`)
+    let categories_get = categories_str.join('&')
+    let sort_filter = document.getElementById('sort_filter').value
+    let sort_filter_get = sort_filter && `${categories.length <= 0 ? '' : '&'}sort_filter=${sort_filter}`
+    let url = `/payment/?${categories_get}${sort_filter_get}`
+    window.location.href = url
 
-  function fetchTag(){
-      let categories_str = categories.map(cate=>`category=${cate}`)
-      let categories_get = categories_str.join('&')
-      let sort_filter = document.getElementById('sort_filter').value
-      let sort_filter_get = sort_filter && `${categories.length <= 0 ? '' : '&'}sort_filter=${sort_filter}`
-      let url = `/payment/?${categories_get}${sort_filter_get}`
-      window.location.href = url
-      
   }
 
 </script>
@@ -204,41 +218,41 @@ Home Page
 
   const ordered_product = JSON.parse(localStorage.getItem("ordered_product"));
   // check if employee selected product before refresh page
-  if (ordered_product){
-    const {storage_products, storage_amount} = ordered_product
+  if (ordered_product) {
+    const { storage_products, storage_amount } = ordered_product
     amount_element.textContent = storage_amount
     amount = storage_amount
     selectedProducts = storage_products
 
 
-    storage_products.map((product)=>{
+    storage_products.map((product) => {
       find_product = document.querySelector(`#product-${product.id}`)
-      if(find_product){
+      if (find_product) {
         inputAmountFieldHandler(product.id, true)
         document.getElementById(`input-${product.id}`).value = product.amount
       }
     })
   }
 
-  function getProductAmount(product_id){
+  function getProductAmount(product_id) {
     return parseInt(document.getElementById(`input-${product_id}`).value)
   }
 
-  function setProductAmount(product_id, value){
+  function setProductAmount(product_id, value) {
     document.getElementById(`input-${product_id}`).value = value
   }
 
-  function getProductInfo(product_id){
+  function getProductInfo(product_id) {
     const data = document.getElementById(product_id).value
     return data.split(',')
   }
 
-  function selectProduct(product_id){
+  function selectProduct(product_id) {
 
     // เช็คว่ามี product ใน array หรือยัง
-    const isProductInCart = selectedProducts.some(product=>product.id==product_id)
+    const isProductInCart = selectedProducts.some(product => product.id == product_id)
 
-    if (!isProductInCart){
+    if (!isProductInCart) {
       // แสดง input
       inputAmountFieldHandler(product_id, true)
       // เอาจำนวน product มา
@@ -249,7 +263,7 @@ Home Page
       const price = parseFloat(data_array[2])
       const quantity = parseInt(data_array[3])
       // เพิ่มเข้า selectedProducts
-      selectedProducts = [...selectedProducts, {id: id, amount: product_amount, name:name, price:price, quantity:quantity}]
+      selectedProducts = [...selectedProducts, { id: id, amount: product_amount, name: name, price: price, quantity: quantity }]
     }
     else {
       console.log(product_id)
@@ -258,102 +272,102 @@ Home Page
     }
     updateAllAmount()
 
-    localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
+    localStorage.setItem("ordered_product", JSON.stringify({ storage_products: selectedProducts, storage_amount: amount }))
   };
 
-  function updateAllAmount(){
-    amount = selectedProducts.reduce((acc, item)=> acc+item.amount, 0)
+  function updateAllAmount() {
+    amount = selectedProducts.reduce((acc, item) => acc + item.amount, 0)
     amount_element.textContent = amount
   }
 
-  function inputAmountFieldHandler(product_id, isActive){
+  function inputAmountFieldHandler(product_id, isActive) {
     const product_input = document.querySelector(`#inputGroup-${product_id}`)
-    if(isActive){
+    if (isActive) {
       product_input.classList.remove('hidden')
       document.getElementById(`product-${product_id}`).classList.add("bg-[#98a6ae]")
       document.getElementById(`product-${product_id}`).classList.remove("hover:bg-gray-50")
       setProductAmount(product_id, 1)
-    }else {
+    } else {
       document.getElementById(`product-${product_id}`).classList.remove("bg-[#98a6ae]")
       document.getElementById(`product-${product_id}`).classList.add("hover:bg-gray-50")
-      
+
       product_input.classList.add('hidden')
     }
   }
 
-  function clearSelectedProduct(){
+  function clearSelectedProduct() {
     localStorage.removeItem("ordered_product")
     window.location.reload()
   }
 
-  function deleteElement(product_id){
+  function deleteElement(product_id) {
     const index = selectedProducts.findIndex(product => product.id === product_id);
     selectedProducts.splice(index, 1)
   }
 
-  function updateAmountChange(product_id){
+  function updateAmountChange(product_id) {
     const product_amount = getProductAmount(product_id)
-    
-    if(product_amount <= 0){
+
+    if (product_amount <= 0) {
       // employee enters 0 means that item is no longer in the cart
       inputAmountFieldHandler(product_id, false)
       deleteElement(product_id)
     } else {
       // update amount number
-      const product = selectedProducts.find(product=>product.id==product_id)
+      const product = selectedProducts.find(product => product.id == product_id)
       product.amount = product_amount
     }
     console.log("updated", selectedProducts)
     updateAllAmount()
-    localStorage.setItem("ordered_product", JSON.stringify({storage_products: selectedProducts, storage_amount: amount}))
+    localStorage.setItem("ordered_product", JSON.stringify({ storage_products: selectedProducts, storage_amount: amount }))
   }
 
-  function processPayment(e){
+  function processPayment(e) {
     e.preventDefault()
-    if(amount <= 0 ){
+    if (amount <= 0) {
       Swal.fire({
         title: 'เกิดข้อผิดพลาด',
         text: "ไม่มีสินค้าในตะกร้า",
         icon: 'warning',
         confirmButtonColor: '#3085d6',
         confirmButtonText: 'ตกลง'
-    })
-    return;
+      })
+      return;
     }
     const ordered_product = localStorage.getItem("ordered_product")
     const input_field = document.getElementById('ordered_products')
     const payment_form = document.getElementById('payment_form')
     input_field.value = ordered_product
     payment_form.submit()
-    
+
   }
 
 
 </script>
 {% endblock script %}
 
-{% comment %} 
+{% comment %}
 indigo: {
-    100: "#dde1e4",
-    200: "#bbc3c9",
-    300: "#98a6ae",
-    400: "#768893",
-    500: "#546a78",
-    600: "#435560",
-    700: "#324048",
-    800: "#222a30",
-    900: "#111518"
+100: "#dde1e4",
+200: "#bbc3c9",
+300: "#98a6ae",
+400: "#768893",
+500: "#546a78",
+600: "#435560",
+700: "#324048",
+800: "#222a30",
+900: "#111518"
 }, {% endcomment %}
 
-{% comment %} 
+{% comment %}
 black: {
-    100: "#d7d8d9",
-    200: "#b0b1b2",
-    300: "#888b8c",
-    400: "#616465",
-    500: "#393d3f",
-    600: "#2e3132",
-    700: "#222526",
-    800: "#171819",
-    900: "#0b0c0d"
+100: "#d7d8d9",
+200: "#b0b1b2",
+300: "#888b8c",
+400: "#616465",
+500: "#393d3f",
+600: "#2e3132",
+700: "#222526",
+800: "#171819",
+900: "#0b0c0d"
 }, {% endcomment %}
