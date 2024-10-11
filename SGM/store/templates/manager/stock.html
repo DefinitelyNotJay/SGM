@@ -65,16 +65,16 @@ Home Page
     let categories = []
     let add_stock_amount = []
     const category_area = document.getElementById('category-area')
-    const localStorageData = getCategoryStorage()
+    const localStorageData = JSON.parse(localStorage.getItem('categories'))
 
     if(localStorageData.categories){
         categories = localStorageData.categories
         for(let cate of categories){
             addTag(cate)
         }
+
+        // ทำให้ select เลือกค่า option ที่เลือกไปล่าสุดก่อน refresh
         for(let option of getSortFilter().getElementsByTagName('option')){
-            console.log(localStorageData)
-            console.log(option.value, "vs", localStorageData.sort_filter)
             if(option.value === localStorageData.sort_filter){
                 option.selected = true
             }
@@ -90,29 +90,21 @@ Home Page
 
     function setCategoryStorage(){
         let x = getSortFilter()
-        console.log("sort_filter", x.value)
         localStorage.setItem('categories', JSON.stringify({categories: [...categories], sort_filter: getSortFilter().value}))
     }
 
-    function getCategoryStorage(){
-        console.log(JSON.parse(localStorage.getItem('categories')))
-        return JSON.parse(localStorage.getItem('categories'))
-    }
-
     function deleteCategoryTag(category_target){
-        console.log("before", categories)
-        const pTags = category_area.getElementsByTagName('p')
-        categories = categories.filter(cate => cate !== category_target)
+        const pTags = category_area.getElementsByTagName('p') //นำ category ที่แสดงอยู่ทั้งหมดมา
+        categories = categories.filter(cate => cate !== category_target) // เอาค่า category นั้นออกจากตัวแปร categories
         cate_area_elements = document.querySelector('#category-area')
         for (let p of pTags){
-            if(p.textContent === category_target){
+            if(p.textContent === category_target){ // ถ้า category นั้นตรงกับเป้าหมาย จะลบ pTag นั้นออกจากพื้นที่
                 p.remove()
                 break
             }
         }
-        console.log("after", categories)
-        setCategoryStorage()
-        fetchTag()
+        setCategoryStorage() // อัพเดททค่าใน localStorage
+        fetchTag() // ทำการ fetch tag ใหม่ เนื่องจากมี tag ถูกลบ
     }
 
     function addTag(category_target){
@@ -123,8 +115,9 @@ Home Page
             pTag.onclick = (e) => {
                 deleteCategoryTag(e.target.textContent)
             }
-            category_area.appendChild(pTag)
-            setCategoryStorage()
+            // สร้าง element ขึ้นมา แล้วใส่คุณสมบัติต่าง ๆ ให้มัน
+            category_area.appendChild(pTag) // เพ่ิม pTag ที่พึ่งสร้าง ใส่เข้าไปใน category_area
+            setCategoryStorage() // บันทึกค่า category ใหม่ใน localStorage
     }
 
     function selectSortFilter(){
@@ -144,9 +137,15 @@ Home Page
     }
 
     function fetchTag(){
+        // ["คด", "ขน"]
         let categories_str = categories.map(cate=>`category=${cate}`)
+        // ["category=คด", "category=ขน"]
         let categories_get = categories_str.join('&')
+        // "category=คด&category=ขน"
+
         let sort_filter = document.getElementById('sort_filter').value
+
+        // .length = ["คด", "ขนม"] => 2
         let sort_filter_get = sort_filter && `${categories.length <= 0 ? '' : '&'}sort_filter=${sort_filter}`
         let url = `/stock/?${categories_get}${sort_filter_get}`
         window.location.href = url
@@ -154,19 +153,24 @@ Home Page
     }
 
     function changeStockAmount(product_id, amount){
+        // ai = [1, 2, 3]
+        // [...ai, 4] => [1, 2, 3, 4]
         add_stock_amount = [...add_stock_amount, {'id': parseInt(product_id), 'amount': parseInt(amount)}]
-        console.log(add_stock_amount)
     }
 
     function submitAmountChange(){
         fetch('/stock/', {
             method: 'POST',
+            // add_stock_amount = [{'id': 1, 'amount': 51}, {'id': 3, 'amount': 60}] 
+            // js => object
+            // python => dictionary
             body: JSON.stringify(add_stock_amount),
             headers: {
                 "X-CSRFToken": "{{ csrf_token }}",
                 'Content-Type': "application/json",
             }
-        }).then(res=>res.json())
+        })
+        .then(res=>res.json())
         .then(data=> window.location.reload())
     }
 

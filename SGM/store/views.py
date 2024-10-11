@@ -38,13 +38,14 @@ class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     
     def get(self, request):
-        categories = request.GET.getlist('category')  # รับ category จาก query parameters ที่อาจมีมากกว่า 1
+        categories = request.GET.getlist('category') # รับ category จาก query parameters ที่อาจมีมากกว่า 1
         sort_filter = request.GET.get('sort_filter')  # รับตัวเลือกการกรองข้อมูล
         context = sort_products(categories, sort_filter)
         return render(request, "manager/stock.html", context)
 
     def post(self, request):
         stock_amount = json.loads(request.body)
+        # stock_amount = [{'id': 1, 'amount': 51}, {'id': 3, 'amount': 60}] 
         for p in stock_amount:
             product = Product.objects.get(pk=p['id'])
             product.daily_restock_quantity = p['amount']

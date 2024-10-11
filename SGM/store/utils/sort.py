@@ -5,12 +5,13 @@ from django.db.models import *
 def sort_products(categories, sort_filter):
         context = {}
         products = []
+
         product_categories = Category.objects.all()
         if not categories and not sort_filter:
             products = Product.objects.all().order_by('quantity_in_stock')
             categories = Category.objects.all()
 
-        # หากมีการเลือก filter
+        # หากมีการเลือก filter หริอ category filter
         else:
             products = Product.objects.all()
 
@@ -27,6 +28,7 @@ def sort_products(categories, sort_filter):
 
             # มี categories
             if categories:
-                products = products.filter(categories__name__in=categories).distinct()
+                products = products.filter(categories__name__in=categories)
+    
         context = {'products': products, 'categories': product_categories}
         return context

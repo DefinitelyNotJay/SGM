@@ -9,13 +9,19 @@
 {% endblock title %}
 
 {% block nav %}
-    {% include "customer/navbar_cus.html" %}
+    
+    {% if not user.is_authenticated %}
+    {% include "visitor/navbar_visitor.html" %}
+    {% else %}
+        {% include "employee/navbar_emp.html" %}
+    {% endif %}
+        
 {% endblock nav %}
 
 {% block content %}
 <div class="flex items-center gap-14 w-full p-8">
     <div class="w-7/12 mx-auto rounded-md items-center flex gap-4">
-        <form method="post" class="bg-gray-100 shadow-md w-fit rounded-lg p-6">
+        <form method="post" class="bg-gray-100 shadow-md w-fit mx-auto rounded-lg p-6">
             <h1 class="text-2xl text-center font-semibold mb-6">
                 {% if isCreate %}
                     สมัครสมาชิก
