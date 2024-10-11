@@ -10,6 +10,7 @@
     <div class="border rounded px-6 py-2 flex justify-between text-center shadow-md mt-12">
         <select name="filter" id="category_filter" class='border px-3 py-2 rounded-md' onchange='selectCategory()'>
             <option value="" default>------</option>
+            <option value="">ทั้งหมด</option>
             {% for c in categories %}
             <option value='{{ c.name }}'>{{ c.name }}</option>
             {% endfor %}
