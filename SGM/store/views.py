@@ -151,7 +151,7 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
         customers = Customer.objects.annotate(total_spent=Sum('order__total_price')).filter(
             order__date__month=current_month,
             order__date__year=current_year,
-            total_spent__isnull=False)
+            total_spent__isnull=False).order_by('-total_spent')
         products = Product.objects.annotate(bestseller=Sum('orderitem__amount')).filter(
             orderitem__order__date__month=current_month,
             orderitem__order__date__year=current_year,
