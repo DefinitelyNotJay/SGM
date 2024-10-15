@@ -13,17 +13,28 @@ from django import forms
 
  
 class EmployeeCreateForm(UserCreationForm):
+    """
+    ฟอร์มการสร้างพนักงาน
+    """
     class Meta:
         model = User
         fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
 
 class UserUpdateForm(forms.ModelForm):
+    """
+    ฟอร์มการ update user
+    """
     class Meta:
         model = User
         fields = ["username", "first_name", "last_name", "email"]
 
 
+
+
 class CustomerUserForm(forms.Form):
+    """
+    เพื่อเลี่ยงการใส่รหัสตามที่ UserCreationForm ต้องการ ; ลูกค้าไม่ควรกรอกรหัสที่มีเงื่อนไขมากเกินไป
+    """
     username = forms.CharField(max_length=10)
     password1 = forms.CharField(widget=forms.PasswordInput())
     password2 = forms.CharField(widget=forms.PasswordInput())
@@ -50,6 +61,9 @@ class CustomerUserForm(forms.Form):
 
 
 class ChangePasswordForm(forms.Form):
+    """
+    ฟอร์มการเปลี่ยนรหัสผ่าน
+    """
     old_password = forms.CharField(widget=forms.PasswordInput())
     new_password = forms.CharField(widget=forms.PasswordInput())
     confirm_password = forms.CharField(widget=forms.PasswordInput())
@@ -68,3 +82,10 @@ class ChangePasswordForm(forms.Form):
         
 
 
+class CustomerCreateForm(ModelForm):
+    """
+    ฟอร์มการสร้าง Cutomer
+    """
+    class Meta:
+        model = Customer
+        fields = ["nickname", "gender", "notes"]

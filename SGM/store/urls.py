@@ -32,10 +32,6 @@ urlpatterns = [
     path('editCategory/<int:pk>/', EditCategory.as_view(), name='editCategory'),
     path('deleteCategory/<int:pk>/', DeleteCategory.as_view(), name='deleteCategory'),
 
-
-    # path('ManageUser/', ManageUserView.as_view(), name="ManageUser"), # หน้าจัดการผู้ใช้/', AddProduct.as_view(), name='addProduct',
-    # path('ManageUser/', ManageUserView.as_view(), name="ManageUser"),
-
     path('employee/', EmployeeList.as_view(), name='employee-list'),
     path('employee/new/', CreateEmployee.as_view(), name='employee-create'),
     path('employee/<int:emp_id>/', ManageEmployee.as_view(), name='employee-edit'),
