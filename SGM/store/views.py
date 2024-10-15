@@ -22,6 +22,7 @@ from django.contrib.auth.models import Group, User
 from .s3 import upload_file, get_client
 from store.utils.sort import sort_products
 from store.forms.CategoryForm import *
+from django.db.models.functions import Coalesce
 
 
 
@@ -126,6 +127,7 @@ class ListCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/login/'
+
     def test_func(self):
         print(self.request.user.groups.all())
         return self.request.user.groups.filter(name='manager').exists()
@@ -144,28 +146,52 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
         "November": "พฤศจิกายน",
         "December": "ธันวาคม",
     }
+
     def get(self, request):
         current_month = datetime.now().month
         current_year = datetime.now().year
-        
-        customers = Customer.objects.annotate(total_spent=Sum('order__total_price')).filter(
+
+        # รับคะแนนสะสม
+        customers = Customer.objects.annotate(
+            total_spent=Sum('order__total_price'),
+            loyalty_points=Coalesce(Subquery(
+                LoyaltyPoints.objects.filter(customer=OuterRef('pk')).values('points')[:1]
+            ), Value(0))
+        ).filter(
             order__date__month=current_month,
             order__date__year=current_year,
-            total_spent__isnull=False).order_by('-total_spent')
+            total_spent__isnull=False
+        ).order_by('-total_spent')
+
+        # อัปเดตคะแนนสะสมสำหรับลูกค้าแต่ละราย 
+        for customer in customers:
+            # คำนวณคะแนนสะสมตามยอดรวมที่ใช้จ่าย 
+            loyalty_points = customer.total_spent // 50  # 1 คะแนนสำหรับการใช้จ่ายทุกๆ 50 บาท 
+
+            # อัปเดตหรือสร้างเรกคอร์ด LoyaltyPoints 
+            loyalty_record, created = LoyaltyPoints.objects.get_or_create(customer=customer)
+            loyalty_record.points = loyalty_points
+            loyalty_record.save()
+
         products = Product.objects.annotate(bestseller=Sum('orderitem__amount')).filter(
             orderitem__order__date__month=current_month,
             orderitem__order__date__year=current_year,
-            bestseller__isnull=False).order_by('-bestseller')
-    
+            bestseller__isnull=False
+        ).order_by('-bestseller')
+
         allcustomer = Customer.objects.all().count()
 
         current_date = now()
         current_month_name_en = current_date.strftime("%B")
         current_month_name_th = self.MONTHS_EN_TO_TH.get(current_month_name_en, current_month_name_en)
 
-
-        return render(request, 'manager/statistics.html', {'customers': customers , 'products':products, 'allcustomer':allcustomer, 'current_month_name_th': current_month_name_th})
-
+        return render(request, 'manager/statistics.html', {
+            'customers': customers,
+            'products': products,
+            'allcustomer': allcustomer,
+            'current_month_name_th': current_month_name_th,
+        })
+    
 class ViewStock(View):
     def get(self, request):
         categories_obj = Category.objects.all().values("name")
