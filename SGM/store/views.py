@@ -5,7 +5,6 @@ from django.views import View
 from django.http import *
 from store.models import *
 from store.forms.authentication import *
-from store.forms.customer import *
 from store.forms.order import *
 from store.forms.product import *
 from django.forms.models import model_to_dict
@@ -540,14 +539,27 @@ class ManageEmployee(LoginRequiredMixin, UserPassesTestMixin, View):
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
         
+
 class Viewpoint(View):
     def get(self, request):
-        # หน้าดูคะแนน
-        customer = request.user.id
+        # ดึงข้อมูล Customer ที่เชื่อมโยงกับ user ปัจจุบัน
+        customer = Customer.objects.get(user=request.user)
+        
         # ยอดที่ใช้จ่ายของลูกค้าคนปัจจุบัน
-        my_spent = Order.objects.filter(customer=customer, status=Order.StatusChoices.PAID).aggregate(Sum('total_price'))['total_price__sum'] or 0
+        my_spent = Order.objects.filter(customer=customer, status='PAID').aggregate(Sum('total_price'))['total_price__sum'] or 0
+        
         # คำนวณคะแนนของลูกค้าคนปัจจุบัน (1 point per 50 THB spent)
         mypoints = my_spent // 50  
+
+        # ตรวจสอบให้มั่นใจว่า mypoints ไม่เป็น null และตั้งค่าเริ่มต้นเป็น 0 หากพบว่าเป็น null
+        mypoints = mypoints if mypoints is not None else 0
+
+        # บันทึกหรืออัปเดตคะแนนสะสมลงใน LoyaltyPoints
+        loyalty_record, created = LoyaltyPoints.objects.get_or_create(customer=customer, defaults={'points': mypoints})
+
+        if not created:  # ถ้าเรคคอร์ดมีอยู่แล้ว ให้อัปเดตคะแนนใหม่
+            loyalty_record.points = mypoints
+            loyalty_record.save()
 
         # ดึงข้อมูลลูกค้าที่มียอดใช้จ่ายมากที่สุด 5 คน พร้อมคะแนน
         top_customers_data = (
@@ -557,7 +569,8 @@ class Viewpoint(View):
             .annotate(total_spent=Sum('total_price'))
             .order_by('-total_spent')[:5]
         )
-          # คำนวณคะแนนสำหรับลูกค้าแต่ละคน
+        
+        # คำนวณคะแนนสำหรับลูกค้าแต่ละคน
         for customer_data in top_customers_data:
             customer_data['total_point'] = customer_data['total_spent'] // 50  # คำนวณคะแนน
 

@@ -30,7 +30,7 @@ Home Page
   <div class='flex gap-3 items-center'>
     <div class='border-r border-gray-400 pr-4'>
       <select name="filter" id="category_filter" class='border px-3 py-2 rounded-md' onchange='selectCategory()'>
-        <option value="" default>------</option>
+        <option value="" default>เลือกประเภท</option>
         {% for c in categories %}
         <option value='{{ c.name }}'>{{c.name}}</option>
         {% endfor %}

@@ -1,7 +1,13 @@
 {% extends "./employee_layout.html" %}
 {% block title %} Customer List {% endblock title %}
 {% block nav %}
+
+{% if user.is_staff %}
+{% include "../manager/navbar_manager.html" %}
+{% else %}
 {% include "./navbar_emp.html" %}
+{% endif %}
+
 {% endblock nav %}
 {% block content %}
 
