@@ -138,3 +138,5 @@ GitHub.sublime-settings
 .history
 SGM/store/__pycache__/views.cpython-312.pyc
 *.pyc
+
+myvenv/
