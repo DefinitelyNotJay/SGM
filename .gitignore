@@ -140,3 +140,4 @@ SGM/store/__pycache__/views.cpython-312.pyc
 *.pyc
 
 myvenv/
+/myvenv
