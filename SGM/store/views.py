@@ -82,27 +82,33 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 
         try:
-            customer = Customer.objects.filter(user__username=customer_id).first()
-    
-            loyaltyPoint = LoyaltyPoints.objects.get_or_create(customer_id=customer.id)
-            print(loyaltyPoint[0])
+            order = None
+            if customer_id:
+                customer = Customer.objects.filter(user__username=customer_id).first()
+        
+                loyaltyPoint = LoyaltyPoints.objects.get_or_create(customer_id=customer.id)
 
-            order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID', payment_method=payment_method)
-            
+                order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID', payment_method=payment_method)
+            else:
+                order = Order.objects.create(customer=None, total_price=total, quantity=amount, status='PAID', payment_method=payment_method)
+                
             total_cost = 0
 
             for product in products:
                 
                 OrderItem.objects.create(order=order, product=Product.objects.get(id=product['id']), amount=product['amount'])
+
                 use_product = Product.objects.get(pk=product['id'])
-                total_cost += use_product.price
                 quantity = use_product.quantity_in_stock
+
                 use_product.quantity_in_stock = quantity - product['amount']
                 use_product.save()
+
+                total_cost += use_product.price * amount
             
-            
-            loyaltyPoint[0].points = total_cost / 50
-            loyaltyPoint[0].save()
+            if customer_id:
+                loyaltyPoint[0].points += (total_cost // 50)
+                loyaltyPoint[0].save()
 
             return JsonResponse({'status': 'complete'})
         except Exception as e:
@@ -157,24 +163,19 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         current_month = datetime.now().month
         current_year = datetime.now().year
+        
+        print(current_month, current_year)
 
         # รับคะแนนสะสม
         customers = Customer.objects.annotate(
-            total_spent=Sum('order__total_price'),
-            loyalty_points=F('loyaltypoints__points')
-        ).filter(
-            order__date__month=current_month,
-            order__date__year=current_year,
-            total_spent__isnull=False
-        ).order_by('-total_spent')
+    total_spent=Sum('order__total_price', filter=Q(order__date__month=current_month, order__date__year=current_year))).filter(total_spent__isnull=False).annotate(
+    loyalty_points=F('loyaltypoints__points')).order_by('-total_spent')
 
-        products = Product.objects.annotate(bestseller=Sum(F('orderitem__amount'))).filter(
-            orderitem__order__date__month=current_month,
-            orderitem__order__date__year=current_year,
-            bestseller__isnull=False
-        ).order_by('-bestseller')
+        products = Product.objects.annotate(
+        total_sold=Sum('orderitem__amount', filter=Q(orderitem__order__date__month=current_month, orderitem__order__date__year=current_year))).filter(total_sold__gt=0).order_by('-total_sold')
+
         for product in products:
-            print(f"Product: {product.name}, bestseller: {product.bestseller}")
+            print(f"Product: {product.name}, bestseller: {product.total_sold}")
 
         allcustomer = Customer.objects.all().count()
 
