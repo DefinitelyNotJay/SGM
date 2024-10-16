@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
 
 class Customer(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=20)
     join_date = models.DateTimeField(auto_now_add=True)
     class GenderChoices(models.Choices):

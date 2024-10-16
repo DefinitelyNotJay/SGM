@@ -5,7 +5,6 @@ from django.views import View
 from django.http import *
 from store.models import *
 from store.forms.authentication import *
-from store.forms.customer import *
 from store.forms.order import *
 from store.forms.product import *
 from django.forms.models import model_to_dict
@@ -27,11 +26,6 @@ from store.forms.CategoryForm import *
 
 
 # Create your views here.
-
-class Inventory(View):
-    def get(self, request):
-        print(Customer.objects.all())
-        return HttpResponse("123")
 
 class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_order', 'store.add_order', 'store.change_order', 'store.delete_order']
@@ -352,8 +346,7 @@ class ManageCustomer(LoginRequiredMixin, View):
 
     def get(self, request, customer_id):
         """
-        - if there is customer_id edit customer form show up
-        - visitor and employee be able to create account for customer
+         แสดงฟอร์มการแก้ไขข้อมูล Customer
         """
 
         if request.user.customer.id != customer_id:
@@ -374,7 +367,7 @@ class ManageCustomer(LoginRequiredMixin, View):
         # get all customers
     def post(self, request, customer_id):
         """
-        
+        บัยทึกฟอร์ม Customer
         """
         # edit customer
         customer_instance = Customer.objects.get(pk=customer_id)
@@ -388,15 +381,14 @@ class ManageCustomer(LoginRequiredMixin, View):
     
     def delete(self, request, customer_id):
         """
-        - delete customer account
-        - only manager is allow
+        ลบ Customer ออกจากระบบ
         """
         
         if not request.user.is_staff:
             return HttpResponseForbidden("คุณไม่มีสิทธิ์ลบบัญชีผู้ใช้งาน")
         
         try:
-            Customer.objects.get(pk=customer_id).delete()
+            User.objects.get(customer__id=customer_id).delete()
             return JsonResponse({"success": True})
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
@@ -446,7 +438,7 @@ class EmployeeList(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     permission_required=['auth.view_user']
     def get(self, request):
-        employees = User.objects.filter(Q(is_staff=False) & Q(customer=None))
+        employees = User.objects.filter(Q(is_staff=False) and Q(customer=None))
         context = {'title': 'พนักงาน', 'employees': employees}
         return render(request, 'manager/account.html', context)
     
@@ -456,14 +448,20 @@ class CreateEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['auth.add_user', 'auth.view_user']
 
     def get(self, request):
-         # สร้างบัญชีพนักงานใหม่
+        """
+        แสดงฟอร์มการสร้าง Customer
+        """
+         
         form = EmployeeCreateForm()
         context = {"form": form}
         return render(request, './registration/sign-up.html', context)
 
     def post(self, request):
+        """
+        ฟอร์มรองรับการสร้าง Customer
+        """
+         
         form = EmployeeCreateForm(request.POST)
-        print(form.data)
         if form.is_valid():
             user = form.save()
             user.set_password(form.cleaned_data.get("password1"))
@@ -479,21 +477,17 @@ class CreateEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 
 class ManageEmployee(LoginRequiredMixin, UserPassesTestMixin, View):
-    # มาเพิ่ม permission ด้วย
     login_url = '/login/'
     def test_func(self):
-        """"
-        - not allow : customer
-        - allow : manager, employee
+        """
+
         """
         return not self.request.user.groups.filter(name='customer').exists()
         
     
     def get(self, request, emp_id=None):
         """"
-        - allow : employee with their own edit profile
-        - show create page if emp_id = None
-        - show edit page if emp_id is not None
+        แสดง Form การแก้ไข Employee
         """
         if request.user.id != emp_id:
             # หาก employee พยายามแก้ url เพื่อไปแก้ข้อมูลคนอื่นจะถูกส่งกลับไปที่ id ตนเอง
@@ -507,8 +501,7 @@ class ManageEmployee(LoginRequiredMixin, UserPassesTestMixin, View):
         
     def post(self, request, emp_id):
         """
-        - create employee form if no emp_id
-        - edit form if emp_id
+        บันทึก form จากการ post
         """
         try:
             # ดึง instance ของ User ที่ต้องการแก้ไข
@@ -531,9 +524,11 @@ class ManageEmployee(LoginRequiredMixin, UserPassesTestMixin, View):
             return render(request, 'manager/employee_form.html', {'form': form, 'errors': form.errors})
 
     def delete(self, request, emp_id):
+        """
+        
+        """
         if not request.user.is_staff:
             return HttpResponseForbidden("คุณไม่มีสิทธิ์ลบพนักงาน")
-
         try:
             User.objects.get(pk=emp_id).delete()
             return JsonResponse({"success": True})

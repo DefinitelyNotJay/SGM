@@ -266,7 +266,6 @@ Home Page
       selectedProducts = [...selectedProducts, { id: id, amount: product_amount, name: name, price: price, quantity: quantity }]
     }
     else {
-      console.log(product_id)
       inputAmountFieldHandler(product_id, false)
       deleteElement(product_id)
     }
@@ -339,7 +338,6 @@ Home Page
     const payment_form = document.getElementById('payment_form')
     input_field.value = ordered_product
     payment_form.submit()
-
   }
 
 

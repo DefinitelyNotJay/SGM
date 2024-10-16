@@ -145,6 +145,7 @@
       cancelButtonColor: "#d33",
     }).then(result=>{
       if(result.isConfirmed){
+        alert(`/${role}/${id}/`)
         fetch(`/${role}/${id}/`, {
           method: 'DELETE',
           headers: {
