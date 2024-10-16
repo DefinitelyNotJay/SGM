@@ -159,22 +159,20 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
         current_year = datetime.now().year
 
         # รับคะแนนสะสม
-        customers = Customer.objects.annotate(
+        customers = Customer.objects.filter(
+            order__date__month=current_month,
+            order__date__year=current_year
+        ).annotate(
             total_spent=Sum('order__total_price'),
             loyalty_points=F('loyaltypoints__points')
-        ).filter(
-            order__date__month=current_month,
-            order__date__year=current_year,
-            total_spent__isnull=False
-        ).order_by('-total_spent')
+        ).filter(total_spent__isnull=False).order_by('-total_spent')
 
-        products = Product.objects.annotate(bestseller=Sum(F('orderitem__amount'))).filter(
-            orderitem__order__date__month=current_month,
-            orderitem__order__date__year=current_year,
-            bestseller__isnull=False
-        ).order_by('-bestseller')
-        for product in products:
-            print(f"Product: {product.name}, bestseller: {product.bestseller}")
+        products = Product.objects.annotate(total_sold=Sum('orderitem__amount', 
+                                            filter=Q(orderitem__order__date__month=current_month, 
+                                                     orderitem__order__date__year=current_year))
+                                            ).filter(total_sold__gt=0).order_by('-total_sold')
+
+
 
         allcustomer = Customer.objects.all().count()
 
