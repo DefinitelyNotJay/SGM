@@ -8,7 +8,7 @@ from store.forms.authentication import *
 from store.forms.order import *
 from store.forms.product import *
 from django.forms.models import model_to_dict
-from django.db.models import Sum, Count, F, Value
+from django.db.models import Sum, Count, F, Value, Q
 from datetime import datetime
 from django.utils.timezone import *
 import json
@@ -22,7 +22,6 @@ from django.contrib.auth.models import Group, User
 from .s3 import upload_file, get_client
 from store.utils.sort import sort_products
 from store.forms.CategoryForm import *
-from django.db.models.functions import Coalesce
 
 
 
@@ -74,24 +73,35 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     def post(self, request):
         ordered_products = json.loads(request.body)
-        print(ordered_products)
         products = ordered_products.get('storage_products')
         amount = int(ordered_products.get('storage_amount'))
         total = float(ordered_products.get('total'))
         customer_id = ordered_products.get('customer_id')
         payment_method = ordered_products.get('payment_method')
-        
+
+
         try:
             customer = Customer.objects.filter(user__username=customer_id).first()
+            loyaltyPoint = LoyaltyPoints.objects.get_or_create(customer_id=customer.id)
+
+            
+            
             order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID', payment_method=payment_method)
             
+            total_cost = 0
+
             for product in products:
+                
                 OrderItem.objects.create(order=order, product=Product.objects.get(id=product['id']), amount=product['amount'])
                 use_product = Product.objects.get(pk=product['id'])
+                total_cost += use_product.price
                 quantity = use_product.quantity_in_stock
                 use_product.quantity_in_stock = quantity - product['amount']
                 use_product.save()
-                
+            
+            loyaltyPoint[0].points = total_cost / 50
+            loyaltyPoint[0].save()
+
             return JsonResponse({'status': 'complete'})
         except Exception as e:
             print(e)
@@ -149,25 +159,12 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
         # รับคะแนนสะสม
         customers = Customer.objects.annotate(
             total_spent=Sum('order__total_price'),
-            loyalty_points=Coalesce(Subquery(
-                LoyaltyPoints.objects.filter(customer=OuterRef('pk')).values('points')[:1]
-            ), Value(0))
+            loyalty_points=Q('points')
         ).filter(
             order__date__month=current_month,
             order__date__year=current_year,
             total_spent__isnull=False
         ).order_by('-total_spent')
-
-        # อัปเดตคะแนนสะสมสำหรับลูกค้าแต่ละราย 
-        for customer in customers:
-            # คำนวณคะแนนสะสมตามยอดรวมที่ใช้จ่าย 
-            loyalty_points = customer.total_spent // 50  # 1 คะแนนสำหรับการใช้จ่ายทุกๆ 50 บาท 
-
-            # อัปเดตหรือสร้างเรกคอร์ด LoyaltyPoints 
-            loyalty_record, created = LoyaltyPoints.objects.get_or_create(customer=customer)
-            loyalty_record.points = loyalty_points
-            loyalty_record.save()
-        
 
         products = Product.objects.annotate(bestseller=Sum(F('orderitem__amount'))).filter(
             orderitem__order__date__month=current_month,
