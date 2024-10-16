@@ -85,6 +85,9 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
             order = None
             if customer_id:
                 customer = Customer.objects.filter(user__username=customer_id).first()
+                
+                if not customer:
+                    return HttpResponseNotFound("ไม่มีบัญชีนี้ในระบบ")
         
                 loyaltyPoint = LoyaltyPoints.objects.get_or_create(customer_id=customer.id)
 
@@ -104,10 +107,11 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
                 use_product.quantity_in_stock = quantity - product['amount']
                 use_product.save()
 
-                total_cost += use_product.price * amount
+                total_cost += use_product.price * product['amount']
             
             if customer_id:
-                loyaltyPoint[0].points += (total_cost // 50)
+                print(loyaltyPoint[0].points, total_cost, (total_cost // 50))
+                loyaltyPoint[0].points = loyaltyPoint[0].points + (total_cost // 50)
                 loyaltyPoint[0].save()
 
             return JsonResponse({'status': 'complete'})
