@@ -307,11 +307,24 @@ Home Page
 
   function updateAmountChange(product_id) {
     const product_amount = getProductAmount(product_id)
+    const product = selectedProducts.find(product => product.id === product_id);
 
     if (product_amount <= 0) {
       // employee enters 0 means that item is no longer in the cart
       inputAmountFieldHandler(product_id, false)
       deleteElement(product_id)
+    } else if (product_amount > product.quantity) {
+        // If amount exceeds stock quantity
+        Swal.fire({
+            title: 'จำนวนสินค้าผิดพลาด',
+            text: "จำนวนที่เลือกเกินจำนวนที่มีอยู่ในสต็อก",
+            icon: 'warning',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'ตกลง'
+        });
+        // Reset the input field to the maximum available quantity
+        setProductAmount(product_id, product.quantity);
+        return;
     } else {
       // update amount number
       const product = selectedProducts.find(product => product.id == product_id)

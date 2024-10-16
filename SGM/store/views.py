@@ -173,11 +173,13 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
             loyalty_record.points = loyalty_points
             loyalty_record.save()
 
-        products = Product.objects.annotate(bestseller=Sum('orderitem__amount')).filter(
+        products = Product.objects.annotate(bestseller=Sum(F('orderitem__amount'))).filter(
             orderitem__order__date__month=current_month,
             orderitem__order__date__year=current_year,
             bestseller__isnull=False
         ).order_by('-bestseller')
+        for product in products:
+            print(f"Product: {product.name}, bestseller: {product.bestseller}")
 
         allcustomer = Customer.objects.all().count()
 
@@ -200,9 +202,14 @@ class ViewStock(View):
         title = ''
         products_new = []
         if category is None:
-            products = Product.objects.all().annotate(total_sale=Sum(F('orderitem__amount'))).order_by('-total_sale')[:5]  # ดึงสินค้าทั้งหมด
-            products_new = Product.objects.all().order_by('-add_date')[:5]
-            title='ขายดีประจำวัน'
+            products = Product.objects.annotate(total_sale=Sum(F('orderitem__amount'))
+                                                ).filter(total_sale__isnull=False).order_by('-total_sale')[:5]  # แสดงเฉพาะ 5 อันดับแรกของสินค้าที่ขายดีที่สุด
+            for product in products:
+                print(f"Product: {product.name}, Total Sale: {product.total_sale}")
+
+            products_new = Product.objects.all().order_by('-add_date')[:5] # แสดงสินค้าใหม่ 5 อันดับ
+            title='สินค้าขายดี'
+            print(products)
         elif category=='all':
             products = Product.objects.all()
             title='ทั้งหมด'

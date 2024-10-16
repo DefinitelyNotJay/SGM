@@ -29,7 +29,7 @@ def product_image_path(instance, filename):
 class Product(models.Model):
     name = models.CharField(max_length=120)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity_in_stock = models.IntegerField()
+    quantity_in_stock = models.PositiveIntegerField(default=0)
     add_date = models.DateTimeField(default=datetime.now())
     categories = models.ManyToManyField(Category)
     image_url = models.URLField(null=True, blank=True)
