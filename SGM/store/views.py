@@ -22,6 +22,7 @@ from django.contrib.auth.models import Group, User
 from .s3 import upload_file, get_client
 from store.utils.sort import sort_products
 from store.forms.CategoryForm import *
+from django.db.models.functions import Coalesce
 
 
 
@@ -121,6 +122,7 @@ class ListCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/login/'
+
     def test_func(self):
         print(self.request.user.groups.all())
         return self.request.user.groups.filter(name='manager').exists()
@@ -139,28 +141,54 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
         "November": "พฤศจิกายน",
         "December": "ธันวาคม",
     }
+
     def get(self, request):
         current_month = datetime.now().month
         current_year = datetime.now().year
-        
-        customers = Customer.objects.annotate(total_spent=Sum('order__total_price')).filter(
+
+        # รับคะแนนสะสม
+        customers = Customer.objects.annotate(
+            total_spent=Sum('order__total_price'),
+            loyalty_points=Coalesce(Subquery(
+                LoyaltyPoints.objects.filter(customer=OuterRef('pk')).values('points')[:1]
+            ), Value(0))
+        ).filter(
             order__date__month=current_month,
             order__date__year=current_year,
-            total_spent__isnull=False)
-        products = Product.objects.annotate(bestseller=Sum('orderitem__amount')).filter(
+            total_spent__isnull=False
+        ).order_by('-total_spent')
+
+        # อัปเดตคะแนนสะสมสำหรับลูกค้าแต่ละราย 
+        for customer in customers:
+            # คำนวณคะแนนสะสมตามยอดรวมที่ใช้จ่าย 
+            loyalty_points = customer.total_spent // 50  # 1 คะแนนสำหรับการใช้จ่ายทุกๆ 50 บาท 
+
+            # อัปเดตหรือสร้างเรกคอร์ด LoyaltyPoints 
+            loyalty_record, created = LoyaltyPoints.objects.get_or_create(customer=customer)
+            loyalty_record.points = loyalty_points
+            loyalty_record.save()
+
+        products = Product.objects.annotate(bestseller=Sum(F('orderitem__amount'))).filter(
             orderitem__order__date__month=current_month,
             orderitem__order__date__year=current_year,
-            bestseller__isnull=False).order_by('-bestseller')
-    
+            bestseller__isnull=False
+        ).order_by('-bestseller')
+        for product in products:
+            print(f"Product: {product.name}, bestseller: {product.bestseller}")
+
         allcustomer = Customer.objects.all().count()
 
         current_date = now()
         current_month_name_en = current_date.strftime("%B")
         current_month_name_th = self.MONTHS_EN_TO_TH.get(current_month_name_en, current_month_name_en)
 
-
-        return render(request, 'manager/statistics.html', {'customers': customers , 'products':products, 'allcustomer':allcustomer, 'current_month_name_th': current_month_name_th})
-
+        return render(request, 'manager/statistics.html', {
+            'customers': customers,
+            'products': products,
+            'allcustomer': allcustomer,
+            'current_month_name_th': current_month_name_th,
+        })
+    
 class ViewStock(View):
     def get(self, request):
         categories_obj = Category.objects.all().values("name")
@@ -169,9 +197,14 @@ class ViewStock(View):
         title = ''
         products_new = []
         if category is None:
-            products = Product.objects.all().annotate(total_sale=Sum(F('orderitem__amount'))).order_by('-total_sale')[:5]  # ดึงสินค้าทั้งหมด
-            products_new = Product.objects.all().order_by('-add_date')[:5]
-            title='ขายดีประจำวัน'
+            products = Product.objects.annotate(total_sale=Sum(F('orderitem__amount'))
+                                                ).filter(total_sale__isnull=False).order_by('-total_sale')[:5]  # แสดงเฉพาะ 5 อันดับแรกของสินค้าที่ขายดีที่สุด
+            for product in products:
+                print(f"Product: {product.name}, Total Sale: {product.total_sale}")
+
+            products_new = Product.objects.all().order_by('-add_date')[:5] # แสดงสินค้าใหม่ 5 อันดับ
+            title='สินค้าขายดี'
+            print(products)
         elif category=='all':
             products = Product.objects.all()
             title='ทั้งหมด'
@@ -535,14 +568,27 @@ class ManageEmployee(LoginRequiredMixin, UserPassesTestMixin, View):
         except:
             return HttpResponseBadRequest("ไม่มีผู้ใช้นี้ในระบบ")
         
+
 class Viewpoint(View):
     def get(self, request):
-        # หน้าดูคะแนน
-        customer = request.user.id
+        # ดึงข้อมูล Customer ที่เชื่อมโยงกับ user ปัจจุบัน
+        customer = Customer.objects.get(user=request.user)
+        
         # ยอดที่ใช้จ่ายของลูกค้าคนปัจจุบัน
-        my_spent = Order.objects.filter(customer=customer, status=Order.StatusChoices.PAID).aggregate(Sum('total_price'))['total_price__sum'] or 0
+        my_spent = Order.objects.filter(customer=customer, status='PAID').aggregate(Sum('total_price'))['total_price__sum'] or 0
+        
         # คำนวณคะแนนของลูกค้าคนปัจจุบัน (1 point per 50 THB spent)
         mypoints = my_spent // 50  
+
+        # ตรวจสอบให้มั่นใจว่า mypoints ไม่เป็น null และตั้งค่าเริ่มต้นเป็น 0 หากพบว่าเป็น null
+        mypoints = mypoints if mypoints is not None else 0
+
+        # บันทึกหรืออัปเดตคะแนนสะสมลงใน LoyaltyPoints
+        loyalty_record, created = LoyaltyPoints.objects.get_or_create(customer=customer, defaults={'points': mypoints})
+
+        if not created:  # ถ้าเรคคอร์ดมีอยู่แล้ว ให้อัปเดตคะแนนใหม่
+            loyalty_record.points = mypoints
+            loyalty_record.save()
 
         # ดึงข้อมูลลูกค้าที่มียอดใช้จ่ายมากที่สุด 5 คน พร้อมคะแนน
         top_customers_data = (
@@ -552,7 +598,8 @@ class Viewpoint(View):
             .annotate(total_spent=Sum('total_price'))
             .order_by('-total_spent')[:5]
         )
-          # คำนวณคะแนนสำหรับลูกค้าแต่ละคน
+        
+        # คำนวณคะแนนสำหรับลูกค้าแต่ละคน
         for customer_data in top_customers_data:
             customer_data['total_point'] = customer_data['total_spent'] // 50  # คำนวณคะแนน
 
