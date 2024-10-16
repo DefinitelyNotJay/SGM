@@ -171,13 +171,11 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
     total_spent=Sum('order__total_price', filter=Q(order__date__month=current_month, order__date__year=current_year))).filter(total_spent__isnull=False).annotate(
     loyalty_points=F('loyaltypoints__points')).order_by('-total_spent')
 
-        products = Product.objects.annotate(bestseller=Sum(F('orderitem__amount'))).filter(
-            orderitem__order__date__month=current_month,
-            orderitem__order__date__year=current_year,
-            bestseller__isnull=False
-        ).order_by('-bestseller')
+        products = Product.objects.annotate(
+        total_sold=Sum('orderitem__amount', filter=Q(orderitem__order__date__month=current_month, orderitem__order__date__year=current_year))).filter(total_sold__gt=0).order_by('-total_sold')
+
         for product in products:
-            print(f"Product: {product.name}, bestseller: {product.bestseller}")
+            print(f"Product: {product.name}, bestseller: {product.total_sold}")
 
         allcustomer = Customer.objects.all().count()
 
