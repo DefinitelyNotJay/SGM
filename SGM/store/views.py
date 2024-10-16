@@ -22,6 +22,7 @@ from django.contrib.auth.models import Group, User
 from .s3 import upload_file, get_client
 from store.utils.sort import sort_products
 from store.forms.CategoryForm import *
+from django.db.models.functions import Coalesce
 
 
 
@@ -159,7 +160,7 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
         # รับคะแนนสะสม
         customers = Customer.objects.annotate(
             total_spent=Sum('order__total_price'),
-            loyalty_points=Q('points')
+            loyalty_points=F('loyaltypoints__points')
         ).filter(
             order__date__month=current_month,
             order__date__year=current_year,
@@ -501,11 +502,6 @@ class CreateEmployee(LoginRequiredMixin, PermissionRequiredMixin, View):
             user.save()
             return redirect('/login/')
         return render(request, './registration/sign-up.html', {'form': form})
-            
-
-
-
-
 
 class ManageEmployee(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/login/'
