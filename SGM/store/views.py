@@ -83,10 +83,10 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         try:
             customer = Customer.objects.filter(user__username=customer_id).first()
+    
             loyaltyPoint = LoyaltyPoints.objects.get_or_create(customer_id=customer.id)
+            print(loyaltyPoint[0])
 
-            
-            
             order = Order.objects.create(customer=customer, total_price=total, quantity=amount, status='PAID', payment_method=payment_method)
             
             total_cost = 0
@@ -99,6 +99,7 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
                 quantity = use_product.quantity_in_stock
                 use_product.quantity_in_stock = quantity - product['amount']
                 use_product.save()
+            
             
             loyaltyPoint[0].points = total_cost / 50
             loyaltyPoint[0].save()

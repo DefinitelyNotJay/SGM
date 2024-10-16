@@ -61,4 +61,4 @@ class OrderItem(models.Model):
 
 class LoyaltyPoints(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    points = models.IntegerField()
+    points = models.IntegerField(default=0)
