@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>  {% block title %} {% endblock %} </title>
+    <title> {% block title %} {% endblock %} </title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
@@ -11,13 +12,39 @@
         body {
             font-family: 'Noto Sans Thai', sans-serif;
         }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            border: 1px solid #ccc;
+            /* สีกรอบ */
+            border-radius: 5px;
+            /* มุมมน */
+            padding: 10px;
+            /* ระยะห่างภายใน */
+            width: 100%;
+            /* ให้เต็มความกว้าง */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            /* เงา */
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #007bff;
+            /* เปลี่ยนสีกรอบเมื่อมีการโฟกัส */
+            outline: none;
+            /* ไม่แสดงกรอบโฟกัสเดิม */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            /* เงาเมื่อมีการโฟกัส */
+        }
     </style>
 
     {% block nav %}
     {% endblock %}
 
     {% block head %}
-    
+
     {% endblock %}
 </head>
 
@@ -31,4 +58,5 @@
     {% endblock %}
 
 </body>
+
 </html>

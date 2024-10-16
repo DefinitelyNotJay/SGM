@@ -445,13 +445,15 @@ class CreateCustomer(View):
                 username = form_auth.cleaned_data.get('username')
                 first_name = form_auth.cleaned_data.get('first_name')
                 last_name = form_auth.cleaned_data.get('last_name')
+                email = form_auth.cleaned_data.get('email')
                 password = form_auth.cleaned_data.get('password1')
 
                 # สร้าง User
                 user = User.objects.create(
                     username=username, 
                     first_name=first_name, 
-                    last_name=last_name
+                    last_name=last_name,
+                    email=email
                 )
                 user.set_password(password)
                 # เพิ่ม customer group ให้ ลูกค้า
