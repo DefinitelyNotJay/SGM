@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
     <style>
         body {
             font-family: 'Noto Sans Thai', sans-serif;
@@ -37,6 +39,57 @@
             /* ไม่แสดงกรอบโฟกัสเดิม */
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
             /* เงาเมื่อมีการโฟกัส */
+        }
+
+        .container {
+            max-width: 600px;
+            /* จำกัดความกว้างของคอนเทนเนอร์ */
+            margin: auto;
+            /* จัดให้อยู่กลาง */
+        }
+
+        .alert {
+            border-radius: 8px;
+            /* ทำให้มุมมน */
+            padding: 20px;
+            /* เพิ่มพื้นที่ภายใน */
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            /* ปรับสีปุ่ม */
+            border: none;
+            transition: background-color 0.3s ease;
+            /* เพิ่มการเปลี่ยนแปลงสี */
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            /* เปลี่ยนสีเมื่อเลื่อนเมาส์ */
+        }
+
+        .card {
+            border-radius: 10px;
+            /* ทำให้มุมมน */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* เพิ่มเงาให้กับการ์ด */
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            /* เปลี่ยนสีพื้นหลังของหัวการ์ด */
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            /* สีพื้นหลังปุ่ม */
+            border: none;
+            /* ไม่มีขอบ */
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+            /* สีพื้นหลังเมื่อชี้เมาส์ */
         }
     </style>
 

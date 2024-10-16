@@ -22,11 +22,21 @@ from django.contrib.auth.models import Group, User
 from .s3 import upload_file, get_client
 from store.utils.sort import sort_products
 from store.forms.CategoryForm import *
-from django.db.models.functions import Coalesce
-
+from django.contrib.auth import views as auth_views
 
 
 # Create your views here.
+class PasswordResetView(auth_views.PasswordResetView):
+    template_name = 'users_hub/password_reset.html'
+
+class PasswordResetDoneView(auth_views.PasswordResetDoneView):
+    template_name = 'users_hub/password_reset_done.html'
+
+class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = 'users_hub/password_reset_confirm.html'
+
+class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    template_name = 'users_hub/password_reset_complete.html'
 
 class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_order', 'store.add_order', 'store.change_order', 'store.delete_order']

@@ -22,8 +22,8 @@
 {% endblock nav %}
 
 {% block content %}
-<div class="flex items-center justify-center gap-14 p-8">
-    <div class="min-w-screen rounded-md grid grid-cols-2 gap-x-1 justify-items-center">
+<div class="flex items-center justify-center gap-14  p-8 ">
+    <div class="min-w-screen rounded-md flex flex-col justify-center">
         <form method="post" class="bg-gray-100 shadow-md w-fit rounded-lg p-6">
             <h1 class="text-2xl text-center font-semibold mb-6">
                 {% if isCreate %}
@@ -62,6 +62,20 @@
                 </div>
             </div>
 
+            <div class='flex gap-4'>
+                <div class="flex flex-col w-full mb-4">
+                    <label for="{{ form.gender.id_for_label }}" class="mb-1 font-medium">เพศ</label>
+                    {{ form.gender|add_class:"px-2 py-1 border w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-400" }}
+                    <div class="text-red-500 mt-1 text-sm">{{ form.gender.errors }}</div>
+                </div>
+
+                <div class="flex flex-col w-full mb-4">
+                    <label for="{{ form.nickname.id_for_label }}" class="mb-1 font-medium">ชื่อเล่น</label>
+                    {{ form.nickname|add_class:"px-2 py-1 border w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-400" }}
+                    <div class="text-red-500 mt-1 text-sm">{{ form.nickname.errors }}</div>
+                </div>
+            </div>
+
             {% if isCreate %}
             <div class='flex gap-4'>
                 <div class="flex flex-col w-full mb-4">
@@ -78,21 +92,7 @@
             </div>
             {% endif %}
 
-            <div class='flex gap-4'>
-                <div class="flex flex-col w-full mb-4">
-                    <label for="{{ form.gender.id_for_label }}" class="mb-1 font-medium">เพศ</label>
-                    {{ form.gender|add_class:"px-2 py-1 border w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-400" }}
-                    <div class="text-red-500 mt-1 text-sm">{{ form.gender.errors }}</div>
-                </div>
-
-                <div class="flex flex-col w-full mb-4">
-                    <label for="{{ form.nickname.id_for_label }}" class="mb-1 font-medium">ชื่อเล่น</label>
-                    {{ form.nickname|add_class:"px-2 py-1 border w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-400" }}
-                    <div class="text-red-500 mt-1 text-sm">{{ form.nickname.errors }}</div>
-                </div>
-            </div>
-
-            {% if not user.customer %}
+            {% if not user.customer and user.is_authenticated %}
             <div class="flex flex-col mb-4">
                 <label for="{{ form.notes.id_for_label }}" class="mb-1 font-medium">หมายเหตุ</label>
                 {{ form.notes|add_class:"p-1.5 border rounded h-20 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none w-full" }}
