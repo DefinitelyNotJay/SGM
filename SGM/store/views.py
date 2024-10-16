@@ -167,6 +167,7 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
             loyalty_record, created = LoyaltyPoints.objects.get_or_create(customer=customer)
             loyalty_record.points = loyalty_points
             loyalty_record.save()
+        
 
         products = Product.objects.annotate(bestseller=Sum(F('orderitem__amount'))).filter(
             orderitem__order__date__month=current_month,
