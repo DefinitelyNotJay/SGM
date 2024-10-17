@@ -44,7 +44,7 @@ class ProductForm(forms.ModelForm):
     
     def clean_name(self):
         name = self.cleaned_data.get("name")
-        if(Product.objects.filter(name=name).count() > 0):
+        if Category.objects.filter(name=name).exists():
             self.add_error("name", "มีสินค้านี้อยู่แล้วในระบบ")
         return name
         
