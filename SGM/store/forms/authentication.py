@@ -19,6 +19,7 @@ class EmployeeCreateForm(UserCreationForm):
     class Meta:
         model = User
         fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
+    
 
 class UserUpdateForm(forms.ModelForm):
     """
@@ -79,8 +80,6 @@ class ChangePasswordForm(forms.Form):
             self.add_error("password2", message)
         return cleaned_data
         
-        
-
 
 class CustomerCreateForm(ModelForm):
     """
