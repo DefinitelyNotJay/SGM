@@ -79,11 +79,13 @@ class ChangePasswordForm(forms.Form):
         cleaned_data = super().clean()
         new_pass = cleaned_data.get('new_password')
         confirm_pass = cleaned_data.get('confirm_password')
+        print(new_pass, "vs", confirm_pass)
 
         if new_pass != confirm_pass:
+            print("It's in")
             message = 'รหัสผ่านทั้ง 2 ช่องต้องตรงกัน'
-            self.add_error("password1", message)
-            self.add_error("password2", message)
+            self.add_error("new_password", message)
+            self.add_error("confirm_password", message)
         return cleaned_data
         
         

@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 from store.forms.authentication import *
@@ -59,14 +60,16 @@ class ChangePassword(View):
         context = {'form': password_form}
         return render(request, 'registration/change-password.html', context)
     def post(self, request):
+        print(request.get_full_path())
         form = ChangePasswordForm(request.POST)
         user = User.objects.get(pk=request.user.id)
         if form.is_valid():
             if not request.user.check_password(form.cleaned_data['old_password']):
-                print('why bro')
                 form.add_error("old_password", "รหัสผ่านเก่าไม่ถูกต้อง")
-                context = {'form': form}
-                return render(request, 'registration/change-password.html', context)
+                # context = {'form': form}
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+            if form.has_error("confirm_password"):
+                return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
             user.set_password(form.cleaned_data['confirm_password'])
             user.save()
         return redirect('/')
