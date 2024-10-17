@@ -22,7 +22,7 @@
       {% csrf_token %}
       <div class='flex flex-col p-1 gap-3'> 
         <div class="flex flex-col p-1">
-          <label for='{{ form.username.id_for_label }}'>เบอร์โทรศัพท์</label>
+          <label for='{{ form.username.id_for_label }}'>ชื่อผู้ใช้</label>
           {{form.username|add_class:"px-3 py-2 border rounded focus:border-blue-300"}}
           <div class="text-red-500">{{form.username.errors}}</div>
         </div>
