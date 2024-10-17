@@ -66,7 +66,7 @@
               <tr class="border-b hover:bg-gray-50 transition duration-200">
                 <td class="px-6 py-4">{{ employee.username }}</td>
                 <td class="px-6 py-4">{{ employee.first_name }} {{ employee.last_name }}</td>
-                <td class="px-6 py-4">{{ employee.date_joined | date:"d-m-Y" }}</td>
+                <td class="px-6 py-4">{{ employee.date_joined | date:"d M Y" }}</td>
                 {% if user.is_staff %}
                   <td class="px-6 py-4 flex gap-2">
                     <button onclick="deleteUser('employee', '{{ employee.id }}')" class="p-2  hover:bg-[#fdfdff] bg-red-600 hover:text-[#333] text-[#fdfdff] border rounded  transition duration-300">
@@ -111,7 +111,7 @@
                     อื่นๆ
                   {% endif %}
                 </td>
-                <td class="px-6 py-4">{{ customer.join_date | date:"d-m-Y" }}</td>
+                <td class="px-6 py-4">{{ customer.join_date | date:"d M Y" }}</td>
                 {% if perms.auth.add_user %}
                 <td class="px-6 py-4 flex gap-2">
                   <button onclick="deleteUser('customer', '{{ customer.id }}')" class="p-2  hover:bg-[#fdfdff] bg-red-600 hover:text-[#333] text-[#fdfdff] border rounded  transition duration-300">
@@ -145,7 +145,6 @@
       cancelButtonColor: "#d33",
     }).then(result=>{
       if(result.isConfirmed){
-        alert(`/${role}/${id}/`)
         fetch(`/${role}/${id}/`, {
           method: 'DELETE',
           headers: {

@@ -490,7 +490,7 @@ class EmployeeList(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     permission_required=['auth.view_user']
     def get(self, request):
-        employees = User.objects.filter(Q(is_staff=False) and Q(customer=None))
+        employees = User.objects.filter(is_staff=False, customer=None)
         context = {'title': 'พนักงาน', 'employees': employees}
         return render(request, 'manager/account.html', context)
     
