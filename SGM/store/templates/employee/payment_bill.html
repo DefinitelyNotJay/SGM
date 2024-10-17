@@ -143,13 +143,23 @@
             body: JSON.stringify({ ...ordered_product, 'total': '{{ total }}', 'customer_id': customer_id || 0, 'payment_method': paymentMethod })
         }).then((res) => {
             res.json().then(data => {
-                localStorage.removeItem("ordered_product");
-                Swal.fire({
-                    title: 'ชำระเงินสำเร็จ !',
-                    icon: 'success',
-                    showConfirmButton: false,
-                    timer: 1500
-                  }).then(result=>window.location.href =  '/payment')
+                
+                if(!data.status){
+                    Swal.fire({
+                        title: 'ไม่พบผู้ใช้นี้ในระบบ !',
+                        icon: 'warning',
+                        showConfirmButton: false,
+                        timer: 1500
+                      })
+                } else {
+                    localStorage.removeItem("ordered_product");
+                    Swal.fire({
+                        title: 'ชำระเงินสำเร็จ !',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                      }).then(result=>window.location.href =  '/payment')
+                }
             });
         });
     }
