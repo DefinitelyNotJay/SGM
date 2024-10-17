@@ -421,10 +421,13 @@ class ManageCustomer(LoginRequiredMixin, View):
         """
         # edit customer
         customer_instance = Customer.objects.get(pk=customer_id)
+        user_instance = User.objects.get(customer__id=customer_id)
         form = CustomerCreateForm(request.POST, instance=customer_instance)
-        if form.is_valid():
+        customer_user_form = UserUpdateForm(request.POST, instance=user_instance)
+        if form.is_valid() and customer_user_form.is_valid():
             try:
                 form.save()
+                customer_user_form.save()
                 return redirect("/")
             except Exception as e:
                 return HttpResponseServerError()
