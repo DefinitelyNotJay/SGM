@@ -1,18 +1,18 @@
 {% extends './layout.html' %}
 
 {% block nav %}
-{% include './navbar_manager.html' %}
+    {% include './navbar_manager.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="container px-4 py-8 p-7">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
         {% if category %} แก้ไขประเภทสินค้า: {{ category.name }} {% else %} เพิ่มประเภทสินค้าใหม่ {% endif %}
     </h1>
     
-    <div class='flex place-content-center'>
-        <div class="bg-white w-1/2 shadow-lg rounded-lg overflow-hidden">
-            <div class="px-10 py-10">
+    <div class="flex justify-center">
+        <div class="bg-white w-full max-w-md shadow-lg rounded-lg overflow-hidden">
+            <div class="px-8 py-8">
                 <form method="POST" enctype="multipart/form-data" class="space-y-4">
                     {% csrf_token %}
 
@@ -22,12 +22,11 @@
                         </label>
                         {{ form.name }}
                         {% if form.name.errors %}
-                        <p class="text-red-500 text-xs italic">{{ form.name.errors }}</p>
+                        <p class="text-red-500 text-xs italic">{{ form.name.errors }}</p> <!-- ทำให้ข้อความแสดงข้อผิดพลาดเป็นสีแดง -->
                         {% endif %}
                     </div>
 
-                    <button type="submit"
-                        class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
                         {% if category %} แก้ไขประเภทสินค้า {% else %} เพิ่มประเภทสินค้า {% endif %}
                     </button>
                 </form>
