@@ -146,7 +146,6 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/login/'
 
     def test_func(self):
-        print(self.request.user.groups.all())
         return self.request.user.groups.filter(name='manager').exists()
 
     MONTHS_EN_TO_TH = {
@@ -167,10 +166,7 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
     def get(self, request):
         current_month = datetime.now().month
         current_year = datetime.now().year
-        
-        print(current_month, current_year)
 
-        # รับคะแนนสะสม
         customers = Customer.objects.annotate(
     total_spent=Sum('order__total_price', filter=Q(order__date__month=current_month, order__date__year=current_year))).filter(total_spent__isnull=False).annotate(
     loyalty_points=F('loyaltypoints__points')).order_by('-total_spent')
@@ -178,8 +174,8 @@ class StatisticsView(LoginRequiredMixin, UserPassesTestMixin, View):
         products = Product.objects.annotate(
         total_sold=Sum('orderitem__amount', filter=Q(orderitem__order__date__month=current_month, orderitem__order__date__year=current_year))).filter(total_sold__gt=0).order_by('-total_sold')
 
-        for product in products:
-            print(f"Product: {product.name}, bestseller: {product.total_sold}")
+        # for product in products:
+        #     print(f"Product: {product.name}, bestseller: {product.total_sold}")
 
         allcustomer = Customer.objects.all().count()
 

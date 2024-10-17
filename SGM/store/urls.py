@@ -10,8 +10,8 @@ urlpatterns = [
     
     # customer
     path('', ViewStock.as_view(), name="view-product"),
+    
     # employee
-    path('stock/', Stock.as_view()),
     path('payment/', Payment.as_view()),
     path('payment/bill', PaymentBill.as_view()),
     path('payment/generate-qrcode', GenerateQRCode.as_view(), name='generate_qrcode'),
@@ -21,6 +21,7 @@ urlpatterns = [
     path('customer/viewpoint/',  Viewpoint.as_view(), name="viewpoint"),
 
     # manager
+    path('stock/', Stock.as_view()),
     path('statistics', StatisticsView.as_view(), name="statistics"),
     path('manageInventory', ManageInventory.as_view(), name="manageInventory"),
     path('manageInventory/<str:category_name>/', ManageInventory.as_view(), name='manageInvenCat'),
