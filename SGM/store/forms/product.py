@@ -41,4 +41,10 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'price', 'quantity_in_stock', 'categories', 'image']
+    
+    def clean_name(self):
+        name = self.cleaned_data.get("name")
+        if(Product.objects.filter(name=name).count() > 0):
+            self.add_error("name", "มีสินค้านี้อยู่แล้วในระบบ")
+        return name
         
