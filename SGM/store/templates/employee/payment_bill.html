@@ -117,16 +117,16 @@
     });
 
     function fetchQRCode() {
-        const customer_id = document.getElementById('customer_number').value;
-        fetch(`/payment/generate-qrcode?amount={{ total }}&customer_id=${customer_id}`)
-            .then(response => response.blob()) // blob => แปลงเป็น Blob (Binary Large Object) 
-            .then(blob => {
-                const imageUrl = URL.createObjectURL(blob);
-                document.getElementById('qrCodeImage').src = imageUrl;
-                document.getElementById('qrCodeModal').classList.remove('hidden');
-            });
-    }
-
+    // ไม่ต้องรับ customer_id จาก input
+    const amount = {{ total }}; // ใช้ total ที่ส่งมา
+    fetch(`/payment/generate-qrcode?amount=${amount}`)
+        .then(response => response.blob())
+        .then(blob => {
+            const imageUrl = URL.createObjectURL(blob);
+            document.getElementById('qrCodeImage').src = imageUrl;
+            document.getElementById('qrCodeModal').classList.remove('hidden');
+        });
+}
     function closePaymentModal() {
         document.getElementById('paymentModal').classList.add('hidden');
     }
