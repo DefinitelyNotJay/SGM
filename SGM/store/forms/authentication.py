@@ -41,17 +41,22 @@ class CustomerUserForm(forms.Form):
     password2 = forms.CharField(widget=forms.PasswordInput())
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
+    email = forms.EmailField()
     
     def clean(self):
         cleaned_data = super().clean()
         pass1 = cleaned_data.get('password1')
         pass2 = cleaned_data.get('password2')
+        email = cleaned_data.get('email')
         
         user = User.objects.filter(username=cleaned_data.get('username'))
         if(user.exists()):
             message = 'มีเบอร์โทรนี้อยู่ในระบบแล้ว'
             self.add_error("username", message)
       
+         # Validate unique email
+        if User.objects.filter(email=email).exists():
+            self.add_error("email", 'อีเมลนี้มีอยู่ในระบบแล้ว')
 
         if pass1 != pass2:
             message = 'รหัสผ่านทั้ง 2 ช่องต้องตรงกัน'
@@ -87,4 +92,4 @@ class CustomerCreateForm(ModelForm):
     """
     class Meta:
         model = Customer
-        fields = ["nickname", "gender", "notes"]
+        fields = ["nickname", "gender", "notes",]
