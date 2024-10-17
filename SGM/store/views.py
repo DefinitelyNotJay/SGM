@@ -99,7 +99,7 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
                 customer = Customer.objects.filter(user__username=customer_id).first()
                 
                 if not customer:
-                    return HttpResponseNotFound("ไม่มีบัญชีนี้ในระบบ")
+                    return JsonResponse({'status': False, 'message': "ไม่มีบัญชีนี้ในระบบ"})
         
                 loyaltyPoint = LoyaltyPoints.objects.get_or_create(customer_id=customer.id)
 
@@ -126,7 +126,7 @@ class PaymentBill(LoginRequiredMixin, PermissionRequiredMixin, View):
                 loyaltyPoint[0].points = loyaltyPoint[0].points + (total_cost // 50)
                 loyaltyPoint[0].save()
 
-            return JsonResponse({'status': 'complete'})
+            return JsonResponse({'status': True})
         except Exception as e:
             print(e)
             return HttpResponse(e)
