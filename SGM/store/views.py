@@ -22,6 +22,7 @@ from django.contrib.auth.models import Group, User
 from .s3 import upload_file, get_client
 from store.utils.sort import sort_products
 from store.forms.CategoryForm import *
+
 from django.contrib.auth import views as auth_views
 
 
@@ -37,6 +38,7 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
 
 class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
     template_name = 'users_hub/password_reset_complete.html'
+
 
 class Stock(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ['store.view_order', 'store.add_order', 'store.change_order', 'store.delete_order']
